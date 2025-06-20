@@ -23,4 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Clingies.Application\Clingies.Application.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets/icon-app-clingy.png" />
+  </ItemGroup>
 </Project>

@@ -24,5 +24,5 @@ public partial class ClingyWindow : Window
             if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
                 BeginMoveDrag(e);
         };
-    }    
+    }  
 }
