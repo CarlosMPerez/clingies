@@ -1,76 +1,101 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="Clingies.App.Windows.ClingyWindow"
-        Width="300"
-        Height="200"
-        CanResize="False"
-        TransparencyLevelHint="AcrylicBlur, Blur, Transparent"
-        Background="Black"
-        SystemDecorations="None"
-        WindowStartupLocation="CenterOwner">
-    
-    <Border BorderBrush="Black" BorderThickness="1">
-        <Grid RowDefinitions="Auto,*">
+<Window
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="Clingies.App.Windows.ClingyWindow"
+  Width="300"
+  Height="200"
+  CanResize="False"
+  Background="Black"
+  SystemDecorations="None"
+  TransparencyLevelHint="AcrylicBlur, Blur, Transparent"
+  WindowStartupLocation="CenterScreen"
+  ShowInTaskbar="False">
+<!-- 🔧 Custom Styles -->
+  <Window.Styles>
+    <!-- 1. Visual styling -->
+    <Style Selector="TextBox">
+      <Setter Property="Background" Value="#FFFFAA"/>
+      <Setter Property="Foreground" Value="Black"/>
+      <Setter Property="CaretBrush" Value="Black"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="8"/>
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="FontFamily" Value="sans-serif"/>
+    </Style>
 
-        <!-- HEADER -->
-        <Grid Background="#87CEFA" Height="30" PointerPressed="OnHeaderDrag">
-            <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition Width="30"/>
-            </Grid.ColumnDefinitions>
+    <Style Selector="TextBox /template/ Border">
+      <Setter Property="Background" Value="#FFFFAA"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
 
-            <TextBlock Text="" VerticalAlignment="Center" Margin="8,0" />
-            <!-- CLOSE BUTTON -->
-            <Button Grid.Column="1" Content="X" Background="Transparent"
-                    BorderThickness="0" Foreground="Black"
-                    FontSize="14" Click="OnClose"
-                    HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Width="20" Height="20" Padding="0"/>
-        </Grid>
-            <!-- CONTENT -->
-            <TextBox
-                Grid.Row="1"
-                x:Name="ContentBox"
-                Background="#FFFFAA"
-                Foreground="Black"
-                BorderThickness="0"
-                CaretBrush="Black"
-                FontSize="14"
-                FontWeight="Normal"
-                FontFamily="sans-serif"
-                Padding="8"
-                AcceptsReturn="True"
-                TextWrapping="Wrap"
-                Focusable="True">
+    <Style Selector="TextBox:pointerover /template/ Border">
+      <Setter Property="Background" Value="#FFFFAA"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
 
-                <TextBox.Styles>
-                    <!-- Normal state -->
-                    <Style Selector="TextBox">
-                        <Setter Property="Background" Value="#FFFFAA"/>
-                        <Setter Property="Foreground" Value="Black"/>
-                        <Setter Property="CaretBrush" Value="Black"/>
-                        <Setter Property="BorderThickness" Value="0"/>
-                    </Style>
+    <Style Selector="TextBox:focus /template/ Border">
+      <Setter Property="Background" Value="#FFFFAA"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+  </Window.Styles>
 
-                    <!-- Focused state -->
-                    <Style Selector="TextBox:focus">
-                        <Setter Property="Background" Value="#FFFFAA"/>
-                        <Setter Property="Foreground" Value="Black"/>
-                        <Setter Property="CaretBrush" Value="Black"/>
-                        <Setter Property="BorderThickness" Value="0"/>
-                    </Style>
+  <!-- 🗒️ Sticky Note UI -->
+  <Border BorderBrush="Black" BorderThickness="1">
+    <Grid RowDefinitions="Auto,*">
 
-                    <!-- Hover state -->
-                    <Style Selector="TextBox:pointerover">
-                        <Setter Property="Background" Value="#FFFFAA"/>
-                        <Setter Property="Foreground" Value="Black"/>
-                        <Setter Property="BorderThickness" Value="0"/>
-                    </Style>
-                </TextBox.Styles>                
-            </TextBox>
-        </Grid>
-    </Border>
+      <!-- HEADER -->
+      <Grid Background="#87CEFA" Height="30" PointerPressed="OnHeaderDrag">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <!-- ON TOP BUTTON -->
+        <Button
+          x:Name="PinButton"
+          Grid.Column="0"
+          Width="20" Height="30"
+          Background="Transparent"
+          BorderThickness="0"
+          Cursor="Hand"
+          Click="OnPinClick"
+          HorizontalAlignment="Left"
+          VerticalAlignment="Top"
+          Margin="0"
+          Classes="pin">
+          <Button.Styles>
+            <Style Selector="Button.pin:pointerover">
+              <Setter Property="Background" Value="#444"/>
+            </Style>
+            <Style Selector="Button.pin:pressed">
+              <Setter Property="Background" Value="#444"/>
+            </Style>
+          </Button.Styles>
+        </Button>
+
+        <!-- Empty title space (center) -->
+        <TextBlock Grid.Column="1" />        
+        
+        <!-- CLOSE BUTTON -->
+        <Button Grid.Column="2" Content="X"
+                Background="Transparent" BorderThickness="0"
+                Foreground="Black" FontSize="14"
+                Click="OnClose"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Width="20" Height="20" Padding="0"/>
+      </Grid>
+
+      <!-- CONTENT -->
+      <TextBox
+        Grid.Row="1"
+        x:Name="ContentBox"
+        AcceptsReturn="True"
+        TextWrapping="Wrap"
+        FontSize="14"
+        FontFamily="sans-serif"
+        Foreground="Black" />
+
+    </Grid>
+  </Border>  
 </Window>
