@@ -3,6 +3,7 @@ using System.IO;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
 using Clingies.Infrastructure.Migrations;
 
 namespace Clingies.App;
@@ -51,9 +52,13 @@ public partial class App : Avalonia.Application
     }
     private TrayIcon DrawTrayIcon()
     {
+        string embeddedPath = "avares://Clingies.App/Assets/icon-app-clingy.png";
+        var uri = new Uri(embeddedPath);
+        using var stream = AssetLoader.Open(uri);
+
         var trayIcon = new TrayIcon
         {
-            Icon = new WindowIcon("Assets/icon-app-clingy.png"),
+            Icon = new WindowIcon(stream),
             ToolTipText = "Clingies"
         };
 
@@ -61,7 +66,7 @@ public partial class App : Avalonia.Application
         var newItem = new NativeMenuItem("New");
         newItem.Click += OnNewClick;
         var settingsItem = new NativeMenuItem("Settings");
-        newItem.Click += OnSettingsClick;
+        settingsItem.Click += OnSettingsClick;
         var exitItem = new NativeMenuItem("Exit");
         exitItem.Click += OnExitClick;
 

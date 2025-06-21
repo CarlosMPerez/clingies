@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 
 namespace Clingies.App.Windows;
@@ -25,4 +26,10 @@ public partial class ClingyWindow : Window
                 BeginMoveDrag(e);
         };
     }  
+
+    private void OnHeaderDrag(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            BeginMoveDrag(e);
+    }    
 }

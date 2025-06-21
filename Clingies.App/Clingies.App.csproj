@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <AssemblyName>Clingies.App</AssemblyName>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -24,6 +25,6 @@
     <ProjectReference Include="..\Clingies.Application\Clingies.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <AvaloniaResource Include="Assets/icon-app-clingy.png" />
+    <AvaloniaResource Include="Assets/**" />
   </ItemGroup>
 </Project>
