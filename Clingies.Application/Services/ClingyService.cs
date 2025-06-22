@@ -6,11 +6,16 @@ namespace Clingies.Application.Services;
 
 public class ClingyService(IClingyRepository repo)
 {
-    public async Task<Clingy> CreateAsync(string title = "", string content = "")
+    public Clingy Create(string title = "", string content = "")
     {
         var clingy = ClingyFactory.CreateNew(title, content);
-        await repo.SaveAsync(clingy);
+        repo.Create(clingy);
         return clingy;
+    }
+
+    public void Update(Clingy clingy)
+    {
+        repo.Update(clingy);
     }
 
 }

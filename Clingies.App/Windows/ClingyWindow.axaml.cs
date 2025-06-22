@@ -3,15 +3,23 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Clingies.Application.Services;
+using Clingies.Domain.Factories;
+using Clingies.Domain.Models;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Clingies.App.Windows;
 
 public partial class ClingyWindow : Window
 {
-    public ClingyWindow()
+    private Clingy _clingy;
+    ClingyService _clingyService;
+    public ClingyWindow(ClingyService clingyService)
     {
         InitializeComponent();
         AttachDragEvents();
+        _clingy = ClingyFactory.CreateNew();
+        _clingyService = clingyService;
     }
 
     private void OnPinClick(object? sender, RoutedEventArgs e)
@@ -34,7 +42,6 @@ public partial class ClingyWindow : Window
         // TODO : SOFT DELETE FROM DB
         this.Close();
     }
-
     private void AttachDragEvents()
     {
         PointerPressed += (_, e) =>
@@ -42,11 +49,37 @@ public partial class ClingyWindow : Window
             if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
                 BeginMoveDrag(e);
         };
-    }  
+    }
+
+    protected override void OnOpened(EventArgs e)
+    {
+        PositionChanged += OnPositionChanged;
+        SizeChanged += OnSizeChanged;
+        ContentBox.TextChanged += OnContentChanged;
+        base.OnOpened(e);
+    }
 
     private void OnHeaderDrag(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             BeginMoveDrag(e);
+    }
+    private void OnPositionChanged(object? sender, PixelPointEventArgs e)
+    {
+        _clingy.Move(Position.X, Position.Y);
+        _clingyService.Update(_clingy);
+    }
+
+    private void OnSizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        _clingy.Resize(Width, Height);
+        _clingyService.Update(_clingy);
+    }    
+    
+    private void OnContentChanged(object? sender, EventArgs e)
+    {
+        string content = ContentBox.Text.IsNullOrEmpty() ? "" : ContentBox.Text!;
+        _clingy.UpdateContent(content);
+        _clingyService.Update(_clingy);
     }    
 }

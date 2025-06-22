@@ -5,15 +5,21 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using Clingies.Application.Services;
-using Clingies.Domain.Factories;
+using Clingies.Infrastructure.Data;
 using Clingies.Infrastructure.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Clingies.App;
 
-public partial class App(IServiceProvider services) : Avalonia.Application
+public partial class App : Avalonia.Application
 {
-    private TrayIcon? _trayIcon;
+    public IServiceProvider _services;
+
+    public App(IServiceProvider services)
+    {
+        _services = services ?? throw new ArgumentNullException(nameof(services));
+    }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -23,21 +29,26 @@ public partial class App(IServiceProvider services) : Avalonia.Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            _trayIcon = DrawTrayIcon();
-            RunMigrations();
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-        }
 
+            desktop.Exit += (_, _) =>
+            {
+                _services.GetRequiredService<ConnectionFactory>().Dispose();
+            };
+        }
         base.OnFrameworkInitializationCompleted();
+
+        DrawTrayIcon();
+        RunMigrations();        
     }
 
-    private async void OnNewClickAsync(object? sender, EventArgs e)
+    private void OnNewClick(object? sender, EventArgs e)
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var service = services.GetRequiredService<ClingyService>();
-            var clingy = await service.CreateAsync("", "");
-            var window = new Windows.ClingyWindow();
+            var service = _services.GetRequiredService<ClingyService>();
+            var clingy = service.Create("", "");
+            var window = new Windows.ClingyWindow(service);
             window.Show();
         }
     }
@@ -54,7 +65,7 @@ public partial class App(IServiceProvider services) : Avalonia.Application
             desktop.Shutdown();
         }
     }
-    private TrayIcon DrawTrayIcon()
+    private void DrawTrayIcon()
     {
         string embeddedPath = "avares://Clingies.App/Assets/icon-app-clingy.png";
         var uri = new Uri(embeddedPath);
@@ -68,7 +79,7 @@ public partial class App(IServiceProvider services) : Avalonia.Application
 
         trayIcon.Menu = new NativeMenu();
         var newItem = new NativeMenuItem("New");
-        newItem.Click += OnNewClickAsync;
+        newItem.Click += OnNewClick;
         var settingsItem = new NativeMenuItem("Settings");
         settingsItem.Click += OnSettingsClick;
         var exitItem = new NativeMenuItem("Exit");
@@ -80,8 +91,6 @@ public partial class App(IServiceProvider services) : Avalonia.Application
         trayIcon.Menu.Items.Add(exitItem);
 
         trayIcon.IsVisible = true;
-
-        return trayIcon;
     }
 
     private void RunMigrations()

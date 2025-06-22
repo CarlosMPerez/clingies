@@ -29,9 +29,14 @@ public class Clingy
         IsDeleted = false;
     }
 
-    public void UpdateContent(string newTitle, string newContent)
+    public void UpdateTitle(string newTitle)
     {
         Title = newTitle;
+        ModifiedAt = DateTime.UtcNow;
+    }
+
+    public void UpdateContent(string newContent)
+    {
         Content = newContent;
         ModifiedAt = DateTime.UtcNow;
     }

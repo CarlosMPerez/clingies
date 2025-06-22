@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using Clingies.App;
 using Clingies.Application.Services;
 using Clingies.Domain.Interfaces;
 using Clingies.Infrastructure.Data;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 internal sealed class Program
 {
@@ -14,10 +14,11 @@ internal sealed class Program
     public static void Main(string[] args)
     {
         var services = ConfigureServices();
+        var app = new App(services);
 
-        BuildAvaloniaApp(services)
-            .StartWithClassicDesktopLifetime(args);
+        BuildAvaloniaApp(app).StartWithClassicDesktopLifetime(args);
     }
+    
     private static IServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
@@ -30,15 +31,15 @@ internal sealed class Program
         services.AddSingleton<IClingyRepository, ClingyRepository>();
         services.AddSingleton<ClingyService>();
 
-        // Add SQLite setup or other dependencies here
-
         return services.BuildServiceProvider();
     }    
 
-    public static AppBuilder BuildAvaloniaApp(IServiceProvider services)
-        => AppBuilder.Configure(() => new App(services))
-               .UsePlatformDetect()
-               .UseSkia()
-               .LogToTrace();
+    public static AppBuilder BuildAvaloniaApp(App app)
+        => AppBuilder
+            .Configure(() => app)
+            .UsePlatformDetect()
+            .UseSkia()
+            .UseX11()
+            .LogToTrace();
 }
 

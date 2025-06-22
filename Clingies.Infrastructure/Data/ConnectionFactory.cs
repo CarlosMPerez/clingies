@@ -3,13 +3,30 @@ using Microsoft.Data.Sqlite;
 
 namespace Clingies.Infrastructure.Data;
 
-public class ConnectionFactory(string dbPath) : IConnectionFactory
+public class ConnectionFactory : IConnectionFactory, IDisposable
 {
-    private readonly string connectionString = $"Data Source={dbPath}";
+    private readonly string _connectionString;
+    private SqliteConnection? _sharedConnection;
 
-    public IDbConnection CreateConnection()
+    public ConnectionFactory(string dbPath)
     {
-        Console.WriteLine("connection string: " + connectionString);
-        return new SqliteConnection(connectionString);
+        _connectionString = $"Data Source={dbPath}";
+    }
+
+    public IDbConnection GetConnection()
+    {
+        if (_sharedConnection is null)
+        {
+            _sharedConnection = new SqliteConnection(_connectionString);
+            _sharedConnection.Open();
+        }
+
+        return _sharedConnection;
+    }
+
+    public void Dispose()
+    {
+        Console.WriteLine("CONNECTION DISPOSED OK");
+        _sharedConnection?.Dispose();
     }
 }
