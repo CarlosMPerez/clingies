@@ -9,6 +9,7 @@ public class ConnectionFactory(string dbPath) : IConnectionFactory
 
     public IDbConnection CreateConnection()
     {
+        Console.WriteLine("connection string: " + connectionString);
         return new SqliteConnection(connectionString);
     }
 }

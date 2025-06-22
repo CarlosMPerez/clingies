@@ -4,11 +4,14 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
+using Clingies.Application.Services;
+using Clingies.Domain.Factories;
 using Clingies.Infrastructure.Migrations;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Clingies.App;
 
-public partial class App : Avalonia.Application
+public partial class App(IServiceProvider services) : Avalonia.Application
 {
     private TrayIcon? _trayIcon;
     public override void Initialize()
@@ -20,19 +23,20 @@ public partial class App : Avalonia.Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             _trayIcon = DrawTrayIcon();
             RunMigrations();
+            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
         }
-
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    private void OnNewClick(object? sender, EventArgs e)
+    private async void OnNewClickAsync(object? sender, EventArgs e)
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            var service = services.GetRequiredService<ClingyService>();
+            var clingy = await service.CreateAsync("", "");
             var window = new Windows.ClingyWindow();
             window.Show();
         }
@@ -64,7 +68,7 @@ public partial class App : Avalonia.Application
 
         trayIcon.Menu = new NativeMenu();
         var newItem = new NativeMenuItem("New");
-        newItem.Click += OnNewClick;
+        newItem.Click += OnNewClickAsync;
         var settingsItem = new NativeMenuItem("Settings");
         settingsItem.Click += OnSettingsClick;
         var exitItem = new NativeMenuItem("Exit");

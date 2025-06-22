@@ -2,7 +2,7 @@ using FluentMigrator;
 
 namespace Clingies.Infrastructure.Migrations
 {
-    [Migration(1)]
+    [Migration(2025062001)]
     public class CreateClingiesTable : Migration
     {
         public override void Up()
