@@ -8,6 +8,7 @@ public class Clingy
     public DateTime CreatedAt { get; private set; }
     public DateTime? ModifiedAt { get; private set; }
     public bool IsDeleted { get; private set; }
+    public bool IsPinned { get; private set; }
 
     public double PositionX { get; private set; }
     public double PositionY { get; private set; }
@@ -17,16 +18,18 @@ public class Clingy
 
     private Clingy() { }
 
-    internal Clingy(Guid id, string title, string content, double x, double y, double width, double height)
+    internal Clingy(Guid id, string title, string content)
     {
         Id = id;
         Title = title;
         Content = content;
-        PositionX = x;
-        PositionY = y;
-        Width = width;
-        Height = height;
+        PositionX = 100;
+        PositionY = 100;
+        Width = 300;
+        Height = 100;
         IsDeleted = false;
+        IsPinned = false;
+        CreatedAt = DateTime.UtcNow;
     }
 
     public void UpdateTitle(string newTitle)

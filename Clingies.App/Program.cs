@@ -14,9 +14,7 @@ internal sealed class Program
     public static void Main(string[] args)
     {
         var services = ConfigureServices();
-        var app = new App(services);
-
-        BuildAvaloniaApp(app).StartWithClassicDesktopLifetime(args);
+        BuildAvaloniaApp(services).StartWithClassicDesktopLifetime(args);
     }
     
     private static IServiceProvider ConfigureServices()
@@ -34,12 +32,11 @@ internal sealed class Program
         return services.BuildServiceProvider();
     }    
 
-    public static AppBuilder BuildAvaloniaApp(App app)
+    public static AppBuilder BuildAvaloniaApp(IServiceProvider services)
         => AppBuilder
-            .Configure(() => app)
+            .Configure(() => new App(services))
             .UsePlatformDetect()
             .UseSkia()
-            .UseX11()
             .LogToTrace();
 }
 

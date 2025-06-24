@@ -1,10 +1,10 @@
 using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Clingies.Application.Services;
-using Clingies.Domain.Factories;
 using Clingies.Domain.Models;
 using Microsoft.IdentityModel.Tokens;
 
@@ -14,12 +14,17 @@ public partial class ClingyWindow : Window
 {
     private Clingy _clingy;
     ClingyService _clingyService;
-    public ClingyWindow(ClingyService clingyService)
+    public ClingyWindow(ClingyService clingyService, Clingy clingy)
     {
         InitializeComponent();
         AttachDragEvents();
-        _clingy = ClingyFactory.CreateNew();
+        _clingy = clingy;
         _clingyService = clingyService;
+        ContentBox.Text = _clingy.Content;
+        Title = _clingy.Title;
+        Width = _clingy.Width;
+        Height = _clingy.Height;
+        Position = new PixelPoint((int)_clingy.PositionX, (int)_clingy.PositionY);
     }
 
     private void OnPinClick(object? sender, RoutedEventArgs e)

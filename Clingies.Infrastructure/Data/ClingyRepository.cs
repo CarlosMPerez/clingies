@@ -9,7 +9,16 @@ public class ClingyRepository(IConnectionFactory connectionFactory) : IClingyRep
 {
     public List<Clingy> GetAllActive()
     {
-        throw new NotImplementedException();
+        using var conn = connectionFactory.GetConnection();
+        List<Clingy> clingies = new List<Clingy>();
+        var sql = """
+            SELECT Id, Title, Content, CreatedAt, ModifiedAt, IsDeleted, IsPinned, 
+                                PositionX, PositionY, Width, Height
+            FROM Clingies
+            WHERE IsDeleted = 0
+        """;
+        clingies = conn.Query<Clingy>(sql).ToList();
+        return clingies;
     }
 
     public Clingy Get(Guid id)
@@ -26,9 +35,9 @@ public class ClingyRepository(IConnectionFactory connectionFactory) : IClingyRep
     {
         using var conn = connectionFactory.GetConnection();
         var sql = """
-            INSERT INTO Clingies (Id, Title, Content, CreatedAt, ModifiedAt, IsDeleted, 
+            INSERT INTO Clingies (Id, Title, Content, CreatedAt, ModifiedAt, IsDeleted, IsPinned,
                                 PositionX, PositionY, Width, Height)
-            VALUES (@Id, @Title, @Content, @CreatedAt, @ModifiedAt, @IsDeleted, 
+            VALUES (@Id, @Title, @Content, @CreatedAt, @ModifiedAt, @IsDeleted, @IsPinned,
                                 @PositionX, @PositionY, @Width, @Height)
             """;
         conn.Execute(sql, clingy);
@@ -48,6 +57,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory) : IClingyRep
                 Content = @Content, 
                 ModifiedAt = @ModifiedAt, 
                 IsDeleted = @IsDeleted, 
+                IsPinned = @IsPinned,
                 PositionX = @PositionX, 
                 PositionY = @PositionY, 
                 Width = @Width, 
@@ -55,6 +65,5 @@ public class ClingyRepository(IConnectionFactory connectionFactory) : IClingyRep
             WHERE Id = @Id
             """;
         conn.Execute(sql, clingy);
-
     }
 }

@@ -4,8 +4,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
+using Clingies.App.Windows;
 using Clingies.Application.Services;
-using Clingies.Infrastructure.Data;
 using Clingies.Infrastructure.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,15 +31,12 @@ public partial class App : Avalonia.Application
         {
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-            desktop.Exit += (_, _) =>
-            {
-                _services.GetRequiredService<ConnectionFactory>().Dispose();
-            };
+            DrawTrayIcon();
+            RunMigrations();
+            RenderActiveClingies();
         }
-        base.OnFrameworkInitializationCompleted();
 
-        DrawTrayIcon();
-        RunMigrations();        
+        base.OnFrameworkInitializationCompleted();
     }
 
     private void OnNewClick(object? sender, EventArgs e)
@@ -48,7 +45,7 @@ public partial class App : Avalonia.Application
         {
             var service = _services.GetRequiredService<ClingyService>();
             var clingy = service.Create("", "");
-            var window = new Windows.ClingyWindow(service);
+            var window = new Windows.ClingyWindow(service, clingy);
             window.Show();
         }
     }
@@ -106,5 +103,15 @@ public partial class App : Avalonia.Application
         // Run migrations
         var migrator = new MigrationRunnerService(dbPath);
         migrator.MigrateUp();
+    }
+
+    private void RenderActiveClingies()
+    {
+        var service = _services.GetRequiredService<ClingyService>();
+        foreach (var clingy in service.GetAllActive())
+        {
+            var window = new ClingyWindow(service, clingy);
+            window.Show();
+        }
     }
 }

@@ -6,6 +6,10 @@ namespace Clingies.Application.Services;
 
 public class ClingyService(IClingyRepository repo)
 {
+    public List<Clingy> GetAllActive()
+    {
+        return repo.GetAllActive();
+    }
     public Clingy Create(string title = "", string content = "")
     {
         var clingy = ClingyFactory.CreateNew(title, content);

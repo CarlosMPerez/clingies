@@ -1,4 +1,3 @@
-using System;
 using FluentMigrator;
 
 namespace Clingies.Infrastructure.Migrations;
