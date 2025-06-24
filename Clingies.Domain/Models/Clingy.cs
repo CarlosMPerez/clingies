@@ -32,6 +32,22 @@ public class Clingy
         CreatedAt = DateTime.UtcNow;
     }
 
+    internal Clingy(Guid id, string title, string content,
+                    double posX, double posY, double width, double height,
+                    bool isDeleted = false, bool isPinned = false)
+    {
+        Id = id;
+        Title = title;
+        Content = content;
+        PositionX = posX;
+        PositionY = posY;
+        Width = width;
+        Height = height;
+        IsDeleted = isDeleted;
+        IsPinned = isPinned;
+        CreatedAt = DateTime.UtcNow;
+    }
+
     public void UpdateTitle(string newTitle)
     {
         Title = newTitle;

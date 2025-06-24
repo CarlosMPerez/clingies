@@ -8,7 +8,7 @@
   Background="Black"
   SystemDecorations="None"
   TransparencyLevelHint="AcrylicBlur, Blur, Transparent"
-  WindowStartupLocation="CenterScreen"
+  WindowStartupLocation="Manual"
   ShowInTaskbar="False">
 <!-- 🔧 Custom Styles -->
   <Window.Styles>

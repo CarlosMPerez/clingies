@@ -13,4 +13,19 @@ public static class ClingyFactory
             content
         );
     }
+
+    public static Clingy FromDto(ClingyDto dto)
+    {
+        return new Clingy(
+            Guid.Parse(dto.Id),
+            dto.Title,
+            dto.Content,
+            dto.PositionX,
+            dto.PositionY,
+            dto.Width,
+            dto.Height,
+            dto.IsDeleted,
+            dto.IsPinned
+        );
+    }
 }

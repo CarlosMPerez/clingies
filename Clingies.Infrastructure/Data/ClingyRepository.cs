@@ -1,3 +1,4 @@
+using Clingies.Domain.Factories;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
 
@@ -17,7 +18,8 @@ public class ClingyRepository(IConnectionFactory connectionFactory) : IClingyRep
             FROM Clingies
             WHERE IsDeleted = 0
         """;
-        clingies = conn.Query<Clingy>(sql).ToList();
+        var dtos = conn.Query<ClingyDto>(sql).ToList();
+        clingies = dtos.Select(dto => ClingyFactory.FromDto(dto)).ToList();
         return clingies;
     }
 
