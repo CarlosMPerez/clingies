@@ -21,10 +21,13 @@ public partial class ClingyWindow : Window
         _clingy = clingy;
         _clingyService = clingyService;
         ContentBox.Text = _clingy.Content;
-        Title = _clingy.Title;
+        TitleTextBlock.Text = _clingy.Title;
         Width = _clingy.Width;
         Height = _clingy.Height;
         Position = new PixelPoint((int)_clingy.PositionX, (int)_clingy.PositionY);
+        Topmost = _clingy.IsPinned;
+        PinButton.Background = _clingy.IsPinned ? new SolidColorBrush(Color.Parse("#444")) : Brushes.Transparent;
+        PinButton.Opacity = _clingy.IsPinned ? 1 : 0;
     }
 
     private void OnPinClick(object? sender, RoutedEventArgs e)
@@ -34,17 +37,21 @@ public partial class ClingyWindow : Window
         {
             PinButton.Background = new SolidColorBrush(Color.Parse("#444"));
             PinButton.Opacity = 1;
+            _clingy.SetPinState(true);
         }
         else
         {
             PinButton.Background = Brushes.Transparent;
             PinButton.Opacity = 0;
+            _clingy.SetPinState(true);
         }
+
+        _clingyService.Update(_clingy);
     }
 
     private void OnClose(object? sender, RoutedEventArgs e)
     {
-        // TODO : SOFT DELETE FROM DB
+        _clingyService.SoftDelete(_clingy.Id);
         this.Close();
     }
     private void AttachDragEvents()
@@ -79,12 +86,39 @@ public partial class ClingyWindow : Window
     {
         _clingy.Resize(Width, Height);
         _clingyService.Update(_clingy);
-    }    
-    
+    }
+
     private void OnContentChanged(object? sender, EventArgs e)
     {
         string content = ContentBox.Text.IsNullOrEmpty() ? "" : ContentBox.Text!;
         _clingy.UpdateContent(content);
         _clingyService.Update(_clingy);
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+
+        // Shift+Ctrl+P -> SET TITLE
+        if (e.KeyModifiers == (KeyModifiers.Shift | KeyModifiers.Control) && e.Key == Key.P)
+        {
+            ShowTitleDialogAsync();
+        }
+    }
+
+    private async void ShowTitleDialogAsync()
+    {
+        var previousTitle = TitleTextBlock.Text;
+        var dialog = new TitleDialog(previousTitle.IsNullOrEmpty() ?
+                            "Set Clingy Title" :
+                            previousTitle!);
+
+        var result = await dialog.ShowDialog<string>(this);
+        if (!string.IsNullOrWhiteSpace(result))
+        {
+            _clingy.UpdateTitle(result);
+            _clingyService.Update(_clingy);
+            TitleTextBlock.Text = result;
+        }
     }    
 }

@@ -79,4 +79,10 @@ public class Clingy
         IsDeleted = true;
         ModifiedAt = DateTime.UtcNow;
     }
+
+    public void SetPinState(bool pinned)
+    {
+        IsPinned = pinned;
+        ModifiedAt = DateTime.UtcNow;
+    }
 }

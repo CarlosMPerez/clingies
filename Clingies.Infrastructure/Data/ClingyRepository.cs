@@ -1,7 +1,6 @@
 using Clingies.Domain.Factories;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
-
 using Dapper;
 
 namespace Clingies.Infrastructure.Data;
@@ -20,17 +19,24 @@ public class ClingyRepository(IConnectionFactory connectionFactory) : IClingyRep
         """;
         var dtos = conn.Query<ClingyDto>(sql).ToList();
         clingies = dtos.Select(dto => ClingyFactory.FromDto(dto)).ToList();
+
         return clingies;
     }
 
     public Clingy Get(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        using var conn = connectionFactory.GetConnection();
+        var parms = new Dictionary<string, object> { { "@Id", id } };        
+        var sql = """
+            SELECT Id, Title, Content, CreatedAt, ModifiedAt, IsDeleted, IsPinned, 
+                                PositionX, PositionY, Width, Height
+            FROM Clingies
+            WHERE Id = @Id
+        """;
+        var dtos = conn.Query<ClingyDto>(sql, parms);
+        var clingy = dtos.Select(dto => ClingyFactory.FromDto(dto)).First();
 
-    public void HardDelete(Guid id)
-    {
-        throw new NotImplementedException();
+        return clingy;
     }
 
     public void Create(Clingy clingy)
@@ -42,12 +48,8 @@ public class ClingyRepository(IConnectionFactory connectionFactory) : IClingyRep
             VALUES (@Id, @Title, @Content, @CreatedAt, @ModifiedAt, @IsDeleted, @IsPinned,
                                 @PositionX, @PositionY, @Width, @Height)
             """;
-        conn.Execute(sql, clingy);
-    }
 
-    public void SoftDelete(Guid id)
-    {
-        throw new NotImplementedException();
+        conn.Execute(sql, clingy);
     }
 
     public void Update(Clingy clingy)
@@ -66,6 +68,32 @@ public class ClingyRepository(IConnectionFactory connectionFactory) : IClingyRep
                 Height = @Height
             WHERE Id = @Id
             """;
+
         conn.Execute(sql, clingy);
+    }
+
+    public void HardDelete(Guid id)
+    {
+        using var conn = connectionFactory.GetConnection();
+        var parms = new Dictionary<string, object> { { "@Id", id } };        
+        var sql = """
+            DELETE FROM Clingies 
+            WHERE Id = @Id
+            """;
+
+        conn.Execute(sql, parms);
+    }
+
+    public void SoftDelete(Guid id)
+    {
+        using var conn = connectionFactory.GetConnection();
+        var parms = new Dictionary<string, object> { { "@Id", id } };        
+        var sql = """
+            UPDATE Clingies SET 
+                IsDeleted = 1 
+            WHERE Id = @Id
+            """;
+
+        conn.Execute(sql, parms);
     }
 }

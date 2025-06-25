@@ -75,7 +75,14 @@
         </Button>
 
         <!-- Empty title space (center) -->
-        <TextBlock Grid.Column="1" />        
+        <TextBlock 
+            Name="TitleTextBlock"
+            Grid.Column="1"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Foreground="Black"
+            FontWeight="Bold"
+            TextTrimming="CharacterEllipsis"/>
         
         <!-- CLOSE BUTTON -->
         <Button Grid.Column="2" Content="X"

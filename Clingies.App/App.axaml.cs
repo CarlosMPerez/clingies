@@ -62,6 +62,19 @@ public partial class App : Avalonia.Application
             desktop.Shutdown();
         }
     }
+
+    private void OnTrayIconClicked(object? sender, EventArgs e)
+    {
+        var service = _services.GetRequiredService<ClingyService>();
+        foreach (var clingy in service.GetAllActive())
+        {
+            var window = new ClingyWindow(service, clingy);
+            window.Topmost = true;
+            window.Activate();
+            window.Topmost = false;
+        }
+    }
+
     private void DrawTrayIcon()
     {
         string embeddedPath = "avares://Clingies.App/Assets/icon-app-clingy.png";
@@ -87,6 +100,7 @@ public partial class App : Avalonia.Application
         trayIcon.Menu.Items.Add(new NativeMenuItemSeparator { Header = "-" });
         trayIcon.Menu.Items.Add(exitItem);
 
+        trayIcon.Clicked += OnTrayIconClicked;
         trayIcon.IsVisible = true;
     }
 
