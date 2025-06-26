@@ -3,6 +3,8 @@ using System.IO;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Clingies.App;
+using Clingies.App.Factories;
+using Clingies.Application.Factories;
 using Clingies.Application.Services;
 using Clingies.Domain.Interfaces;
 using Clingies.Infrastructure.Data;
@@ -27,7 +29,9 @@ internal sealed class Program
                 "Clingies", "clingies.db");
         services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory(dbPath));
         services.AddSingleton<IClingyRepository, ClingyRepository>();
-        services.AddSingleton<ClingyService>();
+        services.AddSingleton<IClingyWindowFactory, ClingyWindowFactory>();
+        services.AddSingleton<ClingyNoteService>();
+        services.AddSingleton<ClingyWindowService>();
 
         return services.BuildServiceProvider();
     }    

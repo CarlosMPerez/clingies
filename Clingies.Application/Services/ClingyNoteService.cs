@@ -4,7 +4,7 @@ using Clingies.Domain.Models;
 
 namespace Clingies.Application.Services;
 
-public class ClingyService(IClingyRepository repo)
+public class ClingyNoteService(IClingyRepository repo)
 {
     public List<Clingy> GetAllActive()
     {

@@ -14,10 +14,15 @@ namespace Clingies.App;
 public partial class App : Avalonia.Application
 {
     public IServiceProvider _services;
+    private ClingyNoteService _noteService;
+    private ClingyWindowService _windowService;
+
 
     public App(IServiceProvider services)
     {
         _services = services ?? throw new ArgumentNullException(nameof(services));
+        _noteService = _services.GetRequiredService<ClingyNoteService>();
+        _windowService = _services.GetRequiredService<ClingyWindowService>();
     }
 
     public override void Initialize()
@@ -33,7 +38,7 @@ public partial class App : Avalonia.Application
 
             DrawTrayIcon();
             RunMigrations();
-            RenderActiveClingies();
+            _windowService.LoadAllActiveClingies();
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -43,10 +48,8 @@ public partial class App : Avalonia.Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var service = _services.GetRequiredService<ClingyService>();
-            var clingy = service.Create("", "");
-            var window = new Windows.ClingyWindow(service, clingy);
-            window.Show();
+            var clingy = _noteService.Create("", "");
+            _windowService.CreateNewWindow(clingy);
         }
     }
 
@@ -65,14 +68,7 @@ public partial class App : Avalonia.Application
 
     private void OnTrayIconClicked(object? sender, EventArgs e)
     {
-        var service = _services.GetRequiredService<ClingyService>();
-        foreach (var clingy in service.GetAllActive())
-        {
-            var window = new ClingyWindow(service, clingy);
-            window.Topmost = true;
-            window.Activate();
-            window.Topmost = false;
-        }
+        _windowService.ShowAllActiveClingiesOnTop();
     }
 
     private void DrawTrayIcon()
@@ -117,15 +113,5 @@ public partial class App : Avalonia.Application
         // Run migrations
         var migrator = new MigrationRunnerService(dbPath);
         migrator.MigrateUp();
-    }
-
-    private void RenderActiveClingies()
-    {
-        var service = _services.GetRequiredService<ClingyService>();
-        foreach (var clingy in service.GetAllActive())
-        {
-            var window = new ClingyWindow(service, clingy);
-            window.Show();
-        }
     }
 }

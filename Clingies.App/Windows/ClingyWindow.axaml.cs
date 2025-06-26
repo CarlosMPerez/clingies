@@ -13,8 +13,8 @@ namespace Clingies.App.Windows;
 public partial class ClingyWindow : Window
 {
     private Clingy _clingy;
-    ClingyService _clingyService;
-    public ClingyWindow(ClingyService clingyService, Clingy clingy)
+    ClingyNoteService _clingyService;
+    public ClingyWindow(ClingyNoteService clingyService, Clingy clingy)
     {
         InitializeComponent();
         AttachDragEvents();
