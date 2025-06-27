@@ -14,9 +14,19 @@ public partial class ClingyWindow : Window
 {
     private Clingy _clingy;
     ClingyNoteService _clingyService;
+
     public ClingyWindow(ClingyNoteService clingyService, Clingy clingy)
     {
         InitializeComponent();
+        // Update height when content changes
+        ContentBox.GetObservable(TextBox.TextProperty)
+              .Subscribe(_ => UpdateWindowHeight());
+        // Update height once on load
+        this.Opened += (_, _) => UpdateWindowHeight();
+
+        // Optional: if user resizes horizontally, we update vertical height again
+        this.GetObservable(ClientSizeProperty)
+            .Subscribe(size => UpdateWindowHeight());              
         AttachDragEvents();
         _clingy = clingy;
         _clingyService = clingyService;
@@ -120,5 +130,14 @@ public partial class ClingyWindow : Window
             _clingyService.Update(_clingy);
             TitleTextBlock.Text = result;
         }
-    }    
+    }
+
+    private void UpdateWindowHeight()
+    {
+        ContentBox.Measure(new Size(Width, double.PositiveInfinity));
+        var desired = ContentBox.DesiredSize.Height;
+
+        // Add some padding for borders/margins
+        Height = Math.Clamp(desired + 32, 80, 1000);
+    }
 }

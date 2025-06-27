@@ -3,10 +3,12 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   x:Class="Clingies.App.Windows.ClingyWindow"
   Width="300"
-  Height="200"
-  CanResize="False"
+  MinWidth="300"
+  CanResize="True"
   Background="Black"
-  SystemDecorations="None"
+  SystemDecorations="BorderOnly"
+  SizeToContent="Height"
+  MinHeight="100"
   TransparencyLevelHint="AcrylicBlur, Blur, Transparent"
   WindowStartupLocation="Manual"
   ShowInTaskbar="False">
@@ -92,16 +94,20 @@
                 HorizontalAlignment="Center" VerticalAlignment="Center"
                 Width="20" Height="20" Padding="0"/>
       </Grid>
-
       <!-- CONTENT -->
       <TextBox
         Grid.Row="1"
         x:Name="ContentBox"
         AcceptsReturn="True"
         TextWrapping="Wrap"
+        BorderThickness="0"
+        VerticalAlignment="Top"
+        HorizontalAlignment="Stretch"
+        Background="Transparent"
+        Foreground="Black"
         FontSize="14"
-        FontFamily="sans-serif"
-        Foreground="Black" />
+        MaxHeight="1000"
+        Margin="8" />
 
     </Grid>
   </Border>  
