@@ -5,16 +5,15 @@
   Width="300"
   MinWidth="300"
   CanResize="True"
-  Background="Black"
+  Background="#FFFFAA"
   SystemDecorations="BorderOnly"
-  SizeToContent="Height"
   MinHeight="100"
   TransparencyLevelHint="AcrylicBlur, Blur, Transparent"
   WindowStartupLocation="Manual"
   ShowInTaskbar="False">
-<!-- 🔧 Custom Styles -->
+
+  <!-- 🔧 Custom Styles -->
   <Window.Styles>
-    <!-- 1. Visual styling -->
     <Style Selector="TextBox">
       <Setter Property="Background" Value="#FFFFAA"/>
       <Setter Property="Foreground" Value="Black"/>
@@ -53,6 +52,7 @@
           <ColumnDefinition Width="*" />
           <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
+
         <!-- ON TOP BUTTON -->
         <Button
           x:Name="PinButton"
@@ -76,7 +76,7 @@
           </Button.Styles>
         </Button>
 
-        <!-- Empty title space (center) -->
+        <!-- TITLE -->
         <TextBlock 
             Name="TitleTextBlock"
             Grid.Column="1"
@@ -85,7 +85,7 @@
             Foreground="Black"
             FontWeight="Bold"
             TextTrimming="CharacterEllipsis"/>
-        
+
         <!-- CLOSE BUTTON -->
         <Button Grid.Column="2" Content="X"
                 Background="Transparent" BorderThickness="0"
@@ -94,21 +94,27 @@
                 HorizontalAlignment="Center" VerticalAlignment="Center"
                 Width="20" Height="20" Padding="0"/>
       </Grid>
-      <!-- CONTENT -->
-      <TextBox
-        Grid.Row="1"
-        x:Name="ContentBox"
-        AcceptsReturn="True"
-        TextWrapping="Wrap"
-        BorderThickness="0"
-        VerticalAlignment="Top"
-        HorizontalAlignment="Stretch"
-        Background="Transparent"
-        Foreground="Black"
-        FontSize="14"
-        MaxHeight="1000"
-        Margin="8" />
 
+      <!-- CONTENT -->
+      <StackPanel x:Name="LayoutRoot"
+                  Grid.Row="1"
+                  Orientation="Vertical"
+                  Margin="0"
+                  Spacing="0"
+                  MinHeight="40">
+        <TextBox
+            x:Name="ContentBox"
+            AcceptsReturn="True"
+            TextWrapping="Wrap"
+            BorderThickness="0"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Stretch"
+            Background="Transparent"
+            Foreground="Black"
+            FontSize="14"
+            MaxLines="1500"
+            Margin="8" />
+      </StackPanel>
     </Grid>
   </Border>  
 </Window>

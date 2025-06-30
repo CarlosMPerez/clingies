@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Clingies.Application.Services;
 using Clingies.Domain.Models;
 using Microsoft.IdentityModel.Tokens;
@@ -14,19 +15,12 @@ public partial class ClingyWindow : Window
 {
     private Clingy _clingy;
     ClingyNoteService _clingyService;
+    private bool _updateScheduled = false;
 
     public ClingyWindow(ClingyNoteService clingyService, Clingy clingy)
     {
         InitializeComponent();
-        // Update height when content changes
-        ContentBox.GetObservable(TextBox.TextProperty)
-              .Subscribe(_ => UpdateWindowHeight());
-        // Update height once on load
-        this.Opened += (_, _) => UpdateWindowHeight();
 
-        // Optional: if user resizes horizontally, we update vertical height again
-        this.GetObservable(ClientSizeProperty)
-            .Subscribe(size => UpdateWindowHeight());              
         AttachDragEvents();
         _clingy = clingy;
         _clingyService = clingyService;
@@ -38,6 +32,12 @@ public partial class ClingyWindow : Window
         Topmost = _clingy.IsPinned;
         PinButton.Background = _clingy.IsPinned ? new SolidColorBrush(Color.Parse("#444")) : Brushes.Transparent;
         PinButton.Opacity = _clingy.IsPinned ? 1 : 0;
+
+        // Update height when content changes
+        ContentBox.GetObservable(TextBox.TextProperty)
+              .Subscribe(_ => UpdateWindowHeight());
+        // Update height once on load
+        ContentBox.TextChanged += (_, _) => UpdateWindowHeight();
     }
 
     private void OnPinClick(object? sender, RoutedEventArgs e)
@@ -134,10 +134,30 @@ public partial class ClingyWindow : Window
 
     private void UpdateWindowHeight()
     {
-        ContentBox.Measure(new Size(Width, double.PositiveInfinity));
-        var desired = ContentBox.DesiredSize.Height;
+        if (_updateScheduled) return;
+        _updateScheduled = true;
 
-        // Add some padding for borders/margins
-        Height = Math.Clamp(desired + 32, 80, 1000);
+        Dispatcher.UIThread.Post(() =>
+        {
+            _updateScheduled = false;
+            LayoutRoot.Measure(new Size(Bounds.Width, double.PositiveInfinity));
+            LayoutRoot.Arrange(new Rect(LayoutRoot.DesiredSize));
+
+            var contentHeight = LayoutRoot.DesiredSize.Height;
+
+            const double headerHeight = 30;
+            const double padding = 16;
+            const double minTotalHeight = headerHeight + padding + 40;
+
+            double finalHeight = Math.Max(minTotalHeight, contentHeight + headerHeight);
+            finalHeight = Math.Clamp(finalHeight, 100, 1000);
+
+            if (Math.Abs(Height - finalHeight) > 1)
+            {
+                Height = finalHeight;
+                _clingy.Resize(Width, finalHeight);
+                _clingyService.Update(_clingy);
+            }
+        }, DispatcherPriority.Background);
     }
 }
