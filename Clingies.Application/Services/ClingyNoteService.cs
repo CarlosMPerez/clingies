@@ -16,9 +16,9 @@ public class ClingyNoteService(IClingyRepository repo)
         return repo.Get(id);
     }
 
-    public Clingy Create(string title = "", string content = "")
+    public Clingy Create(string title = "", string content = "", double posX = 0, double posY = 0)
     {
-        var clingy = ClingyFactory.CreateNew(title, content);
+        var clingy = ClingyFactory.CreateNew(title, content, posX, posY);
         repo.Create(clingy);
         return clingy;
     }

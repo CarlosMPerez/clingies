@@ -1,10 +1,10 @@
 using System;
 using System.IO;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
-using Clingies.App.Windows;
 using Clingies.Application.Services;
 using Clingies.Infrastructure.Migrations;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,10 +48,21 @@ public partial class App : Avalonia.Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var clingy = _noteService.Create("", "");
+            var defClingyWidth = 300;
+            var defClingyHeight = 100;
+
+            var lifetime = App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
+            Window anchor = lifetime?.Windows.Count > 0 ? lifetime.Windows[0] : null;
+            var screen = anchor?.Screens.ScreenFromVisual(anchor)?.WorkingArea
+                                  ?? new PixelRect(0, 0, 800, 600);      
+            var centerX = screen.X + (screen.Width - defClingyWidth) / 2;
+            var centerY = screen.Y + (screen.Height - defClingyHeight) / 2;
+
+            var clingy = _noteService.Create("", "", centerX, centerY);
             _windowService.CreateNewWindow(clingy);
         }
     }
+
 
     private void OnSettingsClick(object? sender, EventArgs e)
     {

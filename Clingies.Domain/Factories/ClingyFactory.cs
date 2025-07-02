@@ -4,13 +4,15 @@ namespace Clingies.Domain.Factories;
 
 public static class ClingyFactory
 {
-    public static Clingy CreateNew(string title = "", string content = "")
+    public static Clingy CreateNew(string title = "", string content = "", double posX = 0, double posY = 0)
     {
         // Defaults
         return new Clingy(
             Guid.NewGuid(),
             title,
-            content
+            content,
+            posX,
+            posY
         );
     }
 

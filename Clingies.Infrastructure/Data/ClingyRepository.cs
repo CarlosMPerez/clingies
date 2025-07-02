@@ -68,7 +68,6 @@ public class ClingyRepository(IConnectionFactory connectionFactory) : IClingyRep
                 Height = @Height
             WHERE Id = @Id
             """;
-
         conn.Execute(sql, clingy);
     }
 

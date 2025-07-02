@@ -18,13 +18,13 @@ public class Clingy
 
     private Clingy() { }
 
-    internal Clingy(Guid id, string title, string content)
+    internal Clingy(Guid id, string title, string content, double posX = 100, double posY = 100)
     {
         Id = id;
         Title = title;
         Content = content;
-        PositionX = 100;
-        PositionY = 100;
+        PositionX = posX;
+        PositionY = posY;
         Width = 300;
         Height = 100;
         IsDeleted = false;

@@ -21,6 +21,14 @@ public partial class ClingyWindow : Window
     {
         InitializeComponent();
 
+        Opened += (_, _) =>
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                UpdateWindowHeight(); // once, after first layout
+            }, DispatcherPriority.Background);
+        };
+
         AttachDragEvents();
         _clingy = clingy;
         _clingyService = clingyService;
