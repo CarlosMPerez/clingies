@@ -4,6 +4,8 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Avalonia.Threading;
 using Clingies.Application.Services;
 using Clingies.Domain.Models;
@@ -16,6 +18,11 @@ public partial class ClingyWindow : Window
     private Clingy _clingy;
     ClingyNoteService _clingyService;
     private bool _updateScheduled = false;
+    private bool _resizingLeft = false;
+    private bool _resizingRight = false;
+    private double _resizeStartX;
+    private double _resizeStartWidth;
+    private PixelPoint _resizeStartWindowPosition;
 
     public ClingyWindow(ClingyNoteService clingyService, Clingy clingy)
     {
@@ -38,8 +45,7 @@ public partial class ClingyWindow : Window
         Height = _clingy.Height;
         Position = new PixelPoint((int)_clingy.PositionX, (int)_clingy.PositionY);
         Topmost = _clingy.IsPinned;
-        PinButton.Background = _clingy.IsPinned ? new SolidColorBrush(Color.Parse("#444")) : Brushes.Transparent;
-        PinButton.Opacity = _clingy.IsPinned ? 1 : 0;
+        LoadPinImage(_clingy.IsPinned);
 
         // Update height when content changes
         ContentBox.GetObservable(TextBox.TextProperty)
@@ -50,21 +56,21 @@ public partial class ClingyWindow : Window
 
     private void OnPinClick(object? sender, RoutedEventArgs e)
     {
-        Topmost = !Topmost;
-        if (Topmost)
-        {
-            PinButton.Background = new SolidColorBrush(Color.Parse("#444"));
-            PinButton.Opacity = 1;
-            _clingy.SetPinState(true);
-        }
-        else
-        {
-            PinButton.Background = Brushes.Transparent;
-            PinButton.Opacity = 0;
-            _clingy.SetPinState(true);
-        }
-
+        LoadPinImage(!_clingy.IsPinned);
+        Topmost = !_clingy.IsPinned;
+        _clingy.SetPinState(!_clingy.IsPinned);
         _clingyService.Update(_clingy);
+    }
+
+    private void LoadPinImage(bool pinned)
+    {
+        string imageRes = pinned ?
+            "avares://Clingies.App/Assets/icon-pinned.png" : 
+            "avares://Clingies.App/Assets/icon-unpinned.png";
+        var uri = new Uri(imageRes);
+        using var stream = AssetLoader.Open(uri);
+        PinButtonImage.Source = new Bitmap(stream);
+
     }
 
     private void OnClose(object? sender, RoutedEventArgs e)
@@ -167,5 +173,58 @@ public partial class ClingyWindow : Window
                 _clingyService.Update(_clingy);
             }
         }, DispatcherPriority.Background);
+    }
+   
+    private void OnResizeLeftStart(object? sender, PointerPressedEventArgs e)
+    {
+        _resizingLeft = true;
+        _resizeStartX = e.GetPosition(this).X;
+        _resizeStartX = Position.X;
+        _resizeStartWidth = Width;
+        _resizeStartWindowPosition = Position;
+    }
+
+    private void OnResizeRightStart(object? sender, PointerPressedEventArgs e)
+    {
+        _resizingRight = true;
+        _resizeStartX = e.GetPosition(this).X;
+        _resizeStartWidth = Width;
+    }
+
+    private void OnResizeEnd(object? sender, PointerReleasedEventArgs e)
+    {
+        _resizingLeft = false;
+        _resizingRight = false;
+    }
+
+    private void OnResizeLeft(object? sender, PointerEventArgs e)
+    {
+        if (_resizingLeft)
+        {
+            double currentX = e.GetPosition(this).X;
+            double delta = currentX - _resizeStartX;
+            double newWidth = _resizeStartWidth - delta;
+
+            if (newWidth >= MinWidth)
+            {
+                Width = newWidth;
+                Position = new PixelPoint(
+                    _resizeStartWindowPosition.X + (int)delta,
+                    _resizeStartWindowPosition.Y
+                );
+            }
+        }
+    }
+
+    private void OnResizeRight(object? sender, PointerEventArgs e)
+    {
+        if (_resizingRight)
+        {
+            double currentX = e.GetPosition(this).X;
+            double delta = currentX - _resizeStartX;
+            double newWidth = _resizeStartWidth + delta;
+
+            if (newWidth >= MinWidth) Width = newWidth;
+        }
     }
 }
