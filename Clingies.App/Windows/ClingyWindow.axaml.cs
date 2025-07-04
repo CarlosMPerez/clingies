@@ -3,7 +3,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
@@ -18,11 +17,6 @@ public partial class ClingyWindow : Window
     private Clingy _clingy;
     ClingyNoteService _clingyService;
     private bool _updateScheduled = false;
-    private bool _resizingLeft = false;
-    private bool _resizingRight = false;
-    private double _resizeStartX;
-    private double _resizeStartWidth;
-    private PixelPoint _resizeStartWindowPosition;
 
     public ClingyWindow(ClingyNoteService clingyService, Clingy clingy)
     {
@@ -174,57 +168,20 @@ public partial class ClingyWindow : Window
             }
         }, DispatcherPriority.Background);
     }
-   
-    private void OnResizeLeftStart(object? sender, PointerPressedEventArgs e)
+
+    private void OnResizeRight(object? sender, PointerPressedEventArgs e)
     {
-        _resizingLeft = true;
-        _resizeStartX = e.GetPosition(this).X;
-        _resizeStartX = Position.X;
-        _resizeStartWidth = Width;
-        _resizeStartWindowPosition = Position;
+        BeginResizeDrag(WindowEdge.East, e);
+
+        _clingy.Resize(this.Width, this.Height);
+        _clingyService.Update(_clingy);
     }
 
-    private void OnResizeRightStart(object? sender, PointerPressedEventArgs e)
+    private void OnResizeLeft(object? sender, PointerPressedEventArgs e)
     {
-        _resizingRight = true;
-        _resizeStartX = e.GetPosition(this).X;
-        _resizeStartWidth = Width;
-    }
+        BeginResizeDrag(WindowEdge.West, e);
 
-    private void OnResizeEnd(object? sender, PointerReleasedEventArgs e)
-    {
-        _resizingLeft = false;
-        _resizingRight = false;
-    }
-
-    private void OnResizeLeft(object? sender, PointerEventArgs e)
-    {
-        if (_resizingLeft)
-        {
-            double currentX = e.GetPosition(this).X;
-            double delta = currentX - _resizeStartX;
-            double newWidth = _resizeStartWidth - delta;
-
-            if (newWidth >= MinWidth)
-            {
-                Width = newWidth;
-                Position = new PixelPoint(
-                    _resizeStartWindowPosition.X + (int)delta,
-                    _resizeStartWindowPosition.Y
-                );
-            }
-        }
-    }
-
-    private void OnResizeRight(object? sender, PointerEventArgs e)
-    {
-        if (_resizingRight)
-        {
-            double currentX = e.GetPosition(this).X;
-            double delta = currentX - _resizeStartX;
-            double newWidth = _resizeStartWidth + delta;
-
-            if (newWidth >= MinWidth) Width = newWidth;
-        }
+        _clingy.Resize(this.Width, this.Height);
+        _clingyService.Update(_clingy);
     }
 }

@@ -47,101 +47,90 @@
 
   <!-- 🗒️ Sticky Note UI -->
   <Border BorderBrush="Black" BorderThickness="1">
-    <Grid ColumnDefinitions="5,*,5">
-      <!-- Left resizable edge -->
-      <Border Grid.Column="0"
-          Background="Transparent"
-          PointerPressed="OnResizeLeftStart"
-          PointerReleased="OnResizeEnd"
-          PointerMoved="OnResizeLeft"
-          Cursor="LeftSide" />
-      <!-- Your main clingy layout goes here -->
-      <Border Grid.Column="1"
-              BorderBrush="Black"
-              BorderThickness="1">
-        <!-- Existing clingy layout: title bar + content -->
-        <Grid RowDefinitions="Auto,*">
-          <!-- HEADER -->
-          <Grid Background="#87CEFA" Height="30" PointerPressed="OnHeaderDrag">
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="30"/>
-              <ColumnDefinition Width="*" />
-              <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <!-- ON TOP BUTTON -->
-            <Button
-                  x:Name="PinButton"
-                  Grid.Column="0"
-                  Width="24" Height="24"
-                  Background="Transparent"
-                  BorderThickness="0"
-                  Click="OnPinClick"
-                  HorizontalAlignment="Center"
-                  VerticalAlignment="Center"
-                  Padding="0">
-              <Image 
-                x:Name="PinButtonImage"
-                Source="avares://Clingies.App/Assets/icon-unpinned.png"
-                Stretch="Uniform"
-                Width="16"
-                Height="16" />              
-            </Button>
-            <!-- TITLE -->
-            <TextBlock 
-                Name="TitleTextBlock"
-                Grid.Column="1"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Foreground="Black"
-                FontWeight="Bold"
-                TextTrimming="CharacterEllipsis"/>
-            <!-- CLOSE BUTTON -->
-            <Button Grid.Column="2" 
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Click="OnClose"
-                    HorizontalAlignment="Center" 
-                    VerticalAlignment="Center"
-                    Width="24" 
-                    Height="24" 
-                    Padding="0">
-              <Image 
-                Source="avares://Clingies.App/Assets/icon-close.png"
-                Stretch="Uniform"
-                Width="16"
-                Height="16" />
-            </Button>
-          </Grid>
-          <!-- CONTENT -->
-          <StackPanel x:Name="LayoutRoot"
-                      Grid.Row="1"
-                      Orientation="Vertical"
-                      Margin="0"
-                      Spacing="0"
-                      MinHeight="40">
-            <TextBox
-                x:Name="ContentBox"
-                AcceptsReturn="True"
-                TextWrapping="Wrap"
-                BorderThickness="0"
-                VerticalAlignment="Top"
-                HorizontalAlignment="Stretch"
+    <Grid RowDefinitions="30, *">
+      <Grid x:Name="GridHeader" Row="0" ColumnDefinitions="24,*,24" 
+        Background="#87CEFA" Height="30" PointerPressed="OnHeaderDrag">
+        <!-- ON TOP BUTTON -->
+        <Button
+              x:Name="PinButton"
+              Grid.Column="0"
+              Width="24" Height="24"
+              Background="Transparent"
+              BorderThickness="0"
+              Click="OnPinClick"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Padding="0">
+          <Image 
+            x:Name="PinButtonImage"
+            Source="avares://Clingies.App/Assets/icon-unpinned.png"
+            Stretch="Uniform"
+            Width="16"
+            Height="16" />              
+        </Button>
+        <!-- TITLE -->
+        <TextBlock 
+            Name="TitleTextBlock"
+            Grid.Column="1"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Foreground="Black"
+            FontWeight="Bold"
+            TextTrimming="CharacterEllipsis"/>
+        <!-- CLOSE BUTTON -->
+        <Button Grid.Column="2" 
                 Background="Transparent"
-                Foreground="Black"
-                FontSize="14"
-                MaxLines="1500"
-                Margin="8"
-                MinHeight="75" />
-          </StackPanel>
-        </Grid>
-      </Border>
-      <!-- Right resizable edge -->
-      <Border Grid.Column="2"
-          Background="Transparent"
-          PointerPressed="OnResizeRightStart"
-          PointerReleased="OnResizeEnd"
-          PointerMoved="OnResizeRight"
-          Cursor="RightSide" />
-    </Grid>  
-  </Border>  
+                BorderThickness="0"
+                Click="OnClose"
+                HorizontalAlignment="Center" 
+                VerticalAlignment="Center"
+                Width="24" 
+                Height="24" 
+                Padding="0">
+          <Image 
+            Source="avares://Clingies.App/Assets/icon-close.png"
+            Stretch="Uniform"
+            Width="16"
+            Height="16" />
+        </Button>
+      </Grid>
+      <Grid x:Name="GridBody" Row="1" ColumnDefinitions="10,*,10">
+        <Border Grid.Column="0"
+            Background="Transparent"
+            PointerPressed="OnResizeLeft"
+            Cursor="LeftSide" />
+        <!-- Your main clingy layout goes here -->
+        <Border Grid.Column="1"
+                BorderBrush="Transparent"
+                BorderThickness="1">
+            <!-- CONTENT -->
+            <StackPanel x:Name="LayoutRoot"
+                        Grid.Row="1"
+                        Orientation="Vertical"
+                        Margin="0"
+                        Spacing="0"
+                        MinHeight="40">
+              <TextBox
+                  x:Name="ContentBox"
+                  AcceptsReturn="True"
+                  TextWrapping="Wrap"
+                  BorderThickness="0"
+                  VerticalAlignment="Top"
+                  HorizontalAlignment="Stretch"
+                  Background="Transparent"
+                  Foreground="Black"
+                  FontSize="14"
+                  MaxLines="1500"
+                  Margin="0"
+                  MinHeight="75" />
+            </StackPanel>
+        </Border>    
+        <!-- Right resizable edge -->
+        <Border Grid.Column="2"
+            Background="Transparent"
+            PointerPressed="OnResizeRight"
+            Cursor="RightSide" />
+      </Grid>
+    </Grid>
+  </Border>
 </Window>
