@@ -2,7 +2,7 @@ using Clingies.Domain.Models;
 
 namespace Clingies.Domain.Factories;
 
-public static class ClingyFactory
+public static class ClingyEntityFactory
 {
     public static Clingy CreateNew(string title = "", string content = "", double posX = 0, double posY = 0)
     {
@@ -27,7 +27,9 @@ public static class ClingyFactory
             dto.Width,
             dto.Height,
             dto.IsDeleted,
-            dto.IsPinned
+            dto.IsPinned,
+            dto.IsRolled,
+            dto.IsStand
         );
     }
 }

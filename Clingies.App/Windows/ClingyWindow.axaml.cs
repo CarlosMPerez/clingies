@@ -6,7 +6,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
-using Clingies.Application.Services;
+using Clingies.App.Windows.CustomEventArgs;
 using Clingies.Domain.Models;
 using Microsoft.IdentityModel.Tokens;
 
@@ -15,10 +15,20 @@ namespace Clingies.App.Windows;
 public partial class ClingyWindow : Window
 {
     private Clingy _clingy;
-    ClingyNoteService _clingyService;
+    public Guid ClingyId { get; private set; }
     private bool _updateScheduled = false;
 
-    public ClingyWindow(ClingyNoteService clingyService, Clingy clingy)
+    public event EventHandler<Guid> CloseRequested;
+    public event EventHandler<PinRequestedEventArgs>? PinRequested;
+    public event EventHandler<HeaderDragRequestedEventArgs>? HeaderDragRequested;
+    public event EventHandler<PositionChangeRequestedEventArgs>? PositionChangeRequested;
+    public event EventHandler<SizeChangeRequestedEventArgs>? SizeChangeRequested;
+    public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
+    public event EventHandler<KeyDownRequestedEventArgs>? KeyDownRequested;
+    public event EventHandler<ResizeRightRequestedEventArgs>? ResizeRightRequested;
+    public event EventHandler<ResizeLeftRequestedEventArgs>? ResizeLeftRequested;
+
+    public ClingyWindow(Clingy clingy)
     {
         InitializeComponent();
 
@@ -32,7 +42,7 @@ public partial class ClingyWindow : Window
 
         AttachDragEvents();
         _clingy = clingy;
-        _clingyService = clingyService;
+        ClingyId = clingy.Id;
         ContentBox.Text = _clingy.Content;
         TitleTextBlock.Text = _clingy.Title;
         Width = _clingy.Width;
@@ -51,9 +61,8 @@ public partial class ClingyWindow : Window
     private void OnPinClick(object? sender, RoutedEventArgs e)
     {
         LoadPinImage(!_clingy.IsPinned);
-        Topmost = !_clingy.IsPinned;
-        _clingy.SetPinState(!_clingy.IsPinned);
-        _clingyService.Update(_clingy);
+        var args = new PinRequestedEventArgs(_clingy.Id, !_clingy.IsPinned);
+        PinRequested?.Invoke(this, args);
     }
 
     private void LoadPinImage(bool pinned)
@@ -69,9 +78,9 @@ public partial class ClingyWindow : Window
 
     private void OnClose(object? sender, RoutedEventArgs e)
     {
-        _clingyService.SoftDelete(_clingy.Id);
-        this.Close();
+        CloseRequested?.Invoke(this, _clingy.Id);
     }
+
     private void AttachDragEvents()
     {
         PointerPressed += (_, e) =>
@@ -96,21 +105,17 @@ public partial class ClingyWindow : Window
     }
     private void OnPositionChanged(object? sender, PixelPointEventArgs e)
     {
-        _clingy.Move(Position.X, Position.Y);
-        _clingyService.Update(_clingy);
+        PositionChangeRequested?.Invoke(this, _clingy.Id);
     }
 
     private void OnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
-        _clingy.Resize(Width, Height);
-        _clingyService.Update(_clingy);
+        SizeChangeRequested?.Invoke(this, _clingy);
     }
 
     private void OnContentChanged(object? sender, EventArgs e)
     {
-        string content = ContentBox.Text.IsNullOrEmpty() ? "" : ContentBox.Text!;
-        _clingy.UpdateContent(content);
-        _clingyService.Update(_clingy);
+        ContentChangeRequested?.Invoke(this, _clingy);
     }
 
     protected override void OnKeyDown(KeyEventArgs e)

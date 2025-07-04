@@ -30,8 +30,8 @@ internal sealed class Program
         services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory(dbPath));
         services.AddSingleton<IClingyRepository, ClingyRepository>();
         services.AddSingleton<IClingyWindowFactory, ClingyWindowFactory>();
-        services.AddSingleton<ClingyNoteService>();
-        services.AddSingleton<ClingyWindowService>();
+        services.AddSingleton<ClingyService>();
+        services.AddSingleton<ClingyWindowManager>();
 
         return services.BuildServiceProvider();
     }    

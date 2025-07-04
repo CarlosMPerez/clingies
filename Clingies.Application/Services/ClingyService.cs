@@ -4,7 +4,7 @@ using Clingies.Domain.Models;
 
 namespace Clingies.Application.Services;
 
-public class ClingyNoteService(IClingyRepository repo)
+public class ClingyService(IClingyRepository repo)
 {
     public List<Clingy> GetAllActive()
     {
@@ -18,7 +18,7 @@ public class ClingyNoteService(IClingyRepository repo)
 
     public Clingy Create(string title = "", string content = "", double posX = 0, double posY = 0)
     {
-        var clingy = ClingyFactory.CreateNew(title, content, posX, posY);
+        var clingy = ClingyEntityFactory.CreateNew(title, content, posX, posY);
         repo.Create(clingy);
         return clingy;
     }

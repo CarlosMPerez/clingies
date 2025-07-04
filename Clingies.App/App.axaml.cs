@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
+using Clingies.App.Factories;
 using Clingies.Application.Services;
 using Clingies.Infrastructure.Migrations;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,15 +15,13 @@ namespace Clingies.App;
 public partial class App : Avalonia.Application
 {
     public IServiceProvider _services;
-    private ClingyNoteService _noteService;
-    private ClingyWindowService _windowService;
+    private ClingyWindowFactory _windowFactory;
 
 
     public App(IServiceProvider services)
     {
         _services = services ?? throw new ArgumentNullException(nameof(services));
-        _noteService = _services.GetRequiredService<ClingyNoteService>();
-        _windowService = _services.GetRequiredService<ClingyWindowService>();
+        _windowFactory = _services.GetRequiredService<ClingyWindowFactory>();
     }
 
     public override void Initialize()
@@ -38,7 +37,7 @@ public partial class App : Avalonia.Application
 
             DrawTrayIcon();
             RunMigrations();
-            _windowService.LoadAllActiveClingies();
+            _windowFactory.InitActiveWindows();
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -58,8 +57,7 @@ public partial class App : Avalonia.Application
             var centerX = screen.X + (screen.Width - defClingyWidth) / 2;
             var centerY = screen.Y + (screen.Height - defClingyHeight) / 2;
 
-            var clingy = _noteService.Create("", "", centerX, centerY);
-            _windowService.CreateNewWindow(clingy);
+            _windowFactory.CreateNewWindow(centerX, centerY);
         }
     }
 
@@ -79,7 +77,7 @@ public partial class App : Avalonia.Application
 
     private void OnTrayIconClicked(object? sender, EventArgs e)
     {
-        _windowService.ShowAllActiveClingiesOnTop();
+        _windowFactory.RenderAllWindows();
     }
 
     private void DrawTrayIcon()

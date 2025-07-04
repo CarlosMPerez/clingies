@@ -9,6 +9,8 @@ public class Clingy
     public DateTime? ModifiedAt { get; private set; }
     public bool IsDeleted { get; private set; }
     public bool IsPinned { get; private set; }
+    public bool IsRolled { get; private set; }
+    public bool IsStand { get; private set; }
 
     public double PositionX { get; private set; }
     public double PositionY { get; private set; }
@@ -29,12 +31,15 @@ public class Clingy
         Height = 100;
         IsDeleted = false;
         IsPinned = false;
+        IsRolled = false;
+        IsStand = false;
         CreatedAt = DateTime.UtcNow;
     }
 
     internal Clingy(Guid id, string title, string content,
                     double posX, double posY, double width, double height,
-                    bool isDeleted = false, bool isPinned = false)
+                    bool isDeleted = false, bool isPinned = false,
+                    bool isRolled = false, bool isStand = false)
     {
         Id = id;
         Title = title;
@@ -45,6 +50,8 @@ public class Clingy
         Height = height;
         IsDeleted = isDeleted;
         IsPinned = isPinned;
+        IsRolled = isRolled;
+        IsStand = isStand;
         CreatedAt = DateTime.UtcNow;
     }
 
@@ -83,6 +90,18 @@ public class Clingy
     public void SetPinState(bool pinned)
     {
         IsPinned = pinned;
+        ModifiedAt = DateTime.UtcNow;
+    }
+
+    public void SetRolledState(bool rolled)
+    {
+        IsRolled = rolled;
+        ModifiedAt = DateTime.UtcNow;
+    }
+
+    public void SetStandState(bool stand)
+    {
+        IsStand = stand;
         ModifiedAt = DateTime.UtcNow;
     }
 }

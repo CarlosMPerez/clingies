@@ -10,6 +10,8 @@ public class ClingyDto
     public DateTime? ModifiedAt { get; set; }
     public bool IsDeleted { get; set; }
     public bool IsPinned { get; set; }
+    public bool IsRolled { get; set; }
+    public bool IsStand { get; set; }
 
     public double PositionX { get; set; }
     public double PositionY { get; set; }
