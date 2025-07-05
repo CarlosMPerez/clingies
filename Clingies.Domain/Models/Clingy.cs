@@ -11,10 +11,8 @@ public class Clingy
     public bool IsPinned { get; private set; }
     public bool IsRolled { get; private set; }
     public bool IsStand { get; private set; }
-
     public double PositionX { get; private set; }
     public double PositionY { get; private set; }
-
     public double Width { get; private set; }
     public double Height { get; private set; }
 

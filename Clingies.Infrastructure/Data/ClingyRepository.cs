@@ -27,7 +27,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory) : IClingyRep
     public Clingy Get(Guid id)
     {
         using var conn = connectionFactory.GetConnection();
-        var parms = new Dictionary<string, object> { { "@Id", id } };        
+        var parms = new Dictionary<string, object> { { "@Id", id } };
         var sql = """
             SELECT Id, Title, Content, CreatedAt, ModifiedAt, 
                 IsDeleted, IsPinned, IsRolled, IsStand,
@@ -46,9 +46,11 @@ public class ClingyRepository(IConnectionFactory connectionFactory) : IClingyRep
         using var conn = connectionFactory.GetConnection();
         var sql = """
             INSERT INTO Clingies (Id, Title, Content, CreatedAt, ModifiedAt, 
-                IsDeleted, IsPinned, IsRolled, IsStand, PositionX, PositionY, Width, Height)
+                IsDeleted, IsPinned, IsRolled, IsStand, 
+                PositionX, PositionY, Width, Height)
             VALUES (@Id, @Title, @Content, @CreatedAt, @ModifiedAt, 
-                @IsDeleted, @IsPinned, @IsRolled, @IsStand, @PositionX, @PositionY, @Width, @Height)
+                @IsDeleted, @IsPinned, @IsRolled, @IsStand, 
+                @PositionX, @PositionY, @Width, @Height)
             """;
 
         conn.Execute(sql, clingy);
@@ -78,7 +80,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory) : IClingyRep
     public void HardDelete(Guid id)
     {
         using var conn = connectionFactory.GetConnection();
-        var parms = new Dictionary<string, object> { { "@Id", id } };        
+        var parms = new Dictionary<string, object> { { "@Id", id } };
         var sql = """
             DELETE FROM Clingies 
             WHERE Id = @Id
@@ -90,7 +92,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory) : IClingyRep
     public void SoftDelete(Guid id)
     {
         using var conn = connectionFactory.GetConnection();
-        var parms = new Dictionary<string, object> { { "@Id", id } };        
+        var parms = new Dictionary<string, object> { { "@Id", id } };
         var sql = """
             UPDATE Clingies SET 
                 IsDeleted = 1 

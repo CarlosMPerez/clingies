@@ -37,5 +37,4 @@ public class ClingyService(IClingyRepository repo)
     {
         repo.HardDelete(id);
     }
-
 }
