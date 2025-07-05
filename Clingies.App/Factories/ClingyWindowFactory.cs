@@ -5,6 +5,7 @@ using Clingies.App.Windows;
 using System;
 using Clingies.App.Windows.CustomEventArgs;
 using System.Linq;
+using Avalonia.Controls;
 
 namespace Clingies.App.Factories;
 
@@ -44,6 +45,7 @@ public class ClingyWindowFactory(ClingyService noteService)
         window.TitleChangeRequested += HandleTitleChangeRequested;
         window.UpdateWindowHeightRequested += HandleUpdateWindowHeightRequested;
         window.UpdateWindowWidthRequested += HandleUpdateWindowWidthRequested;
+        window.RollRequested += HandleRollRequested;
     }
 
     public void RenderAllWindows()
@@ -135,6 +137,20 @@ public class ClingyWindowFactory(ClingyService noteService)
         var clingy = activeClingies.Single(x => x.Id == args.ClingyId);
         window.Width = args.Width;
         clingy.Resize(args.Width, window.Height);
+        noteService.Update(clingy);
+    }
+
+    private void HandleRollRequested(object? sender, RollRequestedEventArgs args)
+    {
+        var window = activeWindows.Single(x => x.ClingyId == args.ClingyId);
+        var clingy = activeClingies.Single(x => x.Id == args.ClingyId);
+
+        // RowDefinition bodyRow = window.FindControl<Grid>("GridWindow")!.RowDefinitions[1];
+        window.BodyBorder.IsVisible = !args.IsRolled;
+        // window.MinHeight = args.IsRolled ? window.TitleGrid.Bounds.Height : 100;
+        // bodyRow.Height = args.IsRolled ? new GridLength(0, GridUnitType.Pixel) : new GridLength(1, GridUnitType.Star);
+
+        clingy.SetRolledState(args.IsRolled);
         noteService.Update(clingy);
     }
 

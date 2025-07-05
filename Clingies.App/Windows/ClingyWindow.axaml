@@ -46,10 +46,11 @@
   </Window.Styles>
 
   <!-- 🗒️ Sticky Note UI -->
-  <Border BorderBrush="Black" BorderThickness="1">
-    <Grid RowDefinitions="30, *">
-      <Grid x:Name="GridHeader" Row="0" ColumnDefinitions="24,*,24" 
-        Background="#87CEFA" Height="30" PointerPressed="OnHeaderDrag">
+  <Grid x:Name="WindowGrid" RowDefinitions="30, Auto">
+    <Border x:Name="TitleBorder" Grid.Row="0" BorderBrush="Black" BorderThickness="1">
+      <Grid x:Name="TitleGrid" ColumnDefinitions="24,*,24" 
+        Background="#87CEFA" Height="30" PointerPressed="OnHeaderDrag"
+        DoubleTapped="OnTitleBarDoubleTapped">
         <!-- ON TOP BUTTON -->
         <Button
               x:Name="PinButton"
@@ -94,7 +95,9 @@
             Height="16" />
         </Button>
       </Grid>
-      <Grid x:Name="GridBody" Row="1" ColumnDefinitions="10,*,10">
+    </Border>
+    <Border x:Name="BodyBorder" Grid.Row="1" BorderBrush="Black" BorderThickness="1">
+      <Grid x:Name="BodyGrid" ColumnDefinitions="10,*,10">
         <Border Grid.Column="0"
             Background="Transparent"
             PointerPressed="OnResizeLeft"
@@ -131,6 +134,6 @@
             PointerPressed="OnResizeRight"
             Cursor="RightSide" />
       </Grid>
-    </Grid>
-  </Border>
+    </Border>
+  </Grid>
 </Window>

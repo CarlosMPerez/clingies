@@ -25,6 +25,7 @@ public partial class ClingyWindow : Window
     public event EventHandler<TitleChangeRequestedEventArgs>? TitleChangeRequested;
     public event EventHandler<UpdateWindowHeightRequestedEventArgs>? UpdateWindowHeightRequested;
     public event EventHandler<UpdateWindowWidthRequestedEventArgs>? UpdateWindowWidthRequested;
+    public event EventHandler<RollRequestedEventArgs>? RollRequested;
 
     public ClingyWindow(Clingy clingy)
     {
@@ -164,6 +165,12 @@ public partial class ClingyWindow : Window
                 UpdateWindowHeightRequested?.Invoke(this, args);
             }
         }, DispatcherPriority.Background);
+    }
+
+    private void OnTitleBarDoubleTapped(object? sender, RoutedEventArgs e)
+    {
+        var args = new RollRequestedEventArgs(_clingy.Id, !_clingy.IsRolled);
+        RollRequested?.Invoke(this, args);
     }
 
     private void OnResizeRight(object? sender, PointerPressedEventArgs e)
