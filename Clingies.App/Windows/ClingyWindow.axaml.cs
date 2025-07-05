@@ -8,7 +8,6 @@ using Avalonia.Platform;
 using Avalonia.Threading;
 using Clingies.App.Windows.CustomEventArgs;
 using Clingies.Domain.Models;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Clingies.App.Windows;
 
@@ -18,15 +17,14 @@ public partial class ClingyWindow : Window
     public Guid ClingyId { get; private set; }
     private bool _updateScheduled = false;
 
-    public event EventHandler<Guid> CloseRequested;
+    public event EventHandler<Guid>? CloseRequested;
     public event EventHandler<PinRequestedEventArgs>? PinRequested;
-    public event EventHandler<HeaderDragRequestedEventArgs>? HeaderDragRequested;
     public event EventHandler<PositionChangeRequestedEventArgs>? PositionChangeRequested;
     public event EventHandler<SizeChangeRequestedEventArgs>? SizeChangeRequested;
     public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
-    public event EventHandler<KeyDownRequestedEventArgs>? KeyDownRequested;
-    public event EventHandler<ResizeRightRequestedEventArgs>? ResizeRightRequested;
-    public event EventHandler<ResizeLeftRequestedEventArgs>? ResizeLeftRequested;
+    public event EventHandler<TitleChangeRequestedEventArgs>? TitleChangeRequested;
+    public event EventHandler<UpdateWindowHeightRequestedEventArgs>? UpdateWindowHeightRequested;
+    public event EventHandler<UpdateWindowWidthRequestedEventArgs>? UpdateWindowWidthRequested;
 
     public ClingyWindow(Clingy clingy)
     {
@@ -90,6 +88,12 @@ public partial class ClingyWindow : Window
         };
     }
 
+    private void OnHeaderDrag(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            BeginMoveDrag(e);
+    }
+
     protected override void OnOpened(EventArgs e)
     {
         PositionChanged += OnPositionChanged;
@@ -97,25 +101,27 @@ public partial class ClingyWindow : Window
         ContentBox.TextChanged += OnContentChanged;
         base.OnOpened(e);
     }
-
-    private void OnHeaderDrag(object? sender, PointerPressedEventArgs e)
-    {
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-            BeginMoveDrag(e);
-    }
     private void OnPositionChanged(object? sender, PixelPointEventArgs e)
     {
-        PositionChangeRequested?.Invoke(this, _clingy.Id);
+        var args = new PositionChangeRequestedEventArgs(ClingyId,
+                                this.Position.X, this.Position.Y);
+        PositionChangeRequested?.Invoke(this, args);
     }
 
     private void OnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
-        SizeChangeRequested?.Invoke(this, _clingy);
+        var args = new SizeChangeRequestedEventArgs(ClingyId, this.Width, this.Height);
+        SizeChangeRequested?.Invoke(this, args);
     }
 
     private void OnContentChanged(object? sender, EventArgs e)
     {
-        ContentChangeRequested?.Invoke(this, _clingy);
+        if (sender is TextBox tb)
+        {
+            var newText = tb.Text ?? string.Empty;
+            var args = new ContentChangeRequestedEventArgs(ClingyId, newText);
+            ContentChangeRequested?.Invoke(this, args);
+        }
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -125,25 +131,12 @@ public partial class ClingyWindow : Window
         // Shift+Ctrl+P -> SET TITLE
         if (e.KeyModifiers == (KeyModifiers.Shift | KeyModifiers.Control) && e.Key == Key.P)
         {
-            ShowTitleDialogAsync();
+            string prevTitle = string.IsNullOrEmpty(TitleTextBlock.Text) ? "" : TitleTextBlock.Text;
+            var args = new TitleChangeRequestedEventArgs(ClingyId, prevTitle);
+            TitleChangeRequested?.Invoke(this, args);
         }
     }
 
-    private async void ShowTitleDialogAsync()
-    {
-        var previousTitle = TitleTextBlock.Text;
-        var dialog = new TitleDialog(previousTitle.IsNullOrEmpty() ?
-                            "Set Clingy Title" :
-                            previousTitle!);
-
-        var result = await dialog.ShowDialog<string>(this);
-        if (!string.IsNullOrWhiteSpace(result))
-        {
-            _clingy.UpdateTitle(result);
-            _clingyService.Update(_clingy);
-            TitleTextBlock.Text = result;
-        }
-    }
 
     private void UpdateWindowHeight()
     {
@@ -167,9 +160,8 @@ public partial class ClingyWindow : Window
 
             if (Math.Abs(Height - finalHeight) > 1)
             {
-                Height = finalHeight;
-                _clingy.Resize(Width, finalHeight);
-                _clingyService.Update(_clingy);
+                var args = new UpdateWindowHeightRequestedEventArgs(ClingyId, finalHeight);
+                UpdateWindowHeightRequested?.Invoke(this, args);
             }
         }, DispatcherPriority.Background);
     }
@@ -177,16 +169,15 @@ public partial class ClingyWindow : Window
     private void OnResizeRight(object? sender, PointerPressedEventArgs e)
     {
         BeginResizeDrag(WindowEdge.East, e);
-
-        _clingy.Resize(this.Width, this.Height);
-        _clingyService.Update(_clingy);
+        var args = new UpdateWindowWidthRequestedEventArgs(ClingyId, this.Width);
+        UpdateWindowWidthRequested?.Invoke(this, args);
     }
 
     private void OnResizeLeft(object? sender, PointerPressedEventArgs e)
     {
         BeginResizeDrag(WindowEdge.West, e);
 
-        _clingy.Resize(this.Width, this.Height);
-        _clingyService.Update(_clingy);
+        var args = new UpdateWindowWidthRequestedEventArgs(ClingyId, this.Width);
+        UpdateWindowWidthRequested?.Invoke(this, args);
     }
 }

@@ -16,12 +16,7 @@ public class ClingyWindowFactory(ClingyService noteService)
     {
         var clingy = noteService.Create("", "", posX, posY);
         var window = new ClingyWindow(clingy);
-        // subscribe to events
-        window.CloseRequested += HandleCloseRequested;
-        window.PinRequested += HandlePinRequested;
-        window.PositionChangeRequested += HandlePositionChangeRequested;
-        window.SizeChangeRequested += HandleSizeChangeRequested;
-        window.ContentChangeRequested += HandleContentChangeRequested;
+        SubscribeWindowToEvents(window);
         activeWindows.Add(window);
         activeClingies.Add(clingy);
         window.Show();
@@ -32,10 +27,23 @@ public class ClingyWindowFactory(ClingyService noteService)
         foreach (var clingy in noteService.GetAllActive())
         {
             var window = new ClingyWindow(clingy);
+            SubscribeWindowToEvents(window);
             activeClingies.Add(clingy);
             activeWindows.Add(window);
             window.Show();
         }
+    }
+
+    private void SubscribeWindowToEvents(ClingyWindow window)
+    {
+        window.CloseRequested += HandleCloseRequested;
+        window.PinRequested += HandlePinRequested;
+        window.PositionChangeRequested += HandlePositionChangeRequested;
+        window.SizeChangeRequested += HandleSizeChangeRequested;
+        window.ContentChangeRequested += HandleContentChangeRequested;
+        window.TitleChangeRequested += HandleTitleChangeRequested;
+        window.UpdateWindowHeightRequested += HandleUpdateWindowHeightRequested;
+        window.UpdateWindowWidthRequested += HandleUpdateWindowWidthRequested;
     }
 
     public void RenderAllWindows()
@@ -51,10 +59,10 @@ public class ClingyWindowFactory(ClingyService noteService)
     #region EventHandlers
     private void HandleCloseRequested(object? sender, Guid id)
     {
-        var window = (ClingyWindow)sender!;
-        window.CloseRequested -= HandleCloseRequested;
+        var window = activeWindows.Single(x => x.ClingyId == id);
+        var clingy = activeClingies.Single(x => x.Id == id);
         activeWindows.Remove(window);
-        activeClingies.Remove(activeClingies.Single(x => x.Id == id));
+        activeClingies.Remove(clingy);
         window.Close();
         noteService.SoftDelete(id);
     }
@@ -63,34 +71,70 @@ public class ClingyWindowFactory(ClingyService noteService)
     {
         var window = activeWindows.Single(x => x.ClingyId == args.ClingyId);
         var clingy = activeClingies.Single(x => x.Id == args.ClingyId);
-        window.PinRequested -= HandlePinRequested;
         window.Topmost = args.IsPinned;
         clingy.SetPinState(args.IsPinned);
         noteService.Update(clingy);
     }
 
-    private void HandlePositionChangeRequested(object? sender, Clingy clingy)
+    private void HandlePositionChangeRequested(object? sender,
+                        PositionChangeRequestedEventArgs args)
     {
         var window = activeWindows.Single(x => x.ClingyId == args.ClingyId);
-        window.PositionChangeRequested -= HandlePositionChangeRequested;
-        clingy.Move(window.Position.X, window.Position.Y);
+        var clingy = activeClingies.Single(x => x.Id == args.ClingyId);
+        window.Position = new Avalonia.PixelPoint(args.PositionX, args.PositionY);
+        clingy.Move(args.PositionX, args.PositionY);
         noteService.Update(clingy);
     }
 
-    private void HandleSizeChangeRequested(object? sender, Clingy clingy)
+    private void HandleSizeChangeRequested(object? sender, SizeChangeRequestedEventArgs args)
     {
-        var window = (ClingyWindow)sender!;
-        window.SizeChangeRequested -= HandleSizeChangeRequested;
-        clingy.Resize(window.Width, window.Height);
+        var window = activeWindows.Single(x => x.ClingyId == args.ClingyId);
+        var clingy = activeClingies.Single(x => x.Id == args.ClingyId);
+        window.Width = args.Width;
+        window.Height = args.Height;
+        clingy.Resize(args.Width, args.Height);
         noteService.Update(clingy);
     }
 
-    private void HandleContentChangeRequested(object? sender, Clingy clingy)
+    private void HandleContentChangeRequested(object? sender, ContentChangeRequestedEventArgs args)
     {
-        var window = (ClingyWindow)sender!;
-        window.ContentChangeRequested -= HandleContentChangeRequested;
-        string content = string.IsNullOrEmpty(window.ContentBox.Text!) ? "" : window.ContentBox.Text!;
-        clingy.UpdateContent(content);
+        var window = activeWindows.Single(x => x.ClingyId == args.ClingyId);
+        var clingy = activeClingies.Single(x => x.Id == args.ClingyId);
+        window.ContentBox.Text = args.Content;
+        clingy.UpdateContent(args.Content);
+        noteService.Update(clingy);
+    }
+
+    private async void HandleTitleChangeRequested(object? sender, TitleChangeRequestedEventArgs args)
+    {
+        var window = activeWindows.Single(x => x.ClingyId == args.ClingyId);
+        var clingy = activeClingies.Single(x => x.Id == args.ClingyId);
+        var dialog = new TitleDialog(args.PreviousTitle);
+
+        var result = await dialog.ShowDialog<string>(window);
+        if (!string.IsNullOrWhiteSpace(result))
+        {
+            clingy.UpdateTitle(result);
+            noteService.Update(clingy);
+            window.TitleTextBlock.Text = result;
+        }
+    }
+
+    private void HandleUpdateWindowHeightRequested(object? sender, UpdateWindowHeightRequestedEventArgs args)
+    {
+        var window = activeWindows.Single(x => x.ClingyId == args.ClingyId);
+        var clingy = activeClingies.Single(x => x.Id == args.ClingyId);
+        window.Height = args.Height;
+        clingy.Resize(window.Width, args.Height);
+        noteService.Update(clingy);
+    }
+
+    private void HandleUpdateWindowWidthRequested(object? sender, UpdateWindowWidthRequestedEventArgs args)
+    {
+        var window = activeWindows.Single(x => x.ClingyId == args.ClingyId);
+        var clingy = activeClingies.Single(x => x.Id == args.ClingyId);
+        window.Width = args.Width;
+        clingy.Resize(args.Width, window.Height);
         noteService.Update(clingy);
     }
 
