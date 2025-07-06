@@ -14,6 +14,7 @@ namespace Clingies.App.Windows;
 public partial class ClingyWindow : Window
 {
     private Clingy _clingy;
+    private bool _isRolled;
     public Guid ClingyId { get; private set; }
     private bool _updateScheduled = false;
 
@@ -31,14 +32,6 @@ public partial class ClingyWindow : Window
     {
         InitializeComponent();
 
-        Opened += (_, _) =>
-        {
-            Dispatcher.UIThread.Post(() =>
-            {
-                UpdateWindowHeight(); // once, after first layout
-            }, DispatcherPriority.Background);
-        };
-
         AttachDragEvents();
         _clingy = clingy;
         ClingyId = clingy.Id;
@@ -49,12 +42,22 @@ public partial class ClingyWindow : Window
         Position = new PixelPoint((int)_clingy.PositionX, (int)_clingy.PositionY);
         Topmost = _clingy.IsPinned;
         LoadPinImage(_clingy.IsPinned);
+        ToggleRolled(_clingy.IsRolled);
+    }
 
-        // Update height when content changes
-        ContentBox.GetObservable(TextBox.TextProperty)
-              .Subscribe(_ => UpdateWindowHeight());
-        // Update height once on load
-        ContentBox.TextChanged += (_, _) => UpdateWindowHeight();
+    private void ToggleRolled(bool isRolled)
+    {
+        _isRolled = isRolled;
+        BodyBorder.IsVisible = !isRolled;
+        if (isRolled)
+        {
+            this.SizeToContent = SizeToContent.Manual;
+            this.Height = TitleBorder.Bounds.Height + 2;
+        }
+        else
+        {
+            this.SizeToContent = SizeToContent.Height;
+        }
     }
 
     private void OnPinClick(object? sender, RoutedEventArgs e)
@@ -138,38 +141,11 @@ public partial class ClingyWindow : Window
         }
     }
 
-
-    private void UpdateWindowHeight()
-    {
-        if (_updateScheduled) return;
-        _updateScheduled = true;
-
-        Dispatcher.UIThread.Post(() =>
-        {
-            _updateScheduled = false;
-            LayoutRoot.Measure(new Size(Bounds.Width, double.PositiveInfinity));
-            LayoutRoot.Arrange(new Rect(LayoutRoot.DesiredSize));
-
-            var contentHeight = LayoutRoot.DesiredSize.Height;
-
-            const double headerHeight = 30;
-            const double padding = 16;
-            const double minTotalHeight = headerHeight + padding + 40;
-
-            double finalHeight = Math.Max(minTotalHeight, contentHeight + headerHeight);
-            finalHeight = Math.Clamp(finalHeight, 100, 1000);
-
-            if (Math.Abs(Height - finalHeight) > 1)
-            {
-                var args = new UpdateWindowHeightRequestedEventArgs(ClingyId, finalHeight);
-                UpdateWindowHeightRequested?.Invoke(this, args);
-            }
-        }, DispatcherPriority.Background);
-    }
-
     private void OnTitleBarDoubleTapped(object? sender, RoutedEventArgs e)
     {
-        var args = new RollRequestedEventArgs(_clingy.Id, !_clingy.IsRolled);
+        _clingy.SetRolledState(!_clingy.IsRolled);
+        ToggleRolled(_clingy.IsRolled);
+        var args = new RollRequestedEventArgs(_clingy.Id, _clingy.IsRolled);
         RollRequested?.Invoke(this, args);
     }
 

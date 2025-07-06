@@ -5,10 +5,11 @@
   x:Class="Clingies.App.Windows.ClingyWindow"
   Width="300"
   MinWidth="300"
+  SizeToContent="Height" 
   CanResize="True"
   Background="#FFFFAA"
   SystemDecorations="BorderOnly"
-  MinHeight="100"
+  MinHeight="30"
   TransparencyLevelHint="AcrylicBlur, Blur, Transparent"
   WindowStartupLocation="Manual"
   ShowInTaskbar="False"
@@ -26,7 +27,7 @@
       <Setter Property="BorderThickness" Value="0"/>
       <Setter Property="Padding" Value="8"/>
       <Setter Property="FontSize" Value="14"/>
-      <Setter Property="FontFamily" Value="sans-serif"/>
+      <Setter Property="FontFamily" Value="arial"/>
     </Style>
 
     <Style Selector="TextBox /template/ Border">
@@ -46,11 +47,11 @@
   </Window.Styles>
 
   <!-- 🗒️ Sticky Note UI -->
-  <Grid x:Name="WindowGrid" RowDefinitions="30, Auto">
+  <Grid x:Name="WindowGrid" RowDefinitions="Auto, *">
     <Border x:Name="TitleBorder" Grid.Row="0" BorderBrush="Black" BorderThickness="1">
       <Grid x:Name="TitleGrid" ColumnDefinitions="24,*,24" 
         Background="#87CEFA" Height="30" PointerPressed="OnHeaderDrag"
-        DoubleTapped="OnTitleBarDoubleTapped">
+      >
         <!-- ON TOP BUTTON -->
         <Button
               x:Name="PinButton"
@@ -77,7 +78,9 @@
             VerticalAlignment="Center"
             Foreground="Black"
             FontWeight="Bold"
-            TextTrimming="CharacterEllipsis"/>
+            TextTrimming="CharacterEllipsis"
+            DoubleTapped="OnTitleBarDoubleTapped" 
+        />
         <!-- CLOSE BUTTON -->
         <Button Grid.Column="2" 
                 Background="Transparent"
@@ -96,7 +99,7 @@
         </Button>
       </Grid>
     </Border>
-    <Border x:Name="BodyBorder" Grid.Row="1" BorderBrush="Black" BorderThickness="1">
+    <Border x:Name="BodyBorder" Grid.Row="1" IsVisible="true" MinHeight="0">
       <Grid x:Name="BodyGrid" ColumnDefinitions="10,*,10">
         <Border Grid.Column="0"
             Background="Transparent"
