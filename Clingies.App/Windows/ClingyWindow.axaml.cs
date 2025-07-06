@@ -67,7 +67,7 @@ public partial class ClingyWindow : Window
     private void LoadPinImage(bool pinned)
     {
         string imageRes = pinned ?
-            "avares://Clingies.App/Assets/icon-pinned.png" : 
+            "avares://Clingies.App/Assets/icon-pinned.png" :
             "avares://Clingies.App/Assets/icon-unpinned.png";
         var uri = new Uri(imageRes);
         using var stream = AssetLoader.Open(uri);
@@ -129,8 +129,8 @@ public partial class ClingyWindow : Window
     {
         base.OnKeyDown(e);
 
-        // Shift+Ctrl+P -> SET TITLE
-        if (e.KeyModifiers == (KeyModifiers.Shift | KeyModifiers.Control) && e.Key == Key.P)
+        // Shift+Ctrl+T -> SET TITLE
+        if (e.KeyModifiers == (KeyModifiers.Shift | KeyModifiers.Control) && e.Key == Key.T)
         {
             string prevTitle = string.IsNullOrEmpty(TitleTextBlock.Text) ? "" : TitleTextBlock.Text;
             var args = new TitleChangeRequestedEventArgs(ClingyId, prevTitle);
