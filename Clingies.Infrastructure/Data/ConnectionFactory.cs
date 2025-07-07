@@ -1,4 +1,5 @@
 using System.Data;
+using Clingies.Common;
 using Microsoft.Data.Sqlite;
 
 namespace Clingies.Infrastructure.Data;
@@ -15,18 +16,27 @@ public class ConnectionFactory : IConnectionFactory, IDisposable
 
     public IDbConnection GetConnection()
     {
-        if (_sharedConnection is null)
+        try
         {
-            _sharedConnection = new SqliteConnection(_connectionString);
-            _sharedConnection.Open();
-        }
+            if (_sharedConnection is null)
+            {
+                _sharedConnection = new SqliteConnection(_connectionString);
+                _sharedConnection.Open();
+            }
 
-        return _sharedConnection;
+            //_logger.Info("Connection open");
+            return _sharedConnection;
+        }
+        catch (Exception ex)
+        {
+            //_logger.Error(ex, "Error opening connection");
+            throw;
+        }
     }
 
     public void Dispose()
     {
-        Console.WriteLine("CONNECTION DISPOSED OK");
+        //_logger.Info("Connection disposed");
         _sharedConnection?.Dispose();
     }
 }

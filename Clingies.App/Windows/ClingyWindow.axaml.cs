@@ -38,8 +38,6 @@ public partial class ClingyWindow : Window
         ClingyId = clingy.Id;
         ContentBox.Text = _clingy.Content;
         TitleTextBlock.Text = _clingy.Title;
-        // Width = _clingy.Width;
-        // Height = _clingy.Height;
         Position = new PixelPoint((int)_clingy.PositionX, (int)_clingy.PositionY);
         Topmost = _clingy.IsPinned;
         LoadPinImage(_clingy.IsPinned);
@@ -93,7 +91,6 @@ public partial class ClingyWindow : Window
         var uri = new Uri(imageRes);
         using var stream = AssetLoader.Open(uri);
         PinButtonImage.Source = new Bitmap(stream);
-
     }
 
     private void OnClose(object? sender, RoutedEventArgs e)
@@ -159,7 +156,7 @@ public partial class ClingyWindow : Window
             SizeToContent = SizeToContent.Manual;
             InvalidateMeasure();
             InvalidateArrange();
-            SizeToContent = SizeToContent.Height;          
+            SizeToContent = SizeToContent.Height;
         }
     }
 

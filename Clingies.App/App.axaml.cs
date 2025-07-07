@@ -5,8 +5,9 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
+using Clingies.App.Common;
 using Clingies.App.Factories;
-using Clingies.Application.Services;
+using Clingies.Common;
 using Clingies.Infrastructure.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,12 +17,14 @@ public partial class App : Avalonia.Application
 {
     public IServiceProvider _services;
     private ClingyWindowFactory _windowFactory;
+    private IClingiesLogger _logger;
 
 
     public App(IServiceProvider services)
     {
         _services = services ?? throw new ArgumentNullException(nameof(services));
         _windowFactory = _services.GetRequiredService<ClingyWindowFactory>();
+        _logger = _services.GetRequiredService<IClingiesLogger>();
     }
 
     public override void Initialize()
@@ -53,7 +56,7 @@ public partial class App : Avalonia.Application
             var lifetime = App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
             Window anchor = lifetime?.Windows.Count > 0 ? lifetime.Windows[0] : null;
             var screen = anchor?.Screens.ScreenFromVisual(anchor)?.WorkingArea
-                                  ?? new PixelRect(0, 0, 800, 600);      
+                                  ?? new PixelRect(0, 0, 800, 600);
             var centerX = screen.X + (screen.Width - defClingyWidth) / 2;
             var centerY = screen.Y + (screen.Height - defClingyHeight) / 2;
 
@@ -111,6 +114,7 @@ public partial class App : Avalonia.Application
 
     private void RunMigrations()
     {
+        _logger.Info("Running migrations");
         // Path to your SQLite DB file, e.g., in user app data folder
         var dbPath = Path.Combine(Environment
                 .GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -122,5 +126,6 @@ public partial class App : Avalonia.Application
         // Run migrations
         var migrator = new MigrationRunnerService(dbPath);
         migrator.MigrateUp();
+        _logger.Info("Migrations done");
     }
 }

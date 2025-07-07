@@ -2,6 +2,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Clingies.Domain\Clingies.Domain.csproj" />
     <ProjectReference Include="..\Clingies.Infrastructure\Clingies.Infrastructure.csproj" />
+    <ProjectReference Include="..\Clingies.Common\Clingies.Common.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
