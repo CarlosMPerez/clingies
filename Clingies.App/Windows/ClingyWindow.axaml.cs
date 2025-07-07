@@ -15,6 +15,7 @@ public partial class ClingyWindow : Window
 {
     private Clingy _clingy;
     private bool _isRolled;
+    private bool _isInitiallyRolled = false;
     public Guid ClingyId { get; private set; }
     private bool _updateScheduled = false;
 
@@ -37,26 +38,43 @@ public partial class ClingyWindow : Window
         ClingyId = clingy.Id;
         ContentBox.Text = _clingy.Content;
         TitleTextBlock.Text = _clingy.Title;
-        Width = _clingy.Width;
-        Height = _clingy.Height;
+        // Width = _clingy.Width;
+        // Height = _clingy.Height;
         Position = new PixelPoint((int)_clingy.PositionX, (int)_clingy.PositionY);
         Topmost = _clingy.IsPinned;
         LoadPinImage(_clingy.IsPinned);
-        ToggleRolled(_clingy.IsRolled);
+        _isInitiallyRolled = _clingy.IsRolled;
     }
 
     private void ToggleRolled(bool isRolled)
     {
         _isRolled = isRolled;
-        BodyBorder.IsVisible = !isRolled;
+
         if (isRolled)
         {
-            this.SizeToContent = SizeToContent.Manual;
-            this.Height = TitleBorder.Bounds.Height + 2;
+            BodyBorder.IsVisible = false;
+            WindowGrid.RowDefinitions[1].Height = new GridLength(0, GridUnitType.Pixel);
+            SizeToContent = SizeToContent.Height;
         }
         else
         {
-            this.SizeToContent = SizeToContent.Height;
+            BodyBorder.IsVisible = true;
+            // Restore body row to auto-height
+            WindowGrid.RowDefinitions[1].Height = GridLength.Auto;
+
+            // Force full layout refresh if this clingy started as rolled
+            if (_isInitiallyRolled)
+            {
+                InvalidateMeasure();
+                InvalidateArrange();
+                SizeToContent = SizeToContent.Manual;
+                SizeToContent = SizeToContent.Height;
+                _isInitiallyRolled = false; // only needed once
+            }
+            else
+            {
+                SizeToContent = SizeToContent.Height;
+            }
         }
     }
 
@@ -100,11 +118,17 @@ public partial class ClingyWindow : Window
 
     protected override void OnOpened(EventArgs e)
     {
+        base.OnOpened(e);
         PositionChanged += OnPositionChanged;
         SizeChanged += OnSizeChanged;
         ContentBox.TextChanged += OnContentChanged;
-        base.OnOpened(e);
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            ToggleRolled(_clingy.IsRolled);
+        }, DispatcherPriority.Loaded);
     }
+
     private void OnPositionChanged(object? sender, PixelPointEventArgs e)
     {
         var args = new PositionChangeRequestedEventArgs(ClingyId,
@@ -114,17 +138,28 @@ public partial class ClingyWindow : Window
 
     private void OnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
+        if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
+            return; // skip update until layout resolves        
+
         var args = new SizeChangeRequestedEventArgs(ClingyId, this.Width, this.Height);
         SizeChangeRequested?.Invoke(this, args);
     }
 
     private void OnContentChanged(object? sender, EventArgs e)
     {
+        if (_isRolled) return; // don't resize if rolled
+
         if (sender is TextBox tb)
         {
             var newText = tb.Text ?? string.Empty;
             var args = new ContentChangeRequestedEventArgs(ClingyId, newText);
             ContentChangeRequested?.Invoke(this, args);
+
+            // Force size recalculation
+            SizeToContent = SizeToContent.Manual;
+            InvalidateMeasure();
+            InvalidateArrange();
+            SizeToContent = SizeToContent.Height;          
         }
     }
 
@@ -143,8 +178,10 @@ public partial class ClingyWindow : Window
 
     private void OnTitleBarDoubleTapped(object? sender, RoutedEventArgs e)
     {
-        _clingy.SetRolledState(!_clingy.IsRolled);
-        ToggleRolled(_clingy.IsRolled);
+        bool newState = !_isRolled;
+        _isRolled = newState;
+        _clingy.SetRolledState(newState);
+        ToggleRolled(newState);
         var args = new RollRequestedEventArgs(_clingy.Id, _clingy.IsRolled);
         RollRequested?.Invoke(this, args);
     }

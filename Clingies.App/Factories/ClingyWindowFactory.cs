@@ -5,7 +5,6 @@ using Clingies.App.Windows;
 using System;
 using Clingies.App.Windows.CustomEventArgs;
 using System.Linq;
-using Avalonia.Controls;
 
 namespace Clingies.App.Factories;
 
@@ -126,7 +125,9 @@ public class ClingyWindowFactory(ClingyService noteService)
     {
         var window = activeWindows.Single(x => x.ClingyId == args.ClingyId);
         var clingy = activeClingies.Single(x => x.Id == args.ClingyId);
-        window.Height = args.Height;
+
+        if (clingy.IsRolled) window.Height = args.Height;
+
         clingy.Resize(window.Width, args.Height);
         noteService.Update(clingy);
     }
