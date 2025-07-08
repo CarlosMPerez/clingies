@@ -41,20 +41,27 @@ internal sealed class Program
 
     private static IServiceProvider ConfigureServices()
     {
+		try
+		{
+			var services = new ServiceCollection();
+			// TODO: Change this for a configuration file so user can decide where the db is
+			var dbPath = Path.Combine(Environment
+					.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+					"Clingies", "clingies.db");
+			services.AddSingleton<IClingiesLogger, ClingiesLogger>();
+			Log.Information("Registering connection for db at {0}", dbPath);
+			services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory(dbPath));
+			services.AddSingleton<IClingyRepository, ClingyRepository>();
+			services.AddSingleton<ClingyWindowFactory>();
+			services.AddSingleton<ClingyService>();
 
-        var services = new ServiceCollection();
-        //var logger = new ClingiesLogger();
-        // TODO: Change this for a configuration file so user can decide where the db is
-        var dbPath = Path.Combine(Environment
-                .GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Clingies", "clingies.db");
-        services.AddSingleton<IClingiesLogger, ClingiesLogger>();
-        services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory(dbPath));
-        services.AddSingleton<IClingyRepository, ClingyRepository>();
-        services.AddSingleton<ClingyWindowFactory>();
-        services.AddSingleton<ClingyService>();
-
-        return services.BuildServiceProvider();
+			return services.BuildServiceProvider();
+		}
+		catch (Exception ex)
+		{
+			Log.Error(ex, "Error registering services");
+			throw;
+		}
     }
 
     public static AppBuilder BuildAvaloniaApp(IServiceProvider services)

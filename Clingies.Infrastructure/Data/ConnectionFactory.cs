@@ -24,12 +24,10 @@ public class ConnectionFactory : IConnectionFactory, IDisposable
                 _sharedConnection.Open();
             }
 
-            //_logger.Info("Connection open");
             return _sharedConnection;
         }
         catch (Exception ex)
         {
-            //_logger.Error(ex, "Error opening connection");
             throw;
         }
     }
