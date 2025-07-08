@@ -1,3 +1,4 @@
+using System.Data;
 using Clingies.Common;
 using Clingies.Domain.Factories;
 using Clingies.Domain.Interfaces;
@@ -8,11 +9,11 @@ namespace Clingies.Infrastructure.Data;
 
 public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLogger logger) : IClingyRepository
 {
+    private IDbConnection Conn => connectionFactory.GetConnection();
     public List<Clingy> GetAllActive()
     {
         try
         {
-            using var conn = connectionFactory.GetConnection();
             List<Clingy> clingies = new List<Clingy>();
             var sql = """
                 SELECT Id, Title, Content, CreatedAt, ModifiedAt, 
@@ -21,7 +22,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 FROM Clingies
                 WHERE IsDeleted = 0
             """;
-            var dtos = conn.Query<ClingyDto>(sql).ToList();
+            var dtos = Conn.Query<ClingyDto>(sql).ToList();
             clingies = dtos.Select(dto => ClingyEntityFactory.FromDto(dto)).ToList();
 
             return clingies;
@@ -32,12 +33,10 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             throw;
         }
     }
-
     public Clingy Get(Guid id)
     {
         try
         {
-            using var conn = connectionFactory.GetConnection();
             var parms = new Dictionary<string, object> { { "@Id", id } };
             var sql = """
                 SELECT Id, Title, Content, CreatedAt, ModifiedAt, 
@@ -46,7 +45,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 FROM Clingies
                 WHERE Id = @Id
             """;
-            var dtos = conn.Query<ClingyDto>(sql, parms);
+            var dtos = Conn.Query<ClingyDto>(sql, parms);
             var clingy = dtos.Select(dto => ClingyEntityFactory.FromDto(dto)).First();
 
             return clingy;
@@ -62,7 +61,6 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
     {
         try
         {
-            using var conn = connectionFactory.GetConnection();
             var sql = """
                 INSERT INTO Clingies (Id, Title, Content, CreatedAt, ModifiedAt, 
                     IsDeleted, IsPinned, IsRolled, IsStand, 
@@ -72,7 +70,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     @PositionX, @PositionY, @Width, @Height)
                 """;
 
-            conn.Execute(sql, clingy);
+            Conn.Execute(sql, clingy);
         }
         catch (Exception ex)
         {
@@ -85,7 +83,6 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
     {
         try
         {
-            using var conn = connectionFactory.GetConnection();
             var sql = """
                 UPDATE Clingies SET 
                     Title = @Title, 
@@ -101,7 +98,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     Height = @Height
                 WHERE Id = @Id
                 """;
-            conn.Execute(sql, clingy);
+            Conn.Execute(sql, clingy);
         }
         catch (Exception ex)
         {
@@ -114,14 +111,13 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
     {
         try
         {
-            using var conn = connectionFactory.GetConnection();
             var parms = new Dictionary<string, object> { { "@Id", id } };
             var sql = """
                 DELETE FROM Clingies 
                 WHERE Id = @Id
                 """;
 
-            conn.Execute(sql, parms);
+            Conn.Execute(sql, parms);
         }
         catch (Exception ex)
         {
@@ -134,7 +130,6 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
     {
         try
         {
-            using var conn = connectionFactory.GetConnection();
             var parms = new Dictionary<string, object> { { "@Id", id } };
             var sql = """
                 UPDATE Clingies SET 
@@ -142,7 +137,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 WHERE Id = @Id
                 """;
 
-            conn.Execute(sql, parms);
+            Conn.Execute(sql, parms);
         }
         catch (Exception ex)
         {

@@ -11,17 +11,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Domain", "Clingies
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Infrastructure", "Clingies.Infrastructure\Clingies.Infrastructure.csproj", "{4DF873B8-CA69-4DAA-852B-F1FA2E7472D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Tests", "Clingies.Tests\Clingies.Tests.csproj", "{DB05787D-D850-45D6-BE08-9ADD05F91427}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Tests.Integration", "Clingies.Tests.Integration\Clingies.Tests.Integration.csproj", "{DB05787D-D850-45D6-BE08-9ADD05F91427}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Common", "Clingies.Common\Clingies.Common.csproj", "{07A21FE4-EDA2-41C2-979F-53D76A0CD89C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Tests.Unit", "Clingies.Tests.Unit\Clingies.Tests.Unit.csproj", "{971AB5A7-6771-44E8-97BD-27182A1F6E65}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{7911F837-6303-43C2-81AB-325C37084CA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -48,5 +47,12 @@ Global
 		{07A21FE4-EDA2-41C2-979F-53D76A0CD89C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07A21FE4-EDA2-41C2-979F-53D76A0CD89C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07A21FE4-EDA2-41C2-979F-53D76A0CD89C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{971AB5A7-6771-44E8-97BD-27182A1F6E65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{971AB5A7-6771-44E8-97BD-27182A1F6E65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{971AB5A7-6771-44E8-97BD-27182A1F6E65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{971AB5A7-6771-44E8-97BD-27182A1F6E65}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
