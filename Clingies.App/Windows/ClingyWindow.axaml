@@ -109,7 +109,7 @@
             PointerPressed="OnResizeLeft"
             Cursor="LeftSide" />
         <!-- Your main clingy layout goes here -->
-        <Border Grid.Column="1"
+        <Border x:Name="ContentContainerBorder" Grid.Column="1"
                 BorderBrush="Transparent"
                 BorderThickness="1">
             <!-- CONTENT -->

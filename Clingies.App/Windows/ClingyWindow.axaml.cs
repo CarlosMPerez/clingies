@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
@@ -15,6 +16,7 @@ public partial class ClingyWindow : Window
 {
     private Clingy _clingy;
     private bool _isRolled;
+    private double _unrolledHeight;
     private bool _isInitiallyRolled = false;
     public Guid ClingyId { get; private set; }
     public event EventHandler<Guid>? CloseRequested;
@@ -42,9 +44,38 @@ public partial class ClingyWindow : Window
         ContentBox.Text = _clingy.Content;
         TitleTextBlock.Text = _clingy.Title;
         Position = new PixelPoint((int)_clingy.PositionX, (int)_clingy.PositionY);
+        Width = clingy.Width;
         Topmost = _clingy.IsPinned;
         LoadPinImage(_clingy.IsPinned);
         _isInitiallyRolled = _clingy.IsRolled;
+        if (!clingy.IsRolled)
+        {
+            Height = clingy.Height;
+            _unrolledHeight = clingy.Height;
+        }
+    }
+
+    protected override void OnOpened(EventArgs e)
+    {
+        base.OnOpened(e);
+        this.Opacity = 0;
+
+        PositionChanged += OnPositionChanged;
+        SizeChanged += OnSizeChanged;
+        ContentBox.TextChanged += OnContentChanged;
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            // Let layout fully build unrolled
+            _unrolledHeight = Height; // capture true measured height
+
+            if (_isInitiallyRolled)
+            {
+                ToggleRolled(true);
+            }
+
+            Opacity = 1;
+        }, DispatcherPriority.Render);
     }
 
     private void ToggleRolled(bool isRolled)
@@ -53,29 +84,24 @@ public partial class ClingyWindow : Window
 
         if (isRolled)
         {
+            // Save current height for restoring later
+            _unrolledHeight = Height;
             BodyBorder.IsVisible = false;
             WindowGrid.RowDefinitions[1].Height = new GridLength(0, GridUnitType.Pixel);
-            SizeToContent = SizeToContent.Height;
+            SizeToContent = SizeToContent.Manual;
+            // Shrink to just title height (approx)
+            var titleHeight = TitleBorder.Bounds.Height;
+            if (titleHeight <= 0)
+                titleHeight = 28; // use a reasonable default if not yet measured
+
+            Height = titleHeight + 2;
         }
         else
         {
             BodyBorder.IsVisible = true;
-            // Restore body row to auto-height
             WindowGrid.RowDefinitions[1].Height = GridLength.Auto;
-
-            // Force full layout refresh if this clingy started as rolled
-            if (_isInitiallyRolled)
-            {
-                InvalidateMeasure();
-                InvalidateArrange();
-                SizeToContent = SizeToContent.Manual;
-                SizeToContent = SizeToContent.Height;
-                _isInitiallyRolled = false; // only needed once
-            }
-            else
-            {
-                SizeToContent = SizeToContent.Height;
-            }
+            SizeToContent = SizeToContent.Manual;
+            Height = _unrolledHeight;
         }
     }
 
@@ -116,19 +142,6 @@ public partial class ClingyWindow : Window
             BeginMoveDrag(e);
     }
 
-    protected override void OnOpened(EventArgs e)
-    {
-        base.OnOpened(e);
-        PositionChanged += OnPositionChanged;
-        SizeChanged += OnSizeChanged;
-        ContentBox.TextChanged += OnContentChanged;
-
-        Dispatcher.UIThread.Post(() =>
-        {
-            ToggleRolled(_clingy.IsRolled);
-        }, DispatcherPriority.Loaded);
-    }
-
     private void OnPositionChanged(object? sender, PixelPointEventArgs e)
     {
         var args = new PositionChangeRequestedEventArgs(ClingyId,
@@ -138,8 +151,10 @@ public partial class ClingyWindow : Window
 
     private void OnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
-        if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
-            return; // skip update until layout resolves        
+        if (double.IsNaN(this.Width) || double.IsNaN(this.Height) || _isInitiallyRolled)
+            return;
+
+        if (!_isRolled) _unrolledHeight = Height;
 
         var args = new SizeChangeRequestedEventArgs(ClingyId, this.Height);
         SizeChangeRequested?.Invoke(this, args);
@@ -147,7 +162,7 @@ public partial class ClingyWindow : Window
 
     private void OnContentChanged(object? sender, EventArgs e)
     {
-        if (_isRolled) return; // don't resize if rolled
+        if (_isRolled) return;
 
         if (sender is TextBox tb)
         {
@@ -155,11 +170,38 @@ public partial class ClingyWindow : Window
             var args = new ContentChangeRequestedEventArgs(ClingyId, newText);
             ContentChangeRequested?.Invoke(this, args);
 
-            // Force size recalculation
-            SizeToContent = SizeToContent.Manual;
-            InvalidateMeasure();
-            InvalidateArrange();
-            SizeToContent = SizeToContent.Height;
+            // Estimate width of content area
+            double availableWidth = tb.Bounds.Width > 0 ? tb.Bounds.Width : Width - 20;
+
+            // Create a throwaway TextBlock to measure
+            var measurementBlock = new TextBlock
+            {
+                Text = newText,
+                FontFamily = tb.FontFamily,
+                FontSize = tb.FontSize,
+                FontWeight = tb.FontWeight,
+                FontStyle = tb.FontStyle,
+                TextWrapping = TextWrapping.Wrap,
+                Width = availableWidth
+            };
+
+            // Measure it
+            measurementBlock.Measure(new Size(availableWidth, double.PositiveInfinity));
+            double contentHeight = measurementBlock.DesiredSize.Height;
+
+            // Fallback minimum
+            if (contentHeight < 30)
+                contentHeight = 30;
+
+            // Estimate title height
+            double titleHeight = TitleBorder.Bounds.Height;
+            if (titleHeight < 1)
+                titleHeight = 28;
+
+            double totalHeight = titleHeight + contentHeight + 12;
+
+            Height = totalHeight;
+            _unrolledHeight = totalHeight;
         }
     }
 
