@@ -49,8 +49,11 @@ internal sealed class Program
 					.GetFolderPath(Environment.SpecialFolder.ApplicationData),
 					"Clingies", "clingies.db");
 			services.AddSingleton<IClingiesLogger, ClingiesLogger>();
-			Log.Information("Registering connection for db at {0}", dbPath);
-			services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory(dbPath));
+			services.AddSingleton<IConnectionFactory>(sp =>
+            {
+                var logger = sp.GetRequiredService<IClingiesLogger>();
+                return new ConnectionFactory(dbPath, logger);
+            });
 			services.AddSingleton<IClingyRepository, ClingyRepository>();
 			services.AddSingleton<ClingyWindowFactory>();
 			services.AddSingleton<ClingyService>();

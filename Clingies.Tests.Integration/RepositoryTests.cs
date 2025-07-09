@@ -8,6 +8,7 @@ using Clingies.Domain.Factories;
 
 namespace Clingies.Tests.Integration
 {
+    [Collection("RepositoryTests")]
     public class RepositoryTests : IDisposable
     {
         private readonly SqliteConnection _connection;
@@ -23,15 +24,9 @@ namespace Clingies.Tests.Integration
                 _connection.Open();
             }
 
-            var tableCheck = _connection
-                .Query<string>("SELECT name FROM sqlite_master WHERE type='table'")
-                .Contains("Clingies");
-            if (!tableCheck)
-            {
-                // Create schema — adapt to your actual table definition
-                var schema = File.ReadAllText("schema.sql");
-                _connection.Execute(schema);
-            }
+            // Create schema 
+            var schema = File.ReadAllText("schema.sql");
+            _connection.Execute(schema);
 
             // Setup ConnectionFactory that returns this in-memory connection
             _connectionFactory = new InMemoryConnectionFactory(_connection);
@@ -42,8 +37,8 @@ namespace Clingies.Tests.Integration
         public void Can_Create_And_Read_Clingy()
         {
             var clingy = CreateTestClingy();
-            _repository.Create(clingy);
-            var sut = _repository.Get(clingy.Id);
+            var id = _repository.Create(clingy);
+            var sut = _repository.Get(id);
 
             Assert.NotNull(sut);
             Assert.Equal("TEST CLINGY", sut!.Title);
@@ -68,10 +63,58 @@ namespace Clingies.Tests.Integration
             Assert.Equal(2, sut.Count);
         }
 
+        [Fact]
+        public void Can_Update_Clingy()
+        {
+            var clingy = CreateTestClingy();
+            var id = _repository.Create(clingy);
+
+            clingy.UpdateTitle("UPDATED TITLE");
+            clingy.UpdateContent("This is an updated content");
+            clingy.SetPinState(true);
+            clingy.SetRolledState(true);
+            _repository.Update(clingy);
+
+            var sut = _repository.Get(id);
+
+            Assert.NotNull(sut);
+            Assert.Equal("UPDATED TITLE", sut.Title);
+            Assert.Equal("This is an updated content", sut.Content);
+            Assert.True(sut.IsRolled);
+            Assert.True(sut.IsPinned);
+        }
+
+        [Fact]
+        public void Can_Soft_Delete_Clingy()
+        {
+            var clingy = CreateTestClingy();
+            var id = _repository.Create(clingy);
+
+            _repository.SoftDelete(id);
+
+            var sut = _repository.Get(id);
+
+            Assert.NotNull(sut);
+            Assert.True(sut.IsDeleted);
+        }
+
+        [Fact]
+        public void Can_Hard_Delete_Clingy()
+        {
+            var clingy = CreateTestClingy();
+            var id = _repository.Create(clingy);
+
+            _repository.HardDelete(id);
+
+            var sut = _repository.Get(id);
+
+            Assert.Null(sut);
+        }
+
         public void Dispose()
         {
             _connection.Execute("DELETE FROM Clingies;");
-            _connection.Execute("VACUUM;"); 
+            _connection.Execute("VACUUM;");
         }
 
         // A simple test logger that does nothing (or you can log to test output)
@@ -110,6 +153,6 @@ namespace Clingies.Tests.Integration
                     "This is a clingy text content for tests", 100, 200);
             clg.MarkDeleted();
             return clg;
-        }        
+        }
     }
 }

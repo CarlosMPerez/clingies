@@ -1,4 +1,4 @@
-CREATE TABLE Clingies (
+CREATE TABLE IF NOT EXISTS Clingies (
     Id TEXT PRIMARY KEY,
     Title TEXT,
     Content TEXT,

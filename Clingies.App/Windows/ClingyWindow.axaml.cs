@@ -17,17 +17,20 @@ public partial class ClingyWindow : Window
     private bool _isRolled;
     private bool _isInitiallyRolled = false;
     public Guid ClingyId { get; private set; }
-    private bool _updateScheduled = false;
-
     public event EventHandler<Guid>? CloseRequested;
     public event EventHandler<PinRequestedEventArgs>? PinRequested;
     public event EventHandler<PositionChangeRequestedEventArgs>? PositionChangeRequested;
     public event EventHandler<SizeChangeRequestedEventArgs>? SizeChangeRequested;
     public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
     public event EventHandler<TitleChangeRequestedEventArgs>? TitleChangeRequested;
-    public event EventHandler<UpdateWindowHeightRequestedEventArgs>? UpdateWindowHeightRequested;
     public event EventHandler<UpdateWindowWidthRequestedEventArgs>? UpdateWindowWidthRequested;
     public event EventHandler<RollRequestedEventArgs>? RollRequested;
+
+    public ClingyWindow()
+    {
+        InitializeComponent();
+        _clingy = null!;
+    }
 
     public ClingyWindow(Clingy clingy)
     {
@@ -138,7 +141,7 @@ public partial class ClingyWindow : Window
         if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
             return; // skip update until layout resolves        
 
-        var args = new SizeChangeRequestedEventArgs(ClingyId, this.Width, this.Height);
+        var args = new SizeChangeRequestedEventArgs(ClingyId, this.Height);
         SizeChangeRequested?.Invoke(this, args);
     }
 

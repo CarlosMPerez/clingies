@@ -33,7 +33,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             throw;
         }
     }
-    public Clingy Get(Guid id)
+    public Clingy? Get(Guid id)
     {
         try
         {
@@ -46,7 +46,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 WHERE Id = @Id
             """;
             var dtos = Conn.Query<ClingyDto>(sql, parms);
-            var clingy = dtos.Select(dto => ClingyEntityFactory.FromDto(dto)).First();
+            var clingy = dtos.Select(dto => ClingyEntityFactory.FromDto(dto)).FirstOrDefault();
 
             return clingy;
         }
@@ -57,7 +57,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
-    public void Create(Clingy clingy)
+    public Guid Create(Clingy clingy)
     {
         try
         {
@@ -71,6 +71,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 """;
 
             Conn.Execute(sql, clingy);
+            return clingy.Id;
         }
         catch (Exception ex)
         {
@@ -79,7 +80,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
-    public void Update(Clingy clingy)
+    public Guid Update(Clingy clingy)
     {
         try
         {
@@ -99,6 +100,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 WHERE Id = @Id
                 """;
             Conn.Execute(sql, clingy);
+            return clingy.Id;
         }
         catch (Exception ex)
         {

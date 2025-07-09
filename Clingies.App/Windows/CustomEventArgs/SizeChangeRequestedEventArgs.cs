@@ -10,10 +10,9 @@ public class SizeChangeRequestedEventArgs : EventArgs
 
     public double Height { get; }
 
-    public SizeChangeRequestedEventArgs(Guid id, double width, double height)
+    public SizeChangeRequestedEventArgs(Guid id, double height)
     {
         ClingyId = id;
-        Width = width;
         Height = height;
     }
 

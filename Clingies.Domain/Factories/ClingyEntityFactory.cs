@@ -20,7 +20,7 @@ public static class ClingyEntityFactory
     {
         return new Clingy(
             Guid.Parse(dto.Id),
-            dto.Title,
+            string.IsNullOrEmpty(dto.Title) ? "" : dto.Title,
             dto.Content,
             dto.PositionX,
             dto.PositionY,

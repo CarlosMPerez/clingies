@@ -20,7 +20,7 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
     }
 
-    public Clingy Get(Guid id)
+    public Clingy? Get(Guid id)
     {
         try
         {

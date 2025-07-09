@@ -5,7 +5,12 @@ namespace Clingies.App.Windows;
 
 public partial class TitleDialog : Window
 {
-    public string TitleText => TitleInput.Text;
+    public string TitleText => string.IsNullOrEmpty(TitleInput.Text) ? "" : TitleInput.Text;
+
+    public TitleDialog()
+    {
+        InitializeComponent();
+    }
 
     public TitleDialog(string initialTitle = "")
     {
