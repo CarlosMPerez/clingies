@@ -1,0 +1,17 @@
+<UserControl
+      xmlns="https://github.com/avaloniaui"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      x:Class="Clingies.App.Controls.ClingyBodyControl">
+  <Border Background="#FFFFAA" Padding="4">
+    <TextBox x:Name="ContentBox"
+             AcceptsReturn="True"
+             TextWrapping="Wrap"
+             BorderThickness="0"
+             FontSize="14"
+             FontFamily="Arial"
+             Background="Transparent"
+             MinHeight="20"
+             VerticalAlignment="Top"
+             HorizontalAlignment="Stretch" />
+  </Border>
+</UserControl>
