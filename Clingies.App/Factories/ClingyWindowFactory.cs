@@ -3,7 +3,7 @@ using Clingies.Application.Services;
 using Clingies.Domain.Models;
 using Clingies.App.Windows;
 using System;
-using Clingies.App.Windows.CustomEventArgs;
+using Clingies.App.Common.CustomEventArgs;
 using System.Linq;
 using Clingies.Common;
 

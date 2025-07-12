@@ -1,6 +1,6 @@
 using System;
 
-namespace Clingies.App.Windows.CustomEventArgs;
+namespace Clingies.App.Common.CustomEventArgs;
 
 public class PinRequestedEventArgs : EventArgs
 {

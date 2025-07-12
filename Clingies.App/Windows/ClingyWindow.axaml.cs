@@ -1,3 +1,11 @@
+using System;
+using Avalonia.Controls;
+using Clingies.App.Windows.Controls;
+using Clingies.App.Common.CustomEventArgs;
+using Clingies.Domain.Models;
+using Avalonia;
+
+namespace Clingies.App.Windows;
 public partial class ClingyWindow : Window
 {
     private Clingy _clingy;
@@ -22,35 +30,20 @@ public partial class ClingyWindow : Window
         Width = clingy.Width;
         Topmost = clingy.IsPinned;
 
-        TitleBar.Title = clingy.Title;
-        Body.Content = clingy.Content;
-
-        TitleBar.CloseRequested += (_, _) => CloseRequested?.Invoke(this, _clingy.Id);
-        TitleBar.PinClicked += (_, _) => TogglePin();
-        TitleBar.TitleDoubleClicked += (_, _) => ToggleRolled();
-        Body.ContentChanged += (_, text) => OnContentChanged(text);
-
-        if (!clingy.IsRolled)
-        {
-            Height = clingy.Height;
-            _unrolledHeight = clingy.Height;
-        }
+        // establish title props
+        ClingyTitleBar.ClingyId = _clingy.Id;
+        ClingyTitleBar.Title = _clingy.Title;
+        ClingyTitleBar.IsRolled = _clingy.IsRolled;
+        ClingyTitleBar.IsPinned = _clingy.IsPinned;
+        // establish body props
+        ClingyBody.ClingyId = _clingy.Id;
+        ClingyBody.BodyContent = _clingy.Content;
     }
 
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);
-        Opacity = 0;
-
-        Dispatcher.UIThread.Post(() =>
-        {
-            _unrolledHeight = Height;
-
-            if (_initiallyRolled)
-                ToggleRolled();
-
-            Opacity = 1;
-        }, DispatcherPriority.Render);
+        if (_initiallyRolled) ToggleRolled();
     }
 
     private void TogglePin()
