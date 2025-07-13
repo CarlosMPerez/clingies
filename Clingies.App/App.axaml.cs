@@ -6,18 +6,21 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using Clingies.App.Factories;
+using Clingies.App.Windows;
 using Clingies.Common;
 using Clingies.Infrastructure.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Clingies.App;
 
-public partial class App : Avalonia.Application
+public partial class App : Application
 {
     public IServiceProvider _services;
     private ClingyWindowFactory _windowFactory;
     private IClingiesLogger _logger;
 
+    [Obsolete("Used only by Avalonia XAML loader", true)]
+    public App() { }
 
     public App(IServiceProvider services)
     {
@@ -28,13 +31,16 @@ public partial class App : Avalonia.Application
 
     public override void Initialize()
     {
+        Console.WriteLine("Initializing App — checking if XAML loader throws...");
         AvaloniaXamlLoader.Load(this);
+        Console.WriteLine("XAML loaded!");
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            desktop.MainWindow = new ClingyNoteWindow();
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             DrawTrayIcon();

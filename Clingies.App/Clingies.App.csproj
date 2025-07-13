@@ -7,6 +7,10 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <UseWpf>false</UseWpf>
+    <EnableDefaultAvaloniaAnalyzers>true</EnableDefaultAvaloniaAnalyzers>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.0" />
@@ -27,10 +31,21 @@
     <PackageReference Include="System.Reactive" Version="6.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Clingies.Application\Clingies.Application.csproj" />
+    <ProjectReference Include="../Clingies.ApplicationLogic/Clingies.ApplicationLogic.csproj" />
     <ProjectReference Include="..\Clingies.Common\Clingies.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <AvaloniaXaml Remove="**/*.axaml" />
+    <AvaloniaXaml Include="App.axaml" />
+    <AvaloniaXaml Include="Windows/**/*.axaml" />
+    <AvaloniaXaml Include="Controls/**/*.axaml" />
+  </ItemGroup>  
+  <ItemGroup>
     <AvaloniaResource Include="Assets/**" />
+  </ItemGroup>  
+  <ItemGroup>
+    <Compile Update="Windows/ClingyNoteWindow.axaml.cs">
+      <DependentUpon>ClingyNoteWindow.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

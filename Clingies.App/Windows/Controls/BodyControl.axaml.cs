@@ -11,21 +11,22 @@ public partial class BodyControl : UserControl
 {
 
     public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
-    public event EventHandler<UpdateWindowWidthRequestedEventArgs>? UpdateWindowWidthRequested;
     private Guid _id;
     private string? _bodyContent;
-    private Window? _parentWindow;
+    private ClingyNoteWindow? _parentWindow;
 
     public BodyControl()
     {
         InitializeComponent();
         this.AttachedToVisualTree += OnAttachedToVisualTree;
+        ContentBox.TextChanged += OnContentChanged;
+        BorderLeft.PointerPressed += OnResizeLeft;
+        BorderRight.PointerPressed += OnResizeRight;
     }
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
-        _parentWindow = (Window)this.GetVisualRoot()!;
+        _parentWindow = (ClingyNoteWindow)this.GetVisualRoot()!;
     }
-
 
     public Guid ClingyId
     {
@@ -38,26 +39,37 @@ public partial class BodyControl : UserControl
         get { return _bodyContent; }
         set
         {
-            _bodyContent = value;
-            ContentBox.Text = value;
+            _bodyContent = string.IsNullOrWhiteSpace(value) ? "" : value;
+            ContentBox.Text = _bodyContent;
+        }
+    }
+
+    private void OnContentChanged(object? sender, TextChangedEventArgs e)
+    {
+        if (IsVisible)
+        {
+            // Measure height
+            ContentBox.Measure(new Size(ContentBox.Bounds.Width, double.PositiveInfinity));
+
+            var measuredHeight = ContentBox.DesiredSize.Height;
+            if (measuredHeight < 30) measuredHeight = 30;
+
+            Height = measuredHeight + 40; // + title + margin
+
+            // call parentwindow with new height and content
+            _parentWindow!.ContentChangeRequest(_bodyContent, Height);
         }
     }
 
     private void OnResizeRight(object? sender, PointerPressedEventArgs e)
     {
         _parentWindow?.BeginResizeDrag(WindowEdge.East, e);
-        CallUpdateWindow();
+        _parentWindow!.WidthChangeRequest();
     }
 
     private void OnResizeLeft(object? sender, PointerPressedEventArgs e)
     {
         _parentWindow?.BeginResizeDrag(WindowEdge.West, e);
-        CallUpdateWindow();
-    }
-
-    private void CallUpdateWindow()
-    {
-        var args = new UpdateWindowWidthRequestedEventArgs(_id, _parentWindow != null ? _parentWindow.Width : 0);
-        UpdateWindowWidthRequested?.Invoke(this, args);
+        _parentWindow!.WidthChangeRequest();
     }
 }

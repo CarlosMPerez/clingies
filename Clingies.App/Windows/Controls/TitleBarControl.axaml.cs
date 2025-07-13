@@ -12,26 +12,26 @@ namespace Clingies.App.Windows.Controls;
 
 public partial class TitleBarControl : UserControl
 {
-    public event EventHandler<Guid>? CloseRequested;
-    public event EventHandler<PinRequestedEventArgs>? PinRequested;
-    public event EventHandler<TitleChangeRequestedEventArgs>? TitleChangeRequested;
-    public event EventHandler<PositionChangeRequestedEventArgs>? PositionChangeRequested;
-    public event EventHandler<RollRequestedEventArgs>? RollRequested;
-
     private Guid _id;
     private bool _isRolled;
     private bool _isPinned;
     private string? _title;
-    private Window? _parentWindow;
+    private ClingyNoteWindow? _parentWindow;
 
     public TitleBarControl()
     {
         InitializeComponent();
         this.AttachedToVisualTree += OnAttachedToVisualTree;
+
+        HeaderGrid.PointerPressed += OnHeaderDrag;
+        HeaderGrid.DoubleTapped += OnDoubleTap;
+        PinButton.Click += OnPinClick;
+        CloseButton.Click += OnClose;
     }
+
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
-        _parentWindow = (Window)this.GetVisualRoot()!;
+        _parentWindow = (ClingyNoteWindow)this.GetVisualRoot()!;
     }
     
     public bool IsRolled
@@ -63,20 +63,21 @@ public partial class TitleBarControl : UserControl
     }
 
     private void OnClose(object? sender, RoutedEventArgs e)
-        => CloseRequested?.Invoke(this, _id);
+    {
+        _parentWindow?.CloseRequest();
+    }
 
     private void OnPinClick(object? sender, RoutedEventArgs e)
     {
-        LoadPinImage(!_isPinned);
-        var args = new PinRequestedEventArgs(_id, !_isPinned);
-        PinRequested?.Invoke(this, args);
+        _isPinned = !_isPinned;
+        LoadPinImage(_isPinned);
+        _parentWindow?.PinRequest(_isPinned);
     }
 
     private void OnDoubleTap(object? sender, RoutedEventArgs e)
     {
-        //ToggleRolled(newState);
-        var args = new RollRequestedEventArgs(_id, _isRolled);
-        RollRequested?.Invoke(this, args);
+        _isRolled = !_isRolled;
+        _parentWindow?.RollRequest(_isRolled);
     }
 
     private void OnHeaderDrag(object? sender, PointerPressedEventArgs e)

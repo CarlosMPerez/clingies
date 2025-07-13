@@ -4,7 +4,7 @@ using Avalonia;
 using Clingies.App;
 using Clingies.App.Common;
 using Clingies.App.Factories;
-using Clingies.Application.Services;
+using Clingies.ApplicationLogic.Services;
 using Clingies.Common;
 using Clingies.Domain.Interfaces;
 using Clingies.Infrastructure.Data;

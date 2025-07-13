@@ -4,13 +4,15 @@
         x:Class="Clingies.App.Windows.Controls.TitleBarControl">
 
   <Border Grid.Row="0" BorderBrush="Black" BorderThickness="1">
-    <Grid ColumnDefinitions="24,*,24" 
+    <Grid x:Name="HeaderGrid"
+      ColumnDefinitions="24,*,24" 
       Background="#87CEFA" 
       Height="30" 
       PointerPressed="OnHeaderDrag"
       DoubleTapped="OnDoubleTap"
     >
-      <Button Grid.Column="0"
+      <Button x:Name="PinButton"
+        Grid.Column="0"
         Width="24" Height="24"
         Background="Transparent"
         BorderThickness="0"
@@ -36,7 +38,8 @@
         FontWeight="Bold"
         TextTrimming="CharacterEllipsis"
       />
-      <Button Grid.Column="2" 
+      <Button x:Name="CloseButton"
+        Grid.Column="2" 
         Background="Transparent"
         BorderThickness="0"
         Click="OnClose"

@@ -4,7 +4,7 @@
   x:Class="Clingies.App.Windows.Controls.BodyControl"
 >
   <!-- 🔧 Custom Styles -->
-  <Window.Styles>
+  <UserControl.Styles>
     <Style Selector="TextBox">
       <Setter Property="Background" Value="#FFFFAA"/>
       <Setter Property="Foreground" Value="Black"/>
@@ -30,7 +30,7 @@
       <Setter Property="Background" Value="#FFFFAA"/>
       <Setter Property="BorderBrush" Value="Transparent"/>
     </Style>
-  </Window.Styles>
+  </UserControl.Styles>
 
     <Border x:Name="BodyBorder" Grid.Row="1" IsVisible="true" 
       MinHeight="0" Margin="0" Padding="0"
@@ -38,6 +38,7 @@
     >
       <Grid x:Name="BodyGrid" ColumnDefinitions="10,*,10">
         <Border Grid.Column="0"
+          x:Name="BorderLeft"
           Background="#FFFFAA"
           PointerPressed="OnResizeLeft"
           Cursor="LeftSide" 
@@ -74,6 +75,7 @@
         </Border>    
         <!-- Right resizable edge -->
         <Border Grid.Column="2"
+          x:Name="BorderRight"
           Background="#FFFFAA"
           PointerPressed="OnResizeRight"
           Cursor="RightSide" 

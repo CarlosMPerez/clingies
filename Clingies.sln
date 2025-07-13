@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.App", "Clingies.App\Clingies.App.csproj", "{7911F837-6303-43C2-81AB-325C37084CA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Application", "Clingies.Application\Clingies.Application.csproj", "{705A6D57-4BF9-45AE-BE33-16133D830EB9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.ApplicationLogic", "Clingies.ApplicationLogic\Clingies.ApplicationLogic.csproj", "{705A6D57-4BF9-45AE-BE33-16133D830EB9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Domain", "Clingies.Domain\Clingies.Domain.csproj", "{272A7959-9D6B-4F4F-914E-9756EDF05A36}"
 EndProject

@@ -3,7 +3,7 @@ using Clingies.Domain.Factories;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
 
-namespace Clingies.Application.Services;
+namespace Clingies.ApplicationLogic.Services;
 
 public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
 {

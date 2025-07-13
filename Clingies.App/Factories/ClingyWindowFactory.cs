@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Clingies.Application.Services;
+using Clingies.ApplicationLogic.Services;
 using Clingies.Domain.Models;
 using Clingies.App.Windows;
 using System;
@@ -12,13 +12,13 @@ namespace Clingies.App.Factories;
 public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logger)
 {
     private List<Clingy> activeClingies = new List<Clingy>();
-    private List<ClingyWindow> activeWindows = new List<ClingyWindow>();
+    private List<ClingyNoteWindow> activeWindows = new List<ClingyNoteWindow>();
     public void CreateNewWindow(double posX, double posY)
     {
         try
         {
             var clingy = noteService.Create("", "", posX, posY);
-            var window = new ClingyWindow(clingy);
+            var window = new ClingyNoteWindow(clingy);
             SubscribeWindowToEvents(window);
             activeWindows.Add(window);
             activeClingies.Add(clingy);
@@ -37,7 +37,7 @@ public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logg
         {
             foreach (var clingy in noteService.GetAllActive())
             {
-                var window = new ClingyWindow(clingy);
+                var window = new ClingyNoteWindow(clingy);
                 SubscribeWindowToEvents(window);
                 activeClingies.Add(clingy);
                 activeWindows.Add(window);
@@ -51,12 +51,11 @@ public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logg
         }
     }
 
-    private void SubscribeWindowToEvents(ClingyWindow window)
+    private void SubscribeWindowToEvents(ClingyNoteWindow window)
     {
         window.CloseRequested += HandleCloseRequested;
         window.PinRequested += HandlePinRequested;
         window.PositionChangeRequested += HandlePositionChangeRequested;
-        window.SizeChangeRequested += HandleSizeChangeRequested;
         window.ContentChangeRequested += HandleContentChangeRequested;
         window.TitleChangeRequested += HandleTitleChangeRequested;
         window.UpdateWindowWidthRequested += HandleUpdateWindowWidthRequested;
@@ -144,8 +143,8 @@ public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logg
         {
             var window = activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = activeClingies.Single(x => x.Id == args.ClingyId);
-            window.ContentBox.Text = args.Content;
-            clingy.UpdateContent(args.Content);
+            clingy.UpdateContent(string.IsNullOrEmpty(args.Content) ? "" : args.Content);
+            clingy.Resize(clingy.Width, args.Height);
             logger.Info("{0} has requested a change in content", clingy.Title!);
             noteService.Update(clingy);
         }
@@ -156,22 +155,15 @@ public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logg
         }
     }
 
-    private async void HandleTitleChangeRequested(object? sender, TitleChangeRequestedEventArgs args)
+    private void HandleTitleChangeRequested(object? sender, TitleChangeRequestedEventArgs args)
     {
         try
         {
             var window = activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = activeClingies.Single(x => x.Id == args.ClingyId);
-            var dialog = new TitleDialog(args.PreviousTitle);
-
-            var result = await dialog.ShowDialog<string>(window);
-            if (!string.IsNullOrWhiteSpace(result))
-            {
-                clingy.UpdateTitle(result);
-                logger.Info("{0} has requested a title change", clingy.Title!);
-                noteService.Update(clingy);
-                window.TitleTextBlock.Text = result;
-            }
+            clingy.UpdateTitle(args.NewTitle);
+            logger.Info("{0} has requested a title change", clingy.Title!);
+            noteService.Update(clingy);
         }
         catch (Exception ex)
         {
