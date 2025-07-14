@@ -1,0 +1,36 @@
+2025-07-14 19:28:33.356 +02:00 [INF] Application started
+2025-07-14 19:28:33.670 +02:00 [INF] Registering connection for db at /home/carlos/.config/Clingies/clingies.db
+2025-07-14 19:28:33.765 +02:00 [FTL] Application terminated unexpectedly
+Avalonia.Markup.Xaml.XamlLoadException: No precompiled XAML found for Clingies.App, make sure to specify x:Class and include your XAML file as AvaloniaResource
+   at Avalonia.Markup.Xaml.AvaloniaXamlLoader.Load(Object obj)
+   at Clingies.App.Initialize() in /home/carlos/work/clingies/src/Clingies/Clingies/App.axaml.cs:line 35
+   at Avalonia.AppBuilder.SetupUnsafe()
+   at Avalonia.AppBuilder.Setup()
+   at Avalonia.AppBuilder.SetupWithLifetime(IApplicationLifetime lifetime)
+   at Avalonia.ClassicDesktopStyleApplicationLifetimeExtensions.StartWithClassicDesktopLifetime(AppBuilder builder, String[] args, Action`1 lifetimeBuilder)
+   at Clingies.Program.Main(String[] args) in /home/carlos/work/clingies/src/Clingies/Clingies/Program.cs:line 29
+2025-07-14 19:28:33.775 +02:00 [INF] Application finished
+2025-07-14 19:31:09.069 +02:00 [INF] Application started
+2025-07-14 19:31:09.409 +02:00 [INF] Registering connection for db at /home/carlos/.config/Clingies/clingies.db
+2025-07-14 19:31:09.501 +02:00 [FTL] Application terminated unexpectedly
+Avalonia.Markup.Xaml.XamlLoadException: No precompiled XAML found for Clingies.App, make sure to specify x:Class and include your XAML file as AvaloniaResource
+   at Avalonia.Markup.Xaml.AvaloniaXamlLoader.Load(Object obj)
+   at Clingies.App.Initialize() in /home/carlos/work/clingies/src/Clingies/Clingies/App.axaml.cs:line 35
+   at Avalonia.AppBuilder.SetupUnsafe()
+   at Avalonia.AppBuilder.Setup()
+   at Avalonia.AppBuilder.SetupWithLifetime(IApplicationLifetime lifetime)
+   at Avalonia.ClassicDesktopStyleApplicationLifetimeExtensions.StartWithClassicDesktopLifetime(AppBuilder builder, String[] args, Action`1 lifetimeBuilder)
+   at Clingies.Program.Main(String[] args) in /home/carlos/work/clingies/src/Clingies/Clingies/Program.cs:line 29
+2025-07-14 19:31:09.511 +02:00 [INF] Application finished
+2025-07-14 19:51:37.976 +02:00 [INF] Application started
+2025-07-14 19:51:38.356 +02:00 [INF] Registering connection for db at /home/carlos/.config/Clingies/clingies.db
+2025-07-14 19:51:38.449 +02:00 [FTL] Application terminated unexpectedly
+Avalonia.Markup.Xaml.XamlLoadException: No precompiled XAML found for Clingies.App, make sure to specify x:Class and include your XAML file as AvaloniaResource
+   at Avalonia.Markup.Xaml.AvaloniaXamlLoader.Load(Object obj)
+   at Clingies.App.Initialize() in /home/carlos/work/clingies/src/Clingies/Clingies/App.axaml.cs:line 34
+   at Avalonia.AppBuilder.SetupUnsafe()
+   at Avalonia.AppBuilder.Setup()
+   at Avalonia.AppBuilder.SetupWithLifetime(IApplicationLifetime lifetime)
+   at Avalonia.ClassicDesktopStyleApplicationLifetimeExtensions.StartWithClassicDesktopLifetime(AppBuilder builder, String[] args, Action`1 lifetimeBuilder)
+   at Clingies.Program.Main(String[] args) in /home/carlos/work/clingies/src/Clingies/Clingies/Program.cs:line 29
+2025-07-14 19:51:38.459 +02:00 [INF] Application finished

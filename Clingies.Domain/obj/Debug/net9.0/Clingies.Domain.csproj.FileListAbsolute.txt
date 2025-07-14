@@ -1,0 +1,11 @@
+/home/carlos/work/clingies/src/Clingies.Domain/bin/Debug/net9.0/Clingies.Domain.deps.json
+/home/carlos/work/clingies/src/Clingies.Domain/bin/Debug/net9.0/Clingies.Domain.dll
+/home/carlos/work/clingies/src/Clingies.Domain/bin/Debug/net9.0/Clingies.Domain.pdb
+/home/carlos/work/clingies/src/Clingies.Domain/obj/Debug/net9.0/Clingies.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/home/carlos/work/clingies/src/Clingies.Domain/obj/Debug/net9.0/Clingies.Domain.AssemblyInfoInputs.cache
+/home/carlos/work/clingies/src/Clingies.Domain/obj/Debug/net9.0/Clingies.Domain.AssemblyInfo.cs
+/home/carlos/work/clingies/src/Clingies.Domain/obj/Debug/net9.0/Clingies.Domain.csproj.CoreCompileInputs.cache
+/home/carlos/work/clingies/src/Clingies.Domain/obj/Debug/net9.0/Clingies.Domain.dll
+/home/carlos/work/clingies/src/Clingies.Domain/obj/Debug/net9.0/refint/Clingies.Domain.dll
+/home/carlos/work/clingies/src/Clingies.Domain/obj/Debug/net9.0/Clingies.Domain.pdb
+/home/carlos/work/clingies/src/Clingies.Domain/obj/Debug/net9.0/ref/Clingies.Domain.dll

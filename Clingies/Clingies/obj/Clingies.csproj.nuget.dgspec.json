@@ -1,0 +1,400 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/carlos/work/clingies/src/Clingies/Clingies/Clingies.csproj": {}
+  },
+  "projects": {
+    "/home/carlos/work/clingies/src/Clingies.ApplicationLogic/Clingies.ApplicationLogic.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/carlos/work/clingies/src/Clingies.ApplicationLogic/Clingies.ApplicationLogic.csproj",
+        "projectName": "Clingies.ApplicationLogic",
+        "projectPath": "/home/carlos/work/clingies/src/Clingies.ApplicationLogic/Clingies.ApplicationLogic.csproj",
+        "packagesPath": "/home/carlos/.nuget/packages/",
+        "outputPath": "/home/carlos/work/clingies/src/Clingies.ApplicationLogic/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/carlos/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "/usr/lib/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/home/carlos/work/clingies/src/Clingies.Common/Clingies.Common.csproj": {
+                "projectPath": "/home/carlos/work/clingies/src/Clingies.Common/Clingies.Common.csproj"
+              },
+              "/home/carlos/work/clingies/src/Clingies.Domain/Clingies.Domain.csproj": {
+                "projectPath": "/home/carlos/work/clingies/src/Clingies.Domain/Clingies.Domain.csproj"
+              },
+              "/home/carlos/work/clingies/src/Clingies.Infrastructure/Clingies.Infrastructure.csproj": {
+                "projectPath": "/home/carlos/work/clingies/src/Clingies.Infrastructure/Clingies.Infrastructure.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.100"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/9.0.108/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/carlos/work/clingies/src/Clingies.Common/Clingies.Common.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/carlos/work/clingies/src/Clingies.Common/Clingies.Common.csproj",
+        "projectName": "Clingies.Common",
+        "projectPath": "/home/carlos/work/clingies/src/Clingies.Common/Clingies.Common.csproj",
+        "packagesPath": "/home/carlos/.nuget/packages/",
+        "outputPath": "/home/carlos/work/clingies/src/Clingies.Common/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/carlos/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "/usr/lib/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.100"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/9.0.108/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/carlos/work/clingies/src/Clingies.Domain/Clingies.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/carlos/work/clingies/src/Clingies.Domain/Clingies.Domain.csproj",
+        "projectName": "Clingies.Domain",
+        "projectPath": "/home/carlos/work/clingies/src/Clingies.Domain/Clingies.Domain.csproj",
+        "packagesPath": "/home/carlos/.nuget/packages/",
+        "outputPath": "/home/carlos/work/clingies/src/Clingies.Domain/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/carlos/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "/usr/lib/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.100"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/9.0.108/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/carlos/work/clingies/src/Clingies.Infrastructure/Clingies.Infrastructure.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/carlos/work/clingies/src/Clingies.Infrastructure/Clingies.Infrastructure.csproj",
+        "projectName": "Clingies.Infrastructure",
+        "projectPath": "/home/carlos/work/clingies/src/Clingies.Infrastructure/Clingies.Infrastructure.csproj",
+        "packagesPath": "/home/carlos/.nuget/packages/",
+        "outputPath": "/home/carlos/work/clingies/src/Clingies.Infrastructure/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/carlos/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "/usr/lib/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/home/carlos/work/clingies/src/Clingies.Common/Clingies.Common.csproj": {
+                "projectPath": "/home/carlos/work/clingies/src/Clingies.Common/Clingies.Common.csproj"
+              },
+              "/home/carlos/work/clingies/src/Clingies.Domain/Clingies.Domain.csproj": {
+                "projectPath": "/home/carlos/work/clingies/src/Clingies.Domain/Clingies.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.100"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "Dapper": {
+              "target": "Package",
+              "version": "[2.1.66, )"
+            },
+            "FluentMigrator.Runner": {
+              "target": "Package",
+              "version": "[7.1.0, )"
+            },
+            "FluentMigrator.Runner.SQLite": {
+              "target": "Package",
+              "version": "[7.1.0, )"
+            },
+            "Microsoft.Data.Sqlite": {
+              "target": "Package",
+              "version": "[9.0.7, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/9.0.108/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/carlos/work/clingies/src/Clingies/Clingies/Clingies.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/carlos/work/clingies/src/Clingies/Clingies/Clingies.csproj",
+        "projectName": "Clingies",
+        "projectPath": "/home/carlos/work/clingies/src/Clingies/Clingies/Clingies.csproj",
+        "packagesPath": "/home/carlos/.nuget/packages/",
+        "outputPath": "/home/carlos/work/clingies/src/Clingies/Clingies/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/carlos/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "/usr/lib/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/home/carlos/work/clingies/src/Clingies.ApplicationLogic/Clingies.ApplicationLogic.csproj": {
+                "projectPath": "/home/carlos/work/clingies/src/Clingies.ApplicationLogic/Clingies.ApplicationLogic.csproj"
+              },
+              "/home/carlos/work/clingies/src/Clingies.Common/Clingies.Common.csproj": {
+                "projectPath": "/home/carlos/work/clingies/src/Clingies.Common/Clingies.Common.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.100"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "Avalonia": {
+              "target": "Package",
+              "version": "[11.3.2, )"
+            },
+            "Avalonia.Desktop": {
+              "target": "Package",
+              "version": "[11.3.2, )"
+            },
+            "Avalonia.Diagnostics": {
+              "target": "Package",
+              "version": "[11.3.2, )"
+            },
+            "Avalonia.Fonts.Inter": {
+              "target": "Package",
+              "version": "[11.3.2, )"
+            },
+            "Avalonia.Themes.Fluent": {
+              "target": "Package",
+              "version": "[11.3.2, )"
+            },
+            "Microsoft.Extensions.DependencyInjection": {
+              "target": "Package",
+              "version": "[9.0.6, )"
+            },
+            "Microsoft.Extensions.Hosting": {
+              "target": "Package",
+              "version": "[9.0.6, )"
+            },
+            "Serilog": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "Serilog.Sinks.Async": {
+              "target": "Package",
+              "version": "[2.1.0, )"
+            },
+            "Serilog.Sinks.Console": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Serilog.Sinks.File": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            },
+            "System.Reactive": {
+              "target": "Package",
+              "version": "[6.0.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/9.0.108/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

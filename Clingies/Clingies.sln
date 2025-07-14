@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies", "Clingies\Clingies.csproj", "{30F14BCE-D172-4050-812D-96D0B9332A43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.ApplicationLogic", "..\Clingies.ApplicationLogic\Clingies.ApplicationLogic.csproj", "{DD251D64-0A6E-4375-A999-FC726D37E942}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Common", "..\Clingies.Common\Clingies.Common.csproj", "{EC79C46E-DD9F-4CDE-BECD-4CBA5EDCF02F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Domain", "..\Clingies.Domain\Clingies.Domain.csproj", "{09D3BA25-B528-40DB-AFCF-9E22EBC37957}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Infrastructure", "..\Clingies.Infrastructure\Clingies.Infrastructure.csproj", "{7FEB9D94-37B4-4F2D-98CD-168683F06D67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Tests.Integration", "..\Clingies.Tests.Integration\Clingies.Tests.Integration.csproj", "{3ED3C452-E460-49A3-B13D-64153DFC7E54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Tests.Unit", "..\Clingies.Tests.Unit\Clingies.Tests.Unit.csproj", "{BB7E7CCF-37DC-4492-8DF5-BFB7C2F769F4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{30F14BCE-D172-4050-812D-96D0B9332A43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30F14BCE-D172-4050-812D-96D0B9332A43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30F14BCE-D172-4050-812D-96D0B9332A43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30F14BCE-D172-4050-812D-96D0B9332A43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD251D64-0A6E-4375-A999-FC726D37E942}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD251D64-0A6E-4375-A999-FC726D37E942}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD251D64-0A6E-4375-A999-FC726D37E942}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD251D64-0A6E-4375-A999-FC726D37E942}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC79C46E-DD9F-4CDE-BECD-4CBA5EDCF02F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC79C46E-DD9F-4CDE-BECD-4CBA5EDCF02F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC79C46E-DD9F-4CDE-BECD-4CBA5EDCF02F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC79C46E-DD9F-4CDE-BECD-4CBA5EDCF02F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09D3BA25-B528-40DB-AFCF-9E22EBC37957}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09D3BA25-B528-40DB-AFCF-9E22EBC37957}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09D3BA25-B528-40DB-AFCF-9E22EBC37957}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09D3BA25-B528-40DB-AFCF-9E22EBC37957}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FEB9D94-37B4-4F2D-98CD-168683F06D67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FEB9D94-37B4-4F2D-98CD-168683F06D67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FEB9D94-37B4-4F2D-98CD-168683F06D67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FEB9D94-37B4-4F2D-98CD-168683F06D67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3ED3C452-E460-49A3-B13D-64153DFC7E54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3ED3C452-E460-49A3-B13D-64153DFC7E54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3ED3C452-E460-49A3-B13D-64153DFC7E54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3ED3C452-E460-49A3-B13D-64153DFC7E54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB7E7CCF-37DC-4492-8DF5-BFB7C2F769F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB7E7CCF-37DC-4492-8DF5-BFB7C2F769F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB7E7CCF-37DC-4492-8DF5-BFB7C2F769F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB7E7CCF-37DC-4492-8DF5-BFB7C2F769F4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
