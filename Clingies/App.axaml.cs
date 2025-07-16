@@ -19,8 +19,8 @@ public partial class App : Application
     private ClingyWindowFactory _windowFactory;
     private IClingiesLogger _logger;
 
-    [Obsolete("Used only by Avalonia XAML loader", true)]
-    public App() { }
+    // [Obsolete("Used only by Avalonia XAML loader", true)]
+    // public App() { }
 
     public App(IServiceProvider services)
     {
@@ -38,7 +38,7 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new ClingyWindow();
+            //desktop.MainWindow = new ClingyWindow();
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             DrawTrayIcon();

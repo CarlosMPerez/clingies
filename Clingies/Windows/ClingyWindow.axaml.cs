@@ -20,10 +20,11 @@ public partial class ClingyWindow : Window
     public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
     public event EventHandler<UpdateWindowWidthRequestedEventArgs>? UpdateWindowWidthRequested;
 
-    public ClingyWindow() => InitializeComponent();
+    //public ClingyWindow() => InitializeWindow();
 
-    public ClingyWindow(Clingy clingy) : this()
+    public ClingyWindow(Clingy clingy) // : this()
     {
+        InitializeComponent();
         _clingy = clingy;
 
         Position = new PixelPoint((int)clingy.PositionX, (int)clingy.PositionY);
@@ -59,7 +60,7 @@ public partial class ClingyWindow : Window
             {
                 var args = new TitleChangeRequestedEventArgs(ClingyId, result);
                 TitleChangeRequested?.Invoke(this, args);
-            }            
+            }
         }
     }
 
@@ -92,5 +93,5 @@ public partial class ClingyWindow : Window
         var args = new RollRequestedEventArgs(ClingyId, isRolled);
         RollRequested?.Invoke(this, args);
         // TODO - NOTIFICAR AL BODY
-    }    
+    }
 }

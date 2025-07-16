@@ -33,7 +33,7 @@
       <AvaloniaResource Include="Assets/**" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\..\Clingies.ApplicationLogic\Clingies.ApplicationLogic.csproj" />
-      <ProjectReference Include="..\..\Clingies.Common\Clingies.Common.csproj" />
+      <ProjectReference Include="..\Clingies.ApplicationLogic\Clingies.ApplicationLogic.csproj" />
+      <ProjectReference Include="..\Clingies.Common\Clingies.Common.csproj" />
     </ItemGroup>
 </Project>
