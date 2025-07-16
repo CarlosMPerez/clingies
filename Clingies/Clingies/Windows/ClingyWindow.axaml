@@ -6,7 +6,7 @@
         xmlns:controls="clr-namespace:Clingies.UserControls"
         x:Class="Clingies.Windows.ClingyWindow"
         Background="Transparent"
-        HasSystemDecorations="False"
+        SystemDecorations="None"
         SizeToContent="Height"
         CanResize="False"
         TransparencyLevelHint="Transparent">

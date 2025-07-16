@@ -88,7 +88,7 @@ public partial class App : Application
 
     private void DrawTrayIcon()
     {
-        string embeddedPath = "avares://Clingies.App/Assets/icon-app-clingy.png";
+        string embeddedPath = "avares://Clingies/Assets/icon-app-clingy.png";
         var uri = new Uri(embeddedPath);
         using var stream = AssetLoader.Open(uri);
 

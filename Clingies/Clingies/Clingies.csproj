@@ -33,12 +33,6 @@
       <AvaloniaResource Include="Assets/**" />
     </ItemGroup>
     <ItemGroup>
-        <AvaloniaXaml Remove="**/*.axaml" />        
-        <AvaloniaXaml Include="App.axaml" />
-        <AvaloniaXaml Include="Windows/**/*.axaml" />
-        <AvaloniaXaml Include="UserControls/**/*.axaml" />
-    </ItemGroup>
-    <ItemGroup>
       <ProjectReference Include="..\..\Clingies.ApplicationLogic\Clingies.ApplicationLogic.csproj" />
       <ProjectReference Include="..\..\Clingies.Common\Clingies.Common.csproj" />
     </ItemGroup>
