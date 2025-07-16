@@ -58,6 +58,7 @@ public partial class ClingyWindow : Window
             var result = await dialog.ShowDialog<string>(this);
             if (!string.IsNullOrWhiteSpace(result))
             {
+                this.ClingyTitleBar.Title = result;
                 var args = new TitleChangeRequestedEventArgs(ClingyId, result);
                 TitleChangeRequested?.Invoke(this, args);
             }

@@ -3,7 +3,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.VisualTree;
@@ -23,11 +22,6 @@ public partial class ClingyTitle : UserControl
     {
         InitializeComponent();
         this.AttachedToVisualTree += OnAttachedToVisualTree;
-
-        HeaderGrid.PointerPressed += OnHeaderDrag;
-        HeaderGrid.DoubleTapped += OnDoubleTap;
-        PinButton.Click += OnPinClick;
-        CloseButton.Click += OnClose;
     }
 
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
@@ -65,6 +59,7 @@ public partial class ClingyTitle : UserControl
 
     private void OnClose(object? sender, RoutedEventArgs e)
     {
+        Console.WriteLine("CLOSE REQUESTED");
         _parentWindow?.CloseRequest();
     }
 
