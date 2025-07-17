@@ -107,7 +107,6 @@ public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logg
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             window.Topmost = args.IsPinned;
             clingy.SetPinState(args.IsPinned);
-            logger.Info("{0} has requested a pin", clingy.Title!);
             noteService.Update(clingy);
         }
         catch (Exception ex)
@@ -126,8 +125,6 @@ public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logg
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             window.Position = new Avalonia.PixelPoint(args.PositionX, args.PositionY);
             clingy.Move(args.PositionX, args.PositionY);
-            logger.Info("Position changed requested {0}. New Position XY: {1}-{2}",
-                    clingy.Title!, args.PositionX, args.PositionY);
             noteService.Update(clingy);
         }
         catch (Exception ex)
@@ -145,7 +142,6 @@ public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logg
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             clingy.UpdateContent(string.IsNullOrEmpty(args.Content) ? "" : args.Content);
             clingy.Resize(clingy.Width, args.Height);
-            logger.Info("{0} has requested a change in content", clingy.Title!);
             noteService.Update(clingy);
         }
         catch (Exception ex)
@@ -162,7 +158,6 @@ public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logg
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             clingy.UpdateTitle(args.NewTitle);
-            logger.Info("{0} has requested a title change", clingy.Title!);
             noteService.Update(clingy);
         }
         catch (Exception ex)
@@ -180,8 +175,6 @@ public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logg
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             window.Height = args.Height;
             clingy.Resize(clingy.Width, args.Height);
-            logger.Info("New size requested {0}. Width/Height: {1}/{2}",
-                        clingy.Title!, clingy.Width, args.Height);
             noteService.Update(clingy);
         }
         catch (Exception ex)
@@ -199,8 +192,6 @@ public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logg
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             window.Width = args.Width;
             clingy.Resize(args.Width, window.Height);
-            logger.Info("New width requested {0}. Width/Height: {1}/{2}",
-                    clingy.Title!, args.Width, window.Height);
             noteService.Update(clingy);
         }
         catch (Exception ex)
@@ -216,9 +207,8 @@ public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logg
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
+            window.ClingyBody.IsRolled = args.IsRolled;
             clingy.SetRolledState(args.IsRolled);
-            logger.Info("Change Rolled status requested {0}. IsRolled: {1}",
-                    clingy.Title!, args.IsRolled);
             noteService.Update(clingy);
         }
         catch (Exception ex)

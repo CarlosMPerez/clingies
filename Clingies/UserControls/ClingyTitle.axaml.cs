@@ -44,7 +44,11 @@ public partial class ClingyTitle : UserControl
     public bool IsPinned
     {
         get { return _isPinned; }
-        set { _isPinned = value; }
+        set
+        {
+            _isPinned = value;
+            LoadPinImage(_isPinned);
+        }
     }
 
     public string? Title
@@ -59,7 +63,6 @@ public partial class ClingyTitle : UserControl
 
     private void OnClose(object? sender, RoutedEventArgs e)
     {
-        Console.WriteLine("CLOSE REQUESTED");
         _parentWindow?.CloseRequest();
     }
 
@@ -76,16 +79,18 @@ public partial class ClingyTitle : UserControl
         _parentWindow?.RollRequest(_isRolled);
     }
 
-    private void OnHeaderDrag(object? sender, PointerPressedEventArgs e)
+    private void OnDrag(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
             _parentWindow?.BeginMoveDrag(e);
+        }
     }
 
     private void LoadPinImage(bool pinned)
     {
         var res = pinned ?
-            "avares://Clingies/Assets/icon-pinned.png" : 
+            "avares://Clingies/Assets/icon-pinned.png" :
             "avares://Clingies/Assets/icon-unpinned.png";
         var uri = new Uri(res);
         using var stream = AssetLoader.Open(uri);

@@ -11,7 +11,6 @@ public partial class ClingyWindow : Window
 {
     private readonly Clingy _clingy;
     public Guid ClingyId => _clingy.Id;
-
     public event EventHandler<Guid>? CloseRequested;
     public event EventHandler<PinRequestedEventArgs>? PinRequested;
     public event EventHandler<TitleChangeRequestedEventArgs>? TitleChangeRequested;
@@ -30,7 +29,6 @@ public partial class ClingyWindow : Window
         Position = new PixelPoint((int)clingy.PositionX, (int)clingy.PositionY);
         Width = clingy.Width;
         Topmost = clingy.IsPinned;
-
         // establish title props
         ClingyTitleBar.ClingyId = _clingy.Id;
         ClingyTitleBar.Title = _clingy.Title;
@@ -39,7 +37,9 @@ public partial class ClingyWindow : Window
         // establish body props
         ClingyBody.ClingyId = _clingy.Id;
         ClingyBody.BodyContent = _clingy.Content;
-        ClingyBody.IsVisible = !_clingy.IsRolled;
+        ClingyBody.IsRolled = _clingy.IsRolled;
+
+        PositionChanged += OnPositionChanged;
     }
 
     protected override void OnOpened(EventArgs e)
@@ -93,6 +93,11 @@ public partial class ClingyWindow : Window
     {
         var args = new RollRequestedEventArgs(ClingyId, isRolled);
         RollRequested?.Invoke(this, args);
-        // TODO - NOTIFICAR AL BODY
+    }
+
+    public void OnPositionChanged(object? sender, PixelPointEventArgs e)
+    {
+        var args = new PositionChangeRequestedEventArgs(ClingyId, this.Position.X, this.Position.Y);
+        PositionChangeRequested?.Invoke(this, args);
     }
 }

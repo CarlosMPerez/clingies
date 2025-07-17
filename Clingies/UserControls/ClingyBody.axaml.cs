@@ -2,7 +2,6 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
 using Clingies.Common.CustomEventArgs;
 using Clingies.Windows;
@@ -11,10 +10,30 @@ namespace Clingies.UserControls;
 
 public partial class ClingyBody : UserControl
 {
-    public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
     private Guid _id;
     private string? _bodyContent;
+    private bool _isRolled;
     private ClingyWindow? _parentWindow;
+
+    public string? BodyContent
+    {
+        get { return _bodyContent; }
+        set
+        {
+            _bodyContent = string.IsNullOrWhiteSpace(value) ? "" : value;
+            ContentBox.Text = _bodyContent;
+        }
+    }
+
+    public bool IsRolled
+    {
+        get { return _isRolled; }
+        set
+        {
+            _isRolled = value;
+            this.IsVisible = !value;
+        }
+    }
 
     public ClingyBody()
     {
@@ -35,16 +54,6 @@ public partial class ClingyBody : UserControl
         set { _id = value; }
     }
 
-    public string? BodyContent
-    {
-        get { return _bodyContent; }
-        set
-        {
-            _bodyContent = string.IsNullOrWhiteSpace(value) ? "" : value;
-            ContentBox.Text = _bodyContent;
-        }
-    }
-
     private void OnContentChanged(object? sender, TextChangedEventArgs e)
     {
         if (IsVisible)
@@ -58,7 +67,7 @@ public partial class ClingyBody : UserControl
             Height = measuredHeight + 40; // + title + margin
 
             // call parentwindow with new height and content
-            _parentWindow!.ContentChangeRequest(_bodyContent, Height);
+            _parentWindow!.ContentChangeRequest(ContentBox.Text!, Height);
         }
     }
 

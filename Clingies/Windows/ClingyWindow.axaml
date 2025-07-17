@@ -8,7 +8,10 @@
         Background="Transparent"
         SystemDecorations="None"
         SizeToContent="Height"
-        CanResize="False"
+        CanResize="True"
+        MinHeight="100"
+        MinWidth="100"
+        ShowInTaskbar="False"
         TransparencyLevelHint="Transparent">
 
     <StackPanel>

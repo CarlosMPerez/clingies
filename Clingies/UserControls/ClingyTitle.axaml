@@ -10,7 +10,7 @@
               ColumnDefinitions="24,*,24" 
               Background="#87CEFA" 
               Height="30" 
-              PointerPressed="OnHeaderDrag"
+              PointerPressed="OnDrag"
               DoubleTapped="OnDoubleTap"
         >
             <Button x:Name="PinButton"

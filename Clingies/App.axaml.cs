@@ -56,15 +56,42 @@ public partial class App : Application
             var defClingyWidth = 300;
             var defClingyHeight = 100;
 
-            var lifetime = App.Current!.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-            Window? anchor = lifetime?.Windows.Count > 0 ? lifetime.Windows[0] : null;
-            var screen = anchor?.Screens.ScreenFromVisual(anchor)?.WorkingArea
-                                  ?? new PixelRect(0, 0, 800, 600);
+            var screen = GetDesktopWorkingArea();
             var centerX = screen.X + (screen.Width - defClingyWidth) / 2;
             var centerY = screen.Y + (screen.Height - defClingyHeight) / 2;
 
             _windowFactory.CreateNewWindow(centerX, centerY);
         }
+    }
+
+    private PixelRect GetDesktopWorkingArea()
+    {
+        var lifetime = App.Current!.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
+        
+        if (lifetime?.Windows.Count > 0)
+        {
+            var anchor = lifetime.Windows[0];
+            return anchor.Screens.ScreenFromVisual(anchor)?.WorkingArea 
+                ?? new PixelRect(0, 0, 800, 600);
+        }
+        
+        var probe = new Window
+        {
+            Width = 1,
+            Height = 1,
+            //TransparencyLevelHint = { WindowTransparencyLevel.Transparent },
+            SystemDecorations = SystemDecorations.None,
+            CanResize = false,
+            ShowInTaskbar = false,
+            IsVisible = false
+        };
+
+        probe.Show(); // required to attach to a screen
+        var screen = probe.Screens.ScreenFromVisual(probe)?.WorkingArea
+                    ?? new PixelRect(0, 0, 800, 600);
+        probe.Close();
+
+        return screen;
     }
 
 
