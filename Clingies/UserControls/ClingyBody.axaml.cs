@@ -3,7 +3,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.VisualTree;
-using Clingies.Common.CustomEventArgs;
 using Clingies.Windows;
 
 namespace Clingies.UserControls;

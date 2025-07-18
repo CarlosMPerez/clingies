@@ -1,11 +1,13 @@
 using FluentMigrator;
 
-namespace Clingies.Infrastructure.Migrations
+namespace Clingies.Infrastructure.Migrations;
+
+[Migration(2025062001)]
+public class CreateClingiesTable : Migration
 {
-    [Migration(2025062001)]
-    public class CreateClingiesTable : Migration
+    public override void Up()
     {
-        public override void Up()
+        if (!Schema.Table("Clingies").Exists())
         {
             Create.Table("Clingies")
                 .WithColumn("Id").AsGuid().PrimaryKey()
@@ -15,10 +17,11 @@ namespace Clingies.Infrastructure.Migrations
                 .WithColumn("ModifiedAt").AsDateTime().Nullable()
                 .WithColumn("IsDeleted").AsBoolean().NotNullable();
         }
+    }
 
-        public override void Down()
-        {
-            Delete.Table("Clingies");
-        }
+    public override void Down()
+    {
+        Delete.Table("Clingies");
     }
 }
+

@@ -1,8 +1,8 @@
-using System;
+using Clingies.Domain.Interfaces;
 using Serilog;
-using Clingies.Common;
 
-namespace Clingies.Common;
+
+namespace Clingies.ApplicationLogic;
 
 public class ClingiesLogger : IClingiesLogger
 {
@@ -13,4 +13,9 @@ public class ClingiesLogger : IClingiesLogger
 
     void IClingiesLogger.Info(string message, params object[] args) =>
         Log.Logger.Information(message, args);
+
+    void IClingiesLogger.Warning(string message, params object[] args)
+    {
+        Log.Logger.Warning(message);
+    }
 }

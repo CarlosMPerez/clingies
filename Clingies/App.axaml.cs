@@ -5,28 +5,25 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
-using Clingies.Common;
+using Clingies.ApplicationLogic.Interfaces;
+using Clingies.Domain.Interfaces;
 using Clingies.Factories;
 using Clingies.Infrastructure.Migrations;
-using Clingies.Windows;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Clingies;
 
-public partial class App : Application
+public partial class App : Application, IClingiesCommandController
 {
     public IServiceProvider _services;
     private ClingyWindowFactory _windowFactory;
+    private TrayMenuFactory _trayMenuFactory;
     private IClingiesLogger _logger;
-
-    // [Obsolete("Used only by Avalonia XAML loader", true)]
-    // public App() { }
 
     public App(IServiceProvider services)
     {
         _services = services ?? throw new ArgumentNullException(nameof(services));
-        _windowFactory = _services.GetRequiredService<ClingyWindowFactory>();
-        _logger = _services.GetRequiredService<IClingiesLogger>();
+
     }
 
     public override void Initialize()
@@ -38,7 +35,10 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            //desktop.MainWindow = new ClingyWindow();
+            _windowFactory = _services.GetRequiredService<ClingyWindowFactory>();
+            _trayMenuFactory = _services.GetRequiredService<TrayMenuFactory>();
+            _logger = _services.GetRequiredService<IClingiesLogger>();            
+
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             DrawTrayIcon();
@@ -49,7 +49,7 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
-    private void OnNewClick(object? sender, EventArgs e)
+    public void OnNewClick(object? sender, EventArgs e)
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -64,17 +64,30 @@ public partial class App : Application
         }
     }
 
+    public void OnSettingsClick(object? sender, EventArgs e)
+    {
+        Console.WriteLine("Settings clicked");
+    }
+
+    public void OnExitClick(object? sender, EventArgs e)
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.Shutdown();
+        }
+    }
+
     private PixelRect GetDesktopWorkingArea()
     {
         var lifetime = App.Current!.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-        
+
         if (lifetime?.Windows.Count > 0)
         {
             var anchor = lifetime.Windows[0];
-            return anchor.Screens.ScreenFromVisual(anchor)?.WorkingArea 
+            return anchor.Screens.ScreenFromVisual(anchor)?.WorkingArea
                 ?? new PixelRect(0, 0, 800, 600);
         }
-        
+
         var probe = new Window
         {
             Width = 1,
@@ -94,20 +107,6 @@ public partial class App : Application
         return screen;
     }
 
-
-    private void OnSettingsClick(object? sender, EventArgs e)
-    {
-        Console.WriteLine("Settings clicked");
-    }
-
-    private void OnExitClick(object? sender, EventArgs e)
-    {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            desktop.Shutdown();
-        }
-    }
-
     private void OnTrayIconClicked(object? sender, EventArgs e)
     {
         _windowFactory.RenderAllWindows();
@@ -115,31 +114,19 @@ public partial class App : Application
 
     private void DrawTrayIcon()
     {
-        string embeddedPath = "avares://Clingies/Assets/icon-app-clingy.png";
+        string embeddedPath = "avares://Clingies/Assets/tray.png";
         var uri = new Uri(embeddedPath);
         using var stream = AssetLoader.Open(uri);
 
         var trayIcon = new TrayIcon
         {
             Icon = new WindowIcon(stream),
-            ToolTipText = "Clingies"
+            ToolTipText = "Clingies",
+            Menu = _trayMenuFactory.BuildTrayMenu(),
+            IsVisible = true
         };
 
-        trayIcon.Menu = new NativeMenu();
-        var newItem = new NativeMenuItem("New");
-        newItem.Click += OnNewClick;
-        var settingsItem = new NativeMenuItem("Settings");
-        settingsItem.Click += OnSettingsClick;
-        var exitItem = new NativeMenuItem("Exit");
-        exitItem.Click += OnExitClick;
-
-        trayIcon.Menu.Items.Add(newItem);
-        trayIcon.Menu.Items.Add(settingsItem);
-        trayIcon.Menu.Items.Add(new NativeMenuItemSeparator { Header = "-" });
-        trayIcon.Menu.Items.Add(exitItem);
-
         trayIcon.Clicked += OnTrayIconClicked;
-        trayIcon.IsVisible = true;
     }
 
     private void RunMigrations()
@@ -158,4 +145,21 @@ public partial class App : Application
         migrator.MigrateUp();
         _logger.Info("Migrations done");
     }
+
+    // IClingiesCommandController implementation, linked those commands with these events
+    public void CreateNewClingy()
+    {
+        _logger.Info("Create New Invoked");
+        OnNewClick(null, EventArgs.Empty);
+    }
+
+    public void ShowSettings()
+    {
+        OnSettingsClick(null, EventArgs.Empty);
+    }
+
+    public void ExitApp()
+    {
+        OnExitClick(null, EventArgs.Empty);
+    }    
 }

@@ -2,7 +2,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Clingies.Domain\Clingies.Domain.csproj" />
     <ProjectReference Include="..\Clingies.Infrastructure\Clingies.Infrastructure.csproj" />
-    <ProjectReference Include="..\Clingies.Common\Clingies.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>

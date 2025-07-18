@@ -2,9 +2,9 @@ using System.Data;
 using Clingies.Infrastructure.Data; // assuming ClingyRepository + IConnectionFactory here
 using Dapper;
 using Microsoft.Data.Sqlite;
-using Clingies.Common;
 using Clingies.Domain.Models;
 using Clingies.Domain.Factories;
+using Clingies.Domain.Interfaces;
 
 namespace Clingies.Tests.Integration
 {
@@ -123,6 +123,7 @@ namespace Clingies.Tests.Integration
             public void Debug(string message, params object[] args) { }
             public void Info(string message, params object[] args) { }
             public void Error(Exception ex, string message, params object[] args) { }
+            public void Warning(string message, params object[] args) { }
         }
 
         // A test connection factory that always returns the same open connection

@@ -1,6 +1,6 @@
 using System;
 
-namespace Clingies.Common.CustomEventArgs;
+namespace Clingies.ApplicationLogic.CustomEventArgs;
 
 public class RollRequestedEventArgs : EventArgs
 {

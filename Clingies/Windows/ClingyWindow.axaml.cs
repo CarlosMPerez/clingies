@@ -2,7 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Clingies.Common.CustomEventArgs;
+using Clingies.ApplicationLogic.CustomEventArgs;
 using Clingies.Domain.Models;
 
 namespace Clingies.Windows;

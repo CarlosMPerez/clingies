@@ -2,12 +2,14 @@
 using System;
 using System.IO;
 using Clingies.ApplicationLogic.Services;
-using Clingies.Common;
 using Clingies.Domain.Interfaces;
 using Clingies.Factories;
 using Clingies.Infrastructure.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Clingies.ApplicationLogic.Interfaces;
+using Clingies.ApplicationLogic;
+using Clingies.ApplicationLogic.Providers;
 
 namespace Clingies;
 
@@ -41,33 +43,38 @@ internal sealed class Program
 
     private static IServiceProvider ConfigureServices()
     {
-		try
-		{
-			var services = new ServiceCollection();
-			// TODO: Change this for a configuration file so user can decide where the db is
-			var dbPath = Path.Combine(Environment
-					.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-					"Clingies", "clingies.db");
-			services.AddSingleton<IClingiesLogger, ClingiesLogger>();
-			services.AddSingleton<IConnectionFactory>(sp =>
+        try
+        {
+            var services = new ServiceCollection();
+            // TODO: Change this for a configuration file so user can decide where the db is
+            var dbPath = Path.Combine(Environment
+                    .GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "Clingies", "clingies.db");
+            services.AddSingleton<IClingiesLogger, ClingiesLogger>();
+            services.AddSingleton<IConnectionFactory>(sp =>
             {
                 var logger = sp.GetRequiredService<IClingiesLogger>();
                 return new ConnectionFactory(dbPath, logger);
             });
-			services.AddSingleton<IClingyRepository, ClingyRepository>();
-			services.AddSingleton<ClingyWindowFactory>();
-			services.AddSingleton<ClingyService>();
+            services.AddSingleton<IClingyRepository, ClingyRepository>();
+            services.AddSingleton<IMenuRepository, MenuRepository>();
+            services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
+            services.AddSingleton<TrayMenuFactory>();
+            services.AddSingleton<ClingyWindowFactory>();
+            services.AddSingleton<ClingyService>();
+            services.AddSingleton<App>();
+            services.AddSingleton<IClingiesCommandController>(sp => sp.GetRequiredService<App>());
 
-			return services.BuildServiceProvider();
-		}
-		catch (Exception ex)
-		{
-			Log.Error(ex, "Error registering services");
-			throw;
-		}
+            return services.BuildServiceProvider();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error registering services");
+            throw;
+        }
     }
 
-    private  static AppBuilder BuildAvaloniaApp(IServiceProvider services)
+    private static AppBuilder BuildAvaloniaApp(IServiceProvider services)
         => AppBuilder
             .Configure<App>(() => new App(services))
             .UsePlatformDetect()

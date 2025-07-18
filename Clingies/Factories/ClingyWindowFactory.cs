@@ -1,11 +1,11 @@
+using System;
+using System.Linq;
 using System.Collections.Generic;
 using Clingies.ApplicationLogic.Services;
 using Clingies.Domain.Models;
 using Clingies.Windows;
-using System;
-using Clingies.Common.CustomEventArgs;
-using System.Linq;
-using Clingies.Common;
+using Clingies.ApplicationLogic.CustomEventArgs;
+using Clingies.Domain.Interfaces;
 
 namespace Clingies.Factories;
 

@@ -90,8 +90,8 @@ public partial class ClingyTitle : UserControl
     private void LoadPinImage(bool pinned)
     {
         var res = pinned ?
-            "avares://Clingies/Assets/icon-pinned.png" :
-            "avares://Clingies/Assets/icon-unpinned.png";
+            "avares://Clingies/Assets/window-pinned.png" :
+            "avares://Clingies/Assets/window-unpinned.png";
         var uri = new Uri(res);
         using var stream = AssetLoader.Open(uri);
         PinButtonImage.Source = new Bitmap(stream);

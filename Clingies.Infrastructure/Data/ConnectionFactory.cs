@@ -1,5 +1,5 @@
 using System.Data;
-using Clingies.Common;
+using Clingies.Domain.Interfaces;
 using Microsoft.Data.Sqlite;
 
 namespace Clingies.Infrastructure.Data;
