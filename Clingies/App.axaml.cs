@@ -19,6 +19,7 @@ public partial class App : Application, IClingiesCommandController
     private ClingyWindowFactory _windowFactory;
     private TrayMenuFactory _trayMenuFactory;
     private IClingiesLogger _logger;
+    private IClassicDesktopStyleApplicationLifetime _desktop;
 
     public App(IServiceProvider services)
     {
@@ -37,9 +38,9 @@ public partial class App : Application, IClingiesCommandController
         {
             _windowFactory = _services.GetRequiredService<ClingyWindowFactory>();
             _trayMenuFactory = _services.GetRequiredService<TrayMenuFactory>();
-            _logger = _services.GetRequiredService<IClingiesLogger>();            
-
-            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            _logger = _services.GetRequiredService<IClingiesLogger>();
+            _desktop = desktop;           
+            _desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             DrawTrayIcon();
             RunMigrations();
@@ -51,7 +52,7 @@ public partial class App : Application, IClingiesCommandController
 
     public void OnNewClick(object? sender, EventArgs e)
     {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (_desktop is not null)
         {
             var defClingyWidth = 300;
             var defClingyHeight = 100;
@@ -71,19 +72,17 @@ public partial class App : Application, IClingiesCommandController
 
     public void OnExitClick(object? sender, EventArgs e)
     {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (_desktop is not null)
         {
-            desktop.Shutdown();
+            _desktop.Shutdown();
         }
     }
 
     private PixelRect GetDesktopWorkingArea()
     {
-        var lifetime = App.Current!.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-
-        if (lifetime?.Windows.Count > 0)
+        if (_desktop.Windows.Count > 0)
         {
-            var anchor = lifetime.Windows[0];
+            var anchor = _desktop.Windows[0];
             return anchor.Screens.ScreenFromVisual(anchor)?.WorkingArea
                 ?? new PixelRect(0, 0, 800, 600);
         }
@@ -92,7 +91,6 @@ public partial class App : Application, IClingiesCommandController
         {
             Width = 1,
             Height = 1,
-            //TransparencyLevelHint = { WindowTransparencyLevel.Transparent },
             SystemDecorations = SystemDecorations.None,
             CanResize = false,
             ShowInTaskbar = false,
@@ -149,7 +147,6 @@ public partial class App : Application, IClingiesCommandController
     // IClingiesCommandController implementation, linked those commands with these events
     public void CreateNewClingy()
     {
-        _logger.Info("Create New Invoked");
         OnNewClick(null, EventArgs.Empty);
     }
 

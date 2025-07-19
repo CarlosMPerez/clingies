@@ -63,19 +63,21 @@ public class TrayMenuFactory(IMenuRepository repo, IClingiesLogger logger, ITray
 
             // Use closure to bind the item's ID to the click event
             var id = item.Id;
-            menuItem.Command = item.Id switch
+            var command = item.Id switch
             {
                 "new" => commandProvider.NewCommand,
                 "settings" => commandProvider.SettingsCommand,
                 "exit" => commandProvider.ExitCommand,
                 _ => null
             };
-            if (menuItem.Command is not null)
+            if (command is not null)
             {
                 menuItem.Click += (_, _) =>
                 {
-                    if (menuItem.Command.CanExecute(null))
-                        menuItem.Command.Execute(null);
+                    if (command.CanExecute(null))
+                    {
+                        command.Execute(null);
+                    }
                 };
             }
             else

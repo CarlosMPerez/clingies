@@ -62,8 +62,7 @@ internal sealed class Program
             services.AddSingleton<TrayMenuFactory>();
             services.AddSingleton<ClingyWindowFactory>();
             services.AddSingleton<ClingyService>();
-            services.AddSingleton<App>();
-            services.AddSingleton<IClingiesCommandController>(sp => sp.GetRequiredService<App>());
+            services.AddSingleton(sp => (IClingiesCommandController)Application.Current!);
 
             return services.BuildServiceProvider();
         }
