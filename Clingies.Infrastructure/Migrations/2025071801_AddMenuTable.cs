@@ -13,11 +13,18 @@ public class _2025071801_AddMenuTable : Migration
                 .WithColumn("id").AsString().PrimaryKey()
                 .WithColumn("label").AsString().Nullable()
                 .WithColumn("tooltip").AsString().Nullable()
-                .WithColumn("icon").AsString().Nullable()
                 .WithColumn("enabled").AsBoolean().NotNullable().WithDefaultValue(true)
                 .WithColumn("separator").AsBoolean().NotNullable().WithDefaultValue(false)
                 .WithColumn("parent_id").AsString().Nullable()
                 .WithColumn("sort_order").AsInt32().WithDefaultValue(0);
+        }
+
+        if (!Schema.Table("system_icon_path").Exists())
+        {
+            Create.Table("system_icon_path")
+                .WithColumn("id").AsString().PrimaryKey()
+                .WithColumn("light_path").AsString().NotNullable()
+                .WithColumn("dark_path").AsString().NotNullable();
         }
     }
 
@@ -26,6 +33,10 @@ public class _2025071801_AddMenuTable : Migration
         if (Schema.Table("system_tray_menu").Exists())
         {
             Delete.Table("system_tray_menu");
+        }
+        if (Schema.Table("system_icon_path").Exists())
+        {
+            Delete.Table("system_icon_path");
         }
     }
 }

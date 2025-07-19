@@ -6,7 +6,9 @@ using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.VisualTree;
+using Clingies.Domain.Interfaces;
 using Clingies.Windows;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Clingies.UserControls;
 
@@ -18,10 +20,15 @@ public partial class ClingyTitle : UserControl
     private string? _title;
     private ClingyWindow? _parentWindow;
 
+    IIconPathRepository _iconRepo;
+
     public ClingyTitle()
     {
         InitializeComponent();
         this.AttachedToVisualTree += OnAttachedToVisualTree;
+
+        _iconRepo = App.Services.GetRequiredService<IIconPathRepository>();
+        CloseButtonImage.Source = LoadPinImage(_iconRepo.GetDarkPath("clingy-close")!);
     }
 
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
@@ -47,7 +54,10 @@ public partial class ClingyTitle : UserControl
         set
         {
             _isPinned = value;
-            LoadPinImage(_isPinned);
+            PinButtonImage.Source = _isPinned ?
+                LoadPinImage(_iconRepo.GetDarkPath("clingy-pinned")!) :
+                LoadPinImage(_iconRepo.GetDarkPath("clingy-unpinned")!);
+
         }
     }
 
@@ -69,7 +79,7 @@ public partial class ClingyTitle : UserControl
     private void OnPinClick(object? sender, RoutedEventArgs e)
     {
         _isPinned = !_isPinned;
-        LoadPinImage(_isPinned);
+        IsPinned = _isPinned;
         _parentWindow?.PinRequest(_isPinned);
     }
 
@@ -87,13 +97,10 @@ public partial class ClingyTitle : UserControl
         }
     }
 
-    private void LoadPinImage(bool pinned)
+    private Bitmap LoadPinImage(string iconPath)
     {
-        var res = pinned ?
-            "avares://Clingies/Assets/window-pinned.png" :
-            "avares://Clingies/Assets/window-unpinned.png";
-        var uri = new Uri(res);
+        var uri = new Uri(iconPath);
         using var stream = AssetLoader.Open(uri);
-        PinButtonImage.Source = new Bitmap(stream);
+        return new Bitmap(stream);
     }
 }

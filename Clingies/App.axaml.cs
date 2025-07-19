@@ -15,21 +15,23 @@ namespace Clingies;
 
 public partial class App : Application, IClingiesCommandController
 {
-    public IServiceProvider _services;
+    private IServiceProvider _services;
     private ClingyWindowFactory _windowFactory;
     private TrayMenuFactory _trayMenuFactory;
     private IClingiesLogger _logger;
+    private IIconPathRepository _iconRepo;
     private IClassicDesktopStyleApplicationLifetime _desktop;
+    public static IServiceProvider Services { get; private set; }
 
     public App(IServiceProvider services)
     {
         _services = services ?? throw new ArgumentNullException(nameof(services));
-
     }
 
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        Services = _services;
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -39,11 +41,12 @@ public partial class App : Application, IClingiesCommandController
             _windowFactory = _services.GetRequiredService<ClingyWindowFactory>();
             _trayMenuFactory = _services.GetRequiredService<TrayMenuFactory>();
             _logger = _services.GetRequiredService<IClingiesLogger>();
+            _iconRepo = _services.GetRequiredService<IIconPathRepository>();
             _desktop = desktop;           
             _desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-            DrawTrayIcon();
             RunMigrations();
+            DrawTrayIcon();
             _windowFactory.InitActiveWindows();
         }
 
@@ -112,19 +115,23 @@ public partial class App : Application, IClingiesCommandController
 
     private void DrawTrayIcon()
     {
-        string embeddedPath = "avares://Clingies/Assets/tray.png";
-        var uri = new Uri(embeddedPath);
-        using var stream = AssetLoader.Open(uri);
-
-        var trayIcon = new TrayIcon
+        string? iconPath = _iconRepo.GetLightPath("clingy-icon");
+        if (!string.IsNullOrEmpty(iconPath))
         {
-            Icon = new WindowIcon(stream),
-            ToolTipText = "Clingies",
-            Menu = _trayMenuFactory.BuildTrayMenu(),
-            IsVisible = true
-        };
+            var uri = new Uri(iconPath!);
+            using var stream = AssetLoader.Open(uri);
 
-        trayIcon.Clicked += OnTrayIconClicked;
+            var trayIcon = new TrayIcon
+            {
+                Icon = new WindowIcon(stream),
+                ToolTipText = "Clingies",
+                Menu = _trayMenuFactory.BuildTrayMenu(),
+                IsVisible = true
+            };
+
+            trayIcon.Clicked += OnTrayIconClicked;
+        }
+        else _logger.Error(new Exception(), "Could not find main tray icon in DB");
     }
 
     private void RunMigrations()

@@ -58,6 +58,7 @@ internal sealed class Program
             });
             services.AddSingleton<IClingyRepository, ClingyRepository>();
             services.AddSingleton<IMenuRepository, MenuRepository>();
+            services.AddSingleton<IIconPathRepository, IconPathRepository>();
             services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
             services.AddSingleton<TrayMenuFactory>();
             services.AddSingleton<ClingyWindowFactory>();

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -9,7 +10,8 @@ using Clingies.Domain.Models;
 
 namespace Clingies.Factories;
 
-public class TrayMenuFactory(IMenuRepository repo, IClingiesLogger logger, ITrayCommandProvider commandProvider)
+public class TrayMenuFactory(IMenuRepository repo, IIconPathRepository iconRepo,
+                            IClingiesLogger logger, ITrayCommandProvider commandProvider)
 
 {
     public NativeMenu BuildTrayMenu()
@@ -43,8 +45,7 @@ public class TrayMenuFactory(IMenuRepository repo, IClingiesLogger logger, ITray
                 IsEnabled = item.Enabled
             };
 
-            if (!string.IsNullOrWhiteSpace(item.Icon))
-                parent.Icon = LoadIcon(item.Icon);
+            parent.Icon = LoadIcon(item.Id);
 
             foreach (var child in children)
                 parent.Menu.Items.Add(BuildMenuItemRecursive(child, repo));
@@ -58,8 +59,7 @@ public class TrayMenuFactory(IMenuRepository repo, IClingiesLogger logger, ITray
                 IsEnabled = item.Enabled,
             };
 
-            if (!string.IsNullOrWhiteSpace(item.Icon))
-                menuItem.Icon = LoadIcon(item.Icon);
+            menuItem.Icon = LoadIcon(item.Id);
 
             // Use closure to bind the item's ID to the click event
             var id = item.Id;
@@ -83,22 +83,28 @@ public class TrayMenuFactory(IMenuRepository repo, IClingiesLogger logger, ITray
             else
             {
                 logger.Warning($"[TrayMenu] No command defined for item id '{item.Id}'");
-            }            
+            }
             return menuItem;
         }
     }
 
-    private Bitmap? LoadIcon(string iconPath)
+    private Bitmap? LoadIcon(string iconId)
     {
         try
         {
-            var uri = new Uri(iconPath, UriKind.Absolute);
-            using var stream = AssetLoader.Open(uri);
-            return new Bitmap(stream);
+            string? iconPath = iconRepo.GetLightPath(iconId);
+            if (!string.IsNullOrEmpty(iconPath))
+            {
+                var uri = new Uri(iconPath, UriKind.Absolute);
+                using var stream = AssetLoader.Open(uri);
+                return new Bitmap(stream);
+            }
+
+            return null;
         }
         catch (Exception ex)
         {
-            logger.Warning($"[TrayMenu] Could not load icon '{iconPath}': {ex.Message}");
+            logger.Warning($"[TrayMenu] Could not load icon '{iconId}': {ex.Message}");
             return null;
         }
     }

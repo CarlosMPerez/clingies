@@ -16,7 +16,7 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
             var sql = """
                 SELECT * FROM system_tray_menu 
                 WHERE parent_id IS NULL
-                ORDER BY parent_id, sort_order
+                ORDER BY sort_order
             """;
             var items = Conn.Query<TrayMenuItem>(sql).ToList();
             return items;

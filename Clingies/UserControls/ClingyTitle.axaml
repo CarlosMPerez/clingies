@@ -25,10 +25,9 @@
             >
                 <Image 
                     x:Name="PinButtonImage"
-                    Source="avares://Clingies/Assets/window-unpinned.png"
                     Stretch="Uniform"
                     Width="16"
-                    Height="16" 
+                    Height="16"
                 />
             </Button>
             <TextBlock 
@@ -51,11 +50,10 @@
                     Height="24" 
                     Padding="0"
             >
-                <Image 
-                    Source="avares://Clingies/Assets/window-close.png"
+                <Image x:Name="CloseButtonImage"
                     Stretch="Uniform"
                     Width="16"
-                    Height="16" 
+                    Height="16"
                 />
             </Button>
         </Grid>
