@@ -13,11 +13,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Clingies;
 
-public partial class App : Application, IClingiesCommandController
+public partial class App : Application, ITrayCommandController
 {
     private IServiceProvider _services;
     private ClingyWindowFactory _windowFactory;
-    private TrayMenuFactory _trayMenuFactory;
+    private MenuFactory _menuFactory;
     private IClingiesLogger _logger;
     private IIconPathRepository _iconRepo;
     private IClassicDesktopStyleApplicationLifetime _desktop;
@@ -39,10 +39,10 @@ public partial class App : Application, IClingiesCommandController
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             _windowFactory = _services.GetRequiredService<ClingyWindowFactory>();
-            _trayMenuFactory = _services.GetRequiredService<TrayMenuFactory>();
+            _menuFactory = _services.GetRequiredService<MenuFactory>();
             _logger = _services.GetRequiredService<IClingiesLogger>();
             _iconRepo = _services.GetRequiredService<IIconPathRepository>();
-            _desktop = desktop;           
+            _desktop = desktop;
             _desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             RunMigrations();
@@ -70,7 +70,7 @@ public partial class App : Application, IClingiesCommandController
 
     public void OnSettingsClick(object? sender, EventArgs e)
     {
-        Console.WriteLine("Settings clicked");
+        Console.WriteLine("SETTING SWINDOW NOT IMPLEMENTED");
     }
 
     public void OnExitClick(object? sender, EventArgs e)
@@ -115,7 +115,7 @@ public partial class App : Application, IClingiesCommandController
 
     private void DrawTrayIcon()
     {
-        string? iconPath = _iconRepo.GetLightPath("clingy-icon");
+        string? iconPath = _iconRepo.GetLightPath("clingy_icon");
         if (!string.IsNullOrEmpty(iconPath))
         {
             var uri = new Uri(iconPath!);
@@ -125,7 +125,7 @@ public partial class App : Application, IClingiesCommandController
             {
                 Icon = new WindowIcon(stream),
                 ToolTipText = "Clingies",
-                Menu = _trayMenuFactory.BuildTrayMenu(),
+                Menu = _menuFactory.BuildTrayMenu(),
                 IsVisible = true
             };
 
@@ -165,5 +165,65 @@ public partial class App : Application, IClingiesCommandController
     public void ExitApp()
     {
         OnExitClick(null, EventArgs.Empty);
-    }    
+    }
+
+    public void CreateNewStack()
+    {
+        Console.WriteLine("CREATE NEW STACK NOT IMPLEMENTED");
+    }
+
+    public void RollUpAllClingies()
+    {
+        Console.WriteLine("ROLL UP ALL CLINGIES NOT IMPLEMENTED");
+    }
+
+    public void RollDownAllClingies()
+    {
+        Console.WriteLine("ROLL DOWN ALL CLINGIES NOT IMPLEMENTED");
+    }
+
+    public void PinAllClingies()
+    {
+        Console.WriteLine("PIN ALL CLINGIES NOT IMPLEMENTED");
+    }
+
+    public void UnpinAllClingies()
+    {
+        Console.WriteLine("UNPIN ALL CLINGIES NOT IMPLEMENTED");
+    }
+
+    public void LockAllClingies()
+    {
+        Console.WriteLine("LOCK ALL CLINGIES NOT IMPLEMENTED");
+    }
+
+    public void UnlockAllClingies()
+    {
+        Console.WriteLine("UNLOCK ALL CLINGIES NOT IMPLEMENTED");
+    }
+
+    public void ShowAllClingies()
+    {
+        Console.WriteLine("SHOW ALL CLINGIES NOT IMPLEMENTED");
+    }
+
+    public void HideAllClingies()
+    {
+        Console.WriteLine("HIDE ALL CLINGIES NOT IMPLEMENTED");
+    }
+
+    public void ShowManageClingiesWindow()
+    {
+        Console.WriteLine("SHOW MANAGE CLINGIES WINDOW NOT IMPLEMENTED");
+    }
+
+    public void ShowHelpWindow()
+    {
+        Console.WriteLine("SHOW HELP WINDOW NOT IMPLEMENTED");
+    }
+
+    public void ShowAboutWindow()
+    {
+        Console.WriteLine("SHOW ABOUT WINDOW NOT IMPLEMENTED");
+    }
 }

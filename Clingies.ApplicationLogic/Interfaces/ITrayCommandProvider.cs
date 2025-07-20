@@ -5,6 +5,18 @@ namespace Clingies.ApplicationLogic.Interfaces;
 public interface ITrayCommandProvider
 {
     ICommand NewCommand { get; }
+    ICommand NewStackCommand { get; }
+    ICommand RolledUpCommand { get; }
+    ICommand RolledDownCommand { get; }
+    ICommand PinnedCommand { get; }
+    ICommand UnpinnedCommand { get; }
+    ICommand LockedCommand { get; }
+    ICommand UnlockedCommand { get; }
+    ICommand ShowCommand { get; }
+    ICommand HideCommand { get; }
+    ICommand ManageClingiesCommand { get; }
     ICommand SettingsCommand { get; }
+    ICommand HelpCommand { get; }
+    ICommand AboutCommand { get; }
     ICommand ExitCommand { get; }
 }

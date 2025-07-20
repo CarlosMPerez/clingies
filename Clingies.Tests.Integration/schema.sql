@@ -11,5 +11,5 @@ CREATE TABLE IF NOT EXISTS Clingies (
     CreatedAt TEXT,
     ModifiedAt TEXT,
     IsRolled BOOLEAN,
-    IsStand BOOLEAN
+    IsLocked BOOLEAN
 );

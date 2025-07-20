@@ -7,15 +7,16 @@ public class _2025071801_AddMenuTable : Migration
 {
     public override void Up()
     {
-        if (!Schema.Table("system_tray_menu").Exists())
+        if (!Schema.Table("system_menu").Exists())
         {
-            Create.Table("system_tray_menu")
+            Create.Table("system_menu")
                 .WithColumn("id").AsString().PrimaryKey()
+                .WithColumn("menu_type").AsString().Nullable()
+                .WithColumn("parent_id").AsString().Nullable()
                 .WithColumn("label").AsString().Nullable()
                 .WithColumn("tooltip").AsString().Nullable()
                 .WithColumn("enabled").AsBoolean().NotNullable().WithDefaultValue(true)
                 .WithColumn("separator").AsBoolean().NotNullable().WithDefaultValue(false)
-                .WithColumn("parent_id").AsString().Nullable()
                 .WithColumn("sort_order").AsInt32().WithDefaultValue(0);
         }
 
@@ -30,9 +31,9 @@ public class _2025071801_AddMenuTable : Migration
 
     public override void Down()
     {
-        if (Schema.Table("system_tray_menu").Exists())
+        if (Schema.Table("system_menu").Exists())
         {
-            Delete.Table("system_tray_menu");
+            Delete.Table("system_menu");
         }
         if (Schema.Table("system_icon_path").Exists())
         {

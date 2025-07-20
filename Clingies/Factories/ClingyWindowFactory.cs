@@ -6,10 +6,13 @@ using Clingies.Domain.Models;
 using Clingies.Windows;
 using Clingies.ApplicationLogic.CustomEventArgs;
 using Clingies.Domain.Interfaces;
+using Clingies.ApplicationLogic.Interfaces;
 
 namespace Clingies.Factories;
 
-public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logger)
+public class ClingyWindowFactory(ClingyService noteService,
+                                IClingiesLogger logger,
+                                Func<IContextCommandController, IContextCommandProvider> providerFactory)
 {
     private readonly List<Clingy> _activeClingies = new List<Clingy>();
     private readonly List<ClingyWindow> _activeWindows = new List<ClingyWindow>();
@@ -19,6 +22,8 @@ public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logg
         {
             var clingy = noteService.Create("", "", posX, posY);
             var window = new ClingyWindow(clingy);
+            var provider = providerFactory(window);
+            window.SetContextCommandProvider(provider);
             SubscribeWindowToEvents(window);
             _activeWindows.Add(window);
             _activeClingies.Add(clingy);
@@ -38,6 +43,8 @@ public class ClingyWindowFactory(ClingyService noteService, IClingiesLogger logg
             foreach (var clingy in noteService.GetAllActive())
             {
                 var window = new ClingyWindow(clingy);
+                var provider = providerFactory(window);
+                window.SetContextCommandProvider(provider);
                 SubscribeWindowToEvents(window);
                 _activeClingies.Add(clingy);
                 _activeWindows.Add(window);

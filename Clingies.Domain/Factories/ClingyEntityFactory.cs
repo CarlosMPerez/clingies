@@ -29,7 +29,7 @@ public static class ClingyEntityFactory
             dto.IsDeleted,
             dto.IsPinned,
             dto.IsRolled,
-            dto.IsStand
+            dto.IsLocked
         );
     }
 }

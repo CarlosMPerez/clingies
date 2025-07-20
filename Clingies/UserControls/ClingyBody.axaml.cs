@@ -80,5 +80,13 @@ public partial class ClingyBody : UserControl
     {
         _parentWindow?.BeginResizeDrag(WindowEdge.West, e);
         _parentWindow!.WidthChangeRequest();
-    }    
+    }
+
+    private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased)
+        {
+            _parentWindow?.ShowContextMenu(e);
+        }
+    }
 }

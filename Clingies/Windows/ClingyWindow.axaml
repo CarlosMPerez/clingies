@@ -13,9 +13,13 @@
         MinWidth="100"
         ShowInTaskbar="False"
         TransparencyLevelHint="Transparent">
-
-    <StackPanel>
-        <controls:ClingyTitle x:Name="ClingyTitleBar"/>
-        <controls:ClingyBody x:Name="ClingyBody"/>
-    </StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+    
+        <controls:ClingyTitle x:Name="ClingyTitleBar" Grid.Row="0" />
+        <controls:ClingyBody x:Name="ClingyBody" Grid.Row="1" />
+    </Grid>
 </Window>

@@ -3,9 +3,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Clingies.UserControls.ClingyTitle">
+             x:Class="Clingies.UserControls.ClingyTitle"
+             PointerReleased="OnPointerReleased">
 
-    <Border Grid.Row="0" BorderBrush="Black" BorderThickness="1">
+    <Border Grid.Row="0" Margin="0" Padding="0" BorderBrush="Black" BorderThickness="1">
         <Grid x:Name="HeaderGrid"
               ColumnDefinitions="24,*,24" 
               Background="#87CEFA" 

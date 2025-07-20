@@ -28,7 +28,7 @@ public partial class ClingyTitle : UserControl
         this.AttachedToVisualTree += OnAttachedToVisualTree;
 
         _iconRepo = App.Services.GetRequiredService<IIconPathRepository>();
-        CloseButtonImage.Source = LoadPinImage(_iconRepo.GetDarkPath("clingy-close")!);
+        CloseButtonImage.Source = LoadPinImage(_iconRepo.GetDarkPath("clingy_close")!);
     }
 
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
@@ -55,8 +55,8 @@ public partial class ClingyTitle : UserControl
         {
             _isPinned = value;
             PinButtonImage.Source = _isPinned ?
-                LoadPinImage(_iconRepo.GetDarkPath("clingy-pinned")!) :
-                LoadPinImage(_iconRepo.GetDarkPath("clingy-unpinned")!);
+                LoadPinImage(_iconRepo.GetDarkPath("clingy_pinned")!) :
+                LoadPinImage(_iconRepo.GetDarkPath("clingy_unpinned")!);
 
         }
     }
@@ -94,6 +94,14 @@ public partial class ClingyTitle : UserControl
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
             _parentWindow?.BeginMoveDrag(e);
+        }
+    }
+
+    private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased)
+        {
+            _parentWindow?.ShowContextMenu(e);
         }
     }
 

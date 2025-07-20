@@ -10,7 +10,7 @@ public class Clingy
     public bool IsDeleted { get; private set; }
     public bool IsPinned { get; private set; }
     public bool IsRolled { get; private set; }
-    public bool IsStand { get; private set; }
+    public bool IsLocked { get; private set; }
     public double PositionX { get; private set; }
     public double PositionY { get; private set; }
     public double Width { get; private set; }
@@ -30,14 +30,14 @@ public class Clingy
         IsDeleted = false;
         IsPinned = false;
         IsRolled = false;
-        IsStand = false;
+        IsLocked = false;
         CreatedAt = DateTime.UtcNow;
     }
 
     internal Clingy(Guid id, string title, string content,
                     double posX, double posY, double width, double height,
                     bool isDeleted = false, bool isPinned = false,
-                    bool isRolled = false, bool isStand = false)
+                    bool isRolled = false, bool isLocked = false)
     {
         Id = id;
         Title = title;
@@ -49,7 +49,7 @@ public class Clingy
         IsDeleted = isDeleted;
         IsPinned = isPinned;
         IsRolled = isRolled;
-        IsStand = isStand;
+        IsLocked = isLocked;
         CreatedAt = DateTime.UtcNow;
     }
 
@@ -97,9 +97,9 @@ public class Clingy
         ModifiedAt = DateTime.UtcNow;
     }
 
-    public void SetStandState(bool stand)
+    public void SetLockState(bool locked)
     {
-        IsStand = stand;
+        IsLocked = locked;
         ModifiedAt = DateTime.UtcNow;
     }
 }

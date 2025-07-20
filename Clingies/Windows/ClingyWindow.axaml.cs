@@ -3,14 +3,18 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Clingies.ApplicationLogic.CustomEventArgs;
+using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Models;
+using Clingies.Factories;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Clingies.Windows;
 
-public partial class ClingyWindow : Window
+public partial class ClingyWindow : Window, IContextCommandController
 {
     private readonly Clingy _clingy;
     public Guid ClingyId => _clingy.Id;
+    private MenuFactory _menuFactory;
     public event EventHandler<Guid>? CloseRequested;
     public event EventHandler<PinRequestedEventArgs>? PinRequested;
     public event EventHandler<TitleChangeRequestedEventArgs>? TitleChangeRequested;
@@ -18,10 +22,9 @@ public partial class ClingyWindow : Window
     public event EventHandler<RollRequestedEventArgs>? RollRequested;
     public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
     public event EventHandler<UpdateWindowWidthRequestedEventArgs>? UpdateWindowWidthRequested;
+    public IContextCommandProvider CommandProvider { get; private set; }
 
-    //public ClingyWindow() => InitializeWindow();
-
-    public ClingyWindow(Clingy clingy) // : this()
+    public ClingyWindow(Clingy clingy)
     {
         InitializeComponent();
         _clingy = clingy;
@@ -40,7 +43,13 @@ public partial class ClingyWindow : Window
         ClingyBody.IsRolled = _clingy.IsRolled;
 
         PositionChanged += OnPositionChanged;
+        _menuFactory = App.Services.GetRequiredService<MenuFactory>();
     }
+
+    public void SetContextCommandProvider(IContextCommandProvider provider)
+    {
+        CommandProvider = provider ?? throw new ArgumentNullException(nameof(provider));
+    }    
 
     protected override void OnOpened(EventArgs e)
     {
@@ -99,5 +108,61 @@ public partial class ClingyWindow : Window
     {
         var args = new PositionChangeRequestedEventArgs(ClingyId, this.Position.X, this.Position.Y);
         PositionChangeRequested?.Invoke(this, args);
+    }
+
+    public void ShowContextMenu(PointerReleasedEventArgs e)
+    {
+        if (e.Source is Control sourceControl)
+        {
+            var menu = _menuFactory.BuildClingyMenu(this);
+            menu.PlacementTarget = this;
+            menu.Placement = PlacementMode.Pointer;
+            menu.Open(sourceControl);
+        }
+    }
+
+    public void SleepClingy()
+    {
+        Console.WriteLine("SLEEP CLINGY NOT IMPLEMENTED");
+    }
+
+    public void AttachClingy()
+    {
+        Console.WriteLine("ATTACH CLINGY NOT IMPLEMENTED");
+    }
+
+    public void BuildStackMenu()
+    {
+        Console.WriteLine("BUILD STACK MENU NOT IMPLEMENTED");
+    }
+
+    public void ShowAlarmWindow()
+    {
+        Console.WriteLine("SHOW ALARM WINDOW NOT IMPLEMENTED");
+    }
+
+    public void ShowChangeTitleDialog()
+    {
+        Console.WriteLine("SHOW CHANGE TITLE DIALOG NOT IMPLEMENTED");
+    }
+
+    public void ShowColorWindow()
+    {
+        Console.WriteLine("SHOW COLOR WINDOW NOT IMPLEMENTED");
+    }
+
+    public void LockClingy()
+    {
+        Console.WriteLine("LOCK CLINGY NOT IMPLEMENTED");
+    }
+
+    public void UnlockClingy()
+    {
+        Console.WriteLine("UNLOCK CLINGY NOT IMPLEMENTED");
+    }
+
+    public void ShowPropertiesWindow()
+    {
+        Console.WriteLine("SHOW PROPERTIES WINDOW NOT IMPLEMENTED");
     }
 }

@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Windows.Input;
 
 namespace Clingies.ApplicationLogic.Providers;

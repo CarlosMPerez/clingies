@@ -9,16 +9,18 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
 {
     private IDbConnection Conn => connectionFactory.GetConnection();
 
-    public List<TrayMenuItem> GetAllParents()
+    public List<TrayMenuItem> GetAllParents(string menuType)
     {
         try
         {
+            var parms = new Dictionary<string, object> { { "@menuType", menuType } };
             var sql = """
-                SELECT * FROM system_tray_menu 
-                WHERE parent_id IS NULL
+                SELECT * FROM system_menu 
+                WHERE menu_type = @menuType
+                AND parent_id IS NULL
                 ORDER BY sort_order
             """;
-            var items = Conn.Query<TrayMenuItem>(sql).ToList();
+            var items = Conn.Query<TrayMenuItem>(sql, parms).ToList();
             return items;
         }
         catch (Exception ex)
@@ -32,9 +34,10 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
     {
         try
         {
+            // menu_type is not needed because it's determined by the parent menu
             var parms = new Dictionary<string, object> { { "@parentId", parentId } };
             var sql = """
-                SELECT * FROM system_tray_menu 
+                SELECT * FROM system_menu 
                 WHERE parent_id = @parentId
                 ORDER BY sort_order
             """;

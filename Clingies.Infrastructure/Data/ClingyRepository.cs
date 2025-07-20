@@ -16,7 +16,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             List<Clingy> clingies = new List<Clingy>();
             var sql = """
                 SELECT Id, Title, Content, CreatedAt, ModifiedAt, 
-                    IsDeleted, IsPinned, IsRolled, IsStand,
+                    IsDeleted, IsPinned, IsRolled, IsLocked,
                     PositionX, PositionY, Width, Height
                 FROM Clingies
                 WHERE IsDeleted = 0
@@ -39,7 +39,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             var parms = new Dictionary<string, object> { { "@Id", id } };
             var sql = """
                 SELECT Id, Title, Content, CreatedAt, ModifiedAt, 
-                    IsDeleted, IsPinned, IsRolled, IsStand,
+                    IsDeleted, IsPinned, IsRolled, IsLocked,
                     PositionX, PositionY, Width, Height
                 FROM Clingies
                 WHERE Id = @Id
@@ -62,10 +62,10 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             var sql = """
                 INSERT INTO Clingies (Id, Title, Content, CreatedAt, ModifiedAt, 
-                    IsDeleted, IsPinned, IsRolled, IsStand, 
+                    IsDeleted, IsPinned, IsRolled, IsLocked, 
                     PositionX, PositionY, Width, Height)
                 VALUES (@Id, @Title, @Content, @CreatedAt, @ModifiedAt, 
-                    @IsDeleted, @IsPinned, @IsRolled, @IsStand, 
+                    @IsDeleted, @IsPinned, @IsRolled, @IsLocked, 
                     @PositionX, @PositionY, @Width, @Height)
                 """;
 
@@ -91,7 +91,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     IsDeleted = @IsDeleted, 
                     IsPinned = @IsPinned,
                     IsRolled = @IsRolled,
-                    IsStand = @IsStand,
+                    IsLocked = @IsLocked,
                     PositionX = @PositionX, 
                     PositionY = @PositionY, 
                     Width = @Width, 

@@ -60,10 +60,12 @@ internal sealed class Program
             services.AddSingleton<IMenuRepository, MenuRepository>();
             services.AddSingleton<IIconPathRepository, IconPathRepository>();
             services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
-            services.AddSingleton<TrayMenuFactory>();
+            services.AddSingleton<MenuFactory>();
             services.AddSingleton<ClingyWindowFactory>();
             services.AddSingleton<ClingyService>();
-            services.AddSingleton(sp => (IClingiesCommandController)Application.Current!);
+            services.AddSingleton(sp => (ITrayCommandController)Application.Current!);
+            services.AddSingleton<Func<IContextCommandController, IContextCommandProvider>>(sp =>
+                                    controller => new ContextCommandProvider(controller));
 
             return services.BuildServiceProvider();
         }
