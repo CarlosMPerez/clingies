@@ -7,12 +7,15 @@ using Clingies.Windows;
 using Clingies.ApplicationLogic.CustomEventArgs;
 using Clingies.Domain.Interfaces;
 using Clingies.ApplicationLogic.Interfaces;
+using Clingies.Services;
+using Avalonia.Media;
 
 namespace Clingies.Factories;
 
 public class ClingyWindowFactory(ClingyService noteService,
                                 IClingiesLogger logger,
-                                Func<IContextCommandController, IContextCommandProvider> providerFactory)
+                                Func<IContextCommandController, IContextCommandProvider> providerFactory,
+                                UtilsService utils)
 {
     private readonly List<Clingy> _activeClingies = new List<Clingy>();
     private readonly List<ClingyWindow> _activeWindows = new List<ClingyWindow>();
@@ -67,6 +70,7 @@ public class ClingyWindowFactory(ClingyService noteService,
         window.TitleChangeRequested += HandleTitleChangeRequested;
         window.UpdateWindowWidthRequested += HandleUpdateWindowWidthRequested;
         window.RollRequested += HandleRollRequested;
+        window.LockRequested += HandleLockRequested;
     }
 
     public void RenderAllWindows()
@@ -119,6 +123,24 @@ public class ClingyWindowFactory(ClingyService noteService,
         catch (Exception ex)
         {
             logger.Error(ex, "Error at HandlePinRequested");
+            throw;
+        }
+    }
+
+    private void HandleLockRequested(object? sender, LockRequestedEventArgs args)
+    {
+        try
+        {
+            var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
+            var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
+            window.ClingyTitleBar.IsLocked = args.IsLocked;
+            window.ClingyBody.IsLocked = args.IsLocked;
+            clingy.SetLockState(args.IsLocked);
+            noteService.Update(clingy);
+        }
+        catch (Exception ex)
+        {
+            logger.Error(ex, "Error at HandleLockRequested");
             throw;
         }
     }

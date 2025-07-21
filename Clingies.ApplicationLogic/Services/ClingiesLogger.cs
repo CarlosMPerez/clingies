@@ -2,7 +2,7 @@ using Clingies.Domain.Interfaces;
 using Serilog;
 
 
-namespace Clingies.ApplicationLogic;
+namespace Clingies.ApplicationLogic.Services;
 
 public class ClingiesLogger : IClingiesLogger
 {

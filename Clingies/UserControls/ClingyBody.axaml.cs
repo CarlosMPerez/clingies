@@ -12,6 +12,7 @@ public partial class ClingyBody : UserControl
     private Guid _id;
     private string? _bodyContent;
     private bool _isRolled;
+    private bool _isLocked;
     private ClingyWindow? _parentWindow;
 
     public string? BodyContent
@@ -34,6 +35,15 @@ public partial class ClingyBody : UserControl
         }
     }
 
+    public bool IsLocked
+    {
+        get { return _isLocked; }
+        set
+        {
+            _isLocked = value;
+            this.ContentBox.IsReadOnly = _isLocked;
+        }
+    }
     public ClingyBody()
     {
         InitializeComponent();
@@ -80,13 +90,5 @@ public partial class ClingyBody : UserControl
     {
         _parentWindow?.BeginResizeDrag(WindowEdge.West, e);
         _parentWindow!.WidthChangeRequest();
-    }
-
-    private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
-    {
-        if (e.GetCurrentPoint(this).Properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased)
-        {
-            _parentWindow?.ShowContextMenu(e);
-        }
     }
 }

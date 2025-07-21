@@ -2,18 +2,18 @@ using System;
 using System.Linq;
 using System.Windows.Input;
 using Avalonia.Controls;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
+using Clingies.Services;
 
 namespace Clingies.Factories;
 
 public class MenuFactory(IMenuRepository repo, IIconPathRepository iconRepo,
                             IClingiesLogger logger,
-                            ITrayCommandProvider trayCommandProvider, 
-                            Func<IContextCommandController, IContextCommandProvider> contextProviderFactory)
+                            ITrayCommandProvider trayCommandProvider,
+                            Func<IContextCommandController, IContextCommandProvider> contextProviderFactory,
+                            UtilsService utils)
 
 {
     IContextCommandProvider _contextCommandProvider;
@@ -57,16 +57,7 @@ public class MenuFactory(IMenuRepository repo, IIconPathRepository iconRepo,
                 IsEnabled = item.Enabled
             };
 
-            var icon = LoadIcon(item.Id);
-            if (icon != null)
-            {
-                parent.Icon = new Image
-                {
-                    Source = icon,
-                    Width = 32,
-                    Height = 32
-                };
-            }
+            parent.Icon = utils.LoadImage(item.Id);
 
             foreach (var child in children)
                 parent.Items.Add(BuildContextMenuItemRecursive(child, repo));
@@ -81,16 +72,7 @@ public class MenuFactory(IMenuRepository repo, IIconPathRepository iconRepo,
                 IsEnabled = item.Enabled
             };
 
-            var icon = LoadIcon(item.Id);
-            if (icon != null)
-            {
-                menuItem.Icon = new Image
-                {
-                    Source = icon,
-                    Width = 32,
-                    Height = 32
-                };
-            }
+            menuItem.Icon = utils.LoadImage(item.Id);
 
             var command = ResolveContextCommand(item.Id);
             if (command is not null)
@@ -142,7 +124,7 @@ public class MenuFactory(IMenuRepository repo, IIconPathRepository iconRepo,
                 IsEnabled = item.Enabled
             };
 
-            parent.Icon = LoadIcon(item.Id);
+            parent.Icon = utils.LoadBitmap(item.Id);
 
             foreach (var child in children)
                 parent.Menu.Items.Add(BuildNativeTrayMenuItemRecursive(child, repo));
@@ -156,7 +138,7 @@ public class MenuFactory(IMenuRepository repo, IIconPathRepository iconRepo,
                 IsEnabled = item.Enabled,
             };
 
-            menuItem.Icon = LoadIcon(item.Id);
+            menuItem.Icon = utils.LoadBitmap(item.Id);
 
             // Use closure to bind the item's ID to the click event
             var command = ResolveTrayCommand(item.Id);
@@ -211,25 +193,4 @@ public class MenuFactory(IMenuRepository repo, IIconPathRepository iconRepo,
         "properties" => _contextCommandProvider.ShowPropertiesWindowCommand,
         _ => null
     };
-
-    private Bitmap? LoadIcon(string iconId)
-    {
-        try
-        {
-            string? iconPath = iconRepo.GetLightPath(iconId);
-            if (!string.IsNullOrEmpty(iconPath))
-            {
-                var uri = new Uri(iconPath, UriKind.Absolute);
-                using var stream = AssetLoader.Open(uri);
-                return new Bitmap(stream);
-            }
-
-            return null;
-        }
-        catch (Exception ex)
-        {
-            logger.Warning($"[TrayMenu] Could not load icon '{iconId}': {ex.Message}");
-            return null;
-        }
-    }
 }

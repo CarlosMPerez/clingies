@@ -7,6 +7,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.VisualTree;
 using Clingies.Domain.Interfaces;
+using Clingies.Services;
 using Clingies.Windows;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,25 +18,27 @@ public partial class ClingyTitle : UserControl
     private Guid _id;
     private bool _isRolled;
     private bool _isPinned;
+    private bool _isLocked;
     private string? _title;
     private ClingyWindow? _parentWindow;
 
     IIconPathRepository _iconRepo;
+    UtilsService _utils;
 
     public ClingyTitle()
     {
         InitializeComponent();
         this.AttachedToVisualTree += OnAttachedToVisualTree;
 
-        _iconRepo = App.Services.GetRequiredService<IIconPathRepository>();
-        CloseButtonImage.Source = LoadPinImage(_iconRepo.GetDarkPath("clingy_close")!);
+        _utils = App.Services.GetRequiredService<UtilsService>();
+        CloseButtonImage.Source = _utils.LoadBitmap("clingy_close");
     }
 
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
         _parentWindow = (ClingyWindow)this.GetVisualRoot()!;
     }
-    
+
     public bool IsRolled
     {
         get { return _isRolled; }
@@ -55,8 +58,20 @@ public partial class ClingyTitle : UserControl
         {
             _isPinned = value;
             PinButtonImage.Source = _isPinned ?
-                LoadPinImage(_iconRepo.GetDarkPath("clingy_pinned")!) :
-                LoadPinImage(_iconRepo.GetDarkPath("clingy_unpinned")!);
+                _utils.LoadBitmap("clingy_pinned") :
+                _utils.LoadBitmap("clingy_unpinned");
+        }
+    }
+
+    public bool IsLocked
+    {
+        get { return _isLocked; }
+        set
+        {
+            _isLocked = value;
+            LockedImage.Source = _isLocked ?
+                _utils.LoadBitmap("clingy_locked") :
+                null;
 
         }
     }
@@ -103,12 +118,5 @@ public partial class ClingyTitle : UserControl
         {
             _parentWindow?.ShowContextMenu(e);
         }
-    }
-
-    private Bitmap LoadPinImage(string iconPath)
-    {
-        var uri = new Uri(iconPath);
-        using var stream = AssetLoader.Open(uri);
-        return new Bitmap(stream);
     }
 }

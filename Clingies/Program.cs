@@ -8,8 +8,8 @@ using Clingies.Infrastructure.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Clingies.ApplicationLogic.Interfaces;
-using Clingies.ApplicationLogic;
 using Clingies.ApplicationLogic.Providers;
+using Clingies.Services;
 
 namespace Clingies;
 
@@ -66,6 +66,7 @@ internal sealed class Program
             services.AddSingleton(sp => (ITrayCommandController)Application.Current!);
             services.AddSingleton<Func<IContextCommandController, IContextCommandProvider>>(sp =>
                                     controller => new ContextCommandProvider(controller));
+            services.AddSingleton<UtilsService>();
 
             return services.BuildServiceProvider();
         }

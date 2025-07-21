@@ -22,6 +22,7 @@ public partial class ClingyWindow : Window, IContextCommandController
     public event EventHandler<RollRequestedEventArgs>? RollRequested;
     public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
     public event EventHandler<UpdateWindowWidthRequestedEventArgs>? UpdateWindowWidthRequested;
+    public event EventHandler<LockRequestedEventArgs>? LockRequested;
     public IContextCommandProvider CommandProvider { get; private set; }
 
     public ClingyWindow(Clingy clingy)
@@ -37,10 +38,12 @@ public partial class ClingyWindow : Window, IContextCommandController
         ClingyTitleBar.Title = _clingy.Title;
         ClingyTitleBar.IsRolled = _clingy.IsRolled;
         ClingyTitleBar.IsPinned = _clingy.IsPinned;
+        ClingyTitleBar.IsLocked = _clingy.IsLocked;
         // establish body props
         ClingyBody.ClingyId = _clingy.Id;
         ClingyBody.BodyContent = _clingy.Content;
         ClingyBody.IsRolled = _clingy.IsRolled;
+        ClingyBody.IsLocked = _clingy.IsLocked;
 
         PositionChanged += OnPositionChanged;
         _menuFactory = App.Services.GetRequiredService<MenuFactory>();
@@ -56,21 +59,26 @@ public partial class ClingyWindow : Window, IContextCommandController
         base.OnOpened(e);
     }
 
-    protected async override void OnKeyDown(KeyEventArgs e)
+    protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
 
         // Shift+Ctrl+T -> SET TITLE
         if (e.KeyModifiers == (KeyModifiers.Shift | KeyModifiers.Control) && e.Key == Key.T)
         {
-            var dialog = new ClingyTitleDialog(string.IsNullOrEmpty(_clingy.Title) ? "" : _clingy.Title);
-            var result = await dialog.ShowDialog<string>(this);
-            if (!string.IsNullOrWhiteSpace(result))
-            {
-                this.ClingyTitleBar.Title = result;
-                var args = new TitleChangeRequestedEventArgs(ClingyId, result);
-                TitleChangeRequested?.Invoke(this, args);
-            }
+            ChangeClingyTitle();
+        }
+    }
+
+    private async void ChangeClingyTitle()
+    {
+        var dialog = new ClingyTitleDialog(string.IsNullOrEmpty(_clingy.Title) ? "" : _clingy.Title);
+        var result = await dialog.ShowDialog<string>(this);
+        if (!string.IsNullOrWhiteSpace(result))
+        {
+            this.ClingyTitleBar.Title = result;
+            var args = new TitleChangeRequestedEventArgs(ClingyId, result);
+            TitleChangeRequested?.Invoke(this, args);
         }
     }
 
@@ -143,7 +151,7 @@ public partial class ClingyWindow : Window, IContextCommandController
 
     public void ShowChangeTitleDialog()
     {
-        Console.WriteLine("SHOW CHANGE TITLE DIALOG NOT IMPLEMENTED");
+        ChangeClingyTitle();
     }
 
     public void ShowColorWindow()
@@ -153,12 +161,14 @@ public partial class ClingyWindow : Window, IContextCommandController
 
     public void LockClingy()
     {
-        Console.WriteLine("LOCK CLINGY NOT IMPLEMENTED");
-    }
+         var args = new LockRequestedEventArgs(ClingyId, true);
+        LockRequested?.Invoke(this, args);
+   }
 
     public void UnlockClingy()
     {
-        Console.WriteLine("UNLOCK CLINGY NOT IMPLEMENTED");
+        var args = new LockRequestedEventArgs(ClingyId, false);
+        LockRequested?.Invoke(this, args);
     }
 
     public void ShowPropertiesWindow()
