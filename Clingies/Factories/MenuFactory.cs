@@ -9,14 +9,14 @@ using Clingies.Services;
 
 namespace Clingies.Factories;
 
-public class MenuFactory(IMenuRepository repo, IIconPathRepository iconRepo,
+public class MenuFactory(IMenuRepository repo, 
                             IClingiesLogger logger,
                             ITrayCommandProvider trayCommandProvider,
                             Func<IContextCommandController, IContextCommandProvider> contextProviderFactory,
                             UtilsService utils)
 
 {
-    IContextCommandProvider _contextCommandProvider;
+    private IContextCommandProvider? _contextCommandProvider;
     public NativeMenu BuildTrayMenu()
     {
         return BuildNativeTrayMenu();
@@ -182,15 +182,15 @@ public class MenuFactory(IMenuRepository repo, IIconPathRepository iconRepo,
 
     private ICommand? ResolveContextCommand(string itemId) => itemId switch
     {
-        "sleep" => _contextCommandProvider.SleepCommand,
-        "attach" => _contextCommandProvider.AttachCommand,
-        "add_to_stack" => _contextCommandProvider.BuildStackMenuCommand,
-        "alarm" => _contextCommandProvider.ShowAlarmWindowCommand,
-        "title" => _contextCommandProvider.ShowChangeTitleDialogCommand,
-        "color" => _contextCommandProvider.ShowColorWindowCommand,
-        "lock" => _contextCommandProvider.LockCommand,
-        "unlock" => _contextCommandProvider.UnlockCommand,
-        "properties" => _contextCommandProvider.ShowPropertiesWindowCommand,
+        "sleep" => _contextCommandProvider!.SleepCommand,
+        "attach" => _contextCommandProvider!.AttachCommand,
+        "add_to_stack" => _contextCommandProvider!.BuildStackMenuCommand,
+        "alarm" => _contextCommandProvider!.ShowAlarmWindowCommand,
+        "title" => _contextCommandProvider!.ShowChangeTitleDialogCommand,
+        "color" => _contextCommandProvider!.ShowColorWindowCommand,
+        "lock" => _contextCommandProvider!.LockCommand,
+        "unlock" => _contextCommandProvider!.UnlockCommand,
+        "properties" => _contextCommandProvider!.ShowPropertiesWindowCommand,
         _ => null
     };
 }

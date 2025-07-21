@@ -48,9 +48,12 @@ public partial class ClingyBody : UserControl
     {
         InitializeComponent();
         this.AttachedToVisualTree += OnAttachedToVisualTree;
-        ContentBox.TextChanged += OnContentChanged;
-        BorderLeft.PointerPressed += OnResizeLeft;
-        BorderRight.PointerPressed += OnResizeRight;
+        BorderLeft.PointerPressed += OnResizeLeftBegin;
+        BorderRight.PointerPressed += OnResizeRightBegin;
+        BorderBottom.PointerPressed += OnResizeDownBegin;
+        BorderLeft.PointerReleased += OnResizeLeftEnd;
+        BorderRight.PointerReleased += OnResizeRightEnd;
+        BorderBottom.PointerReleased += OnResizeDownEnd;
     }
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
@@ -63,32 +66,33 @@ public partial class ClingyBody : UserControl
         set { _id = value; }
     }
 
-    private void OnContentChanged(object? sender, TextChangedEventArgs e)
+    private void OnResizeRightBegin(object? sender, PointerPressedEventArgs e)
     {
-        if (IsVisible)
-        {
-            // Measure height
-            ContentBox.Measure(new Size(ContentBox.Bounds.Width, double.PositiveInfinity));
-
-            var measuredHeight = ContentBox.DesiredSize.Height;
-            if (measuredHeight < 30) measuredHeight = 30;
-
-            Height = measuredHeight + 40; // + title + margin
-
-            // call parentwindow with new height and content
-            _parentWindow!.ContentChangeRequest(ContentBox.Text!, Height);
-        }
+        _parentWindow!.BeginResizeDrag(WindowEdge.East, e);
     }
 
-    private void OnResizeRight(object? sender, PointerPressedEventArgs e)
+    private void OnResizeLeftBegin(object? sender, PointerPressedEventArgs e)
     {
-        _parentWindow?.BeginResizeDrag(WindowEdge.East, e);
+        _parentWindow!.BeginResizeDrag(WindowEdge.West, e);
+    }
+
+    private void OnResizeDownBegin(object? sender, PointerPressedEventArgs e)
+    {
+        _parentWindow!.BeginResizeDrag(WindowEdge.South, e);
+    }
+
+    private void OnResizeRightEnd(object? sender, PointerReleasedEventArgs e)
+    {
         _parentWindow!.WidthChangeRequest();
     }
 
-    private void OnResizeLeft(object? sender, PointerPressedEventArgs e)
+    private void OnResizeLeftEnd(object? sender, PointerReleasedEventArgs e)
     {
-        _parentWindow?.BeginResizeDrag(WindowEdge.West, e);
         _parentWindow!.WidthChangeRequest();
+    }
+
+    private void OnResizeDownEnd(object? sender, PointerReleasedEventArgs e)
+    {
+        _parentWindow!.HeightChangeRequest();
     }
 }

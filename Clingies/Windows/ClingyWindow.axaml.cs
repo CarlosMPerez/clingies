@@ -22,6 +22,7 @@ public partial class ClingyWindow : Window, IContextCommandController
     public event EventHandler<RollRequestedEventArgs>? RollRequested;
     public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
     public event EventHandler<UpdateWindowWidthRequestedEventArgs>? UpdateWindowWidthRequested;
+    public event EventHandler<UpdateWindowHeightRequestedEventArgs>? UpdateWindowHeightRequested;
     public event EventHandler<LockRequestedEventArgs>? LockRequested;
     public IContextCommandProvider CommandProvider { get; private set; }
 
@@ -32,6 +33,7 @@ public partial class ClingyWindow : Window, IContextCommandController
 
         Position = new PixelPoint((int)clingy.PositionX, (int)clingy.PositionY);
         Width = clingy.Width;
+        Height = clingy.Height;
         Topmost = clingy.IsPinned;
         // establish title props
         ClingyTitleBar.ClingyId = _clingy.Id;
@@ -46,7 +48,7 @@ public partial class ClingyWindow : Window, IContextCommandController
         ClingyBody.IsLocked = _clingy.IsLocked;
 
         PositionChanged += OnPositionChanged;
-        _menuFactory = App.Services.GetRequiredService<MenuFactory>();
+        _menuFactory = App.Services!.GetRequiredService<MenuFactory>();
     }
 
     public void SetContextCommandProvider(IContextCommandProvider provider)
@@ -85,14 +87,21 @@ public partial class ClingyWindow : Window, IContextCommandController
     public void ContentChangeRequest(string bodyContent, double height)
     {
         var args = new ContentChangeRequestedEventArgs(ClingyId, bodyContent, height);
-        this.Height = this.ClingyTitleBar.Height + height;
         ContentChangeRequested?.Invoke(this, args);
     }
 
     public void WidthChangeRequest()
     {
+        Console.WriteLine(Width);
         var args = new UpdateWindowWidthRequestedEventArgs(ClingyId, Width);
         UpdateWindowWidthRequested?.Invoke(this, args);
+    }
+
+    public void HeightChangeRequest()
+    {
+        Console.WriteLine(Height);
+        var args = new UpdateWindowHeightRequestedEventArgs(ClingyId, Height);
+        UpdateWindowHeightRequested?.Invoke(this, args);
     }
 
     public void CloseRequest()

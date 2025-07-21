@@ -7,7 +7,6 @@
         x:Class="Clingies.Windows.ClingyWindow"
         Background="Transparent"
         SystemDecorations="None"
-        SizeToContent="Height"
         CanResize="True"
         MinHeight="100"
         MinWidth="100"

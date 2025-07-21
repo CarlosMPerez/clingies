@@ -1,5 +1,3 @@
-using System;
-
 namespace Clingies.ApplicationLogic.CustomEventArgs;
 
 public class UpdateWindowHeightRequestedEventArgs

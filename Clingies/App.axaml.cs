@@ -16,12 +16,12 @@ namespace Clingies;
 public partial class App : Application, ITrayCommandController
 {
     private IServiceProvider _services;
-    private ClingyWindowFactory _windowFactory;
-    private MenuFactory _menuFactory;
-    private IClingiesLogger _logger;
-    private IIconPathRepository _iconRepo;
-    private IClassicDesktopStyleApplicationLifetime _desktop;
-    public static IServiceProvider Services { get; private set; }
+    private ClingyWindowFactory? _windowFactory;
+    private MenuFactory? _menuFactory;
+    private IClingiesLogger? _logger;
+    private IIconPathRepository? _iconRepo;
+    private IClassicDesktopStyleApplicationLifetime? _desktop;
+    public static IServiceProvider? Services { get; private set; }
 
     public App(IServiceProvider services)
     {
@@ -64,7 +64,7 @@ public partial class App : Application, ITrayCommandController
             var centerX = screen.X + (screen.Width - defClingyWidth) / 2;
             var centerY = screen.Y + (screen.Height - defClingyHeight) / 2;
 
-            _windowFactory.CreateNewWindow(centerX, centerY);
+            _windowFactory!.CreateNewWindow(centerX, centerY);
         }
     }
 
@@ -83,7 +83,7 @@ public partial class App : Application, ITrayCommandController
 
     private PixelRect GetDesktopWorkingArea()
     {
-        if (_desktop.Windows.Count > 0)
+        if (_desktop!.Windows.Count > 0)
         {
             var anchor = _desktop.Windows[0];
             return anchor.Screens.ScreenFromVisual(anchor)?.WorkingArea
@@ -110,12 +110,12 @@ public partial class App : Application, ITrayCommandController
 
     private void OnTrayIconClicked(object? sender, EventArgs e)
     {
-        _windowFactory.RenderAllWindows();
+        _windowFactory!.RenderAllWindows();
     }
 
     private void DrawTrayIcon()
     {
-        string? iconPath = _iconRepo.GetLightPath("clingy_icon");
+        string? iconPath = _iconRepo!.GetLightPath("clingy_icon");
         if (!string.IsNullOrEmpty(iconPath))
         {
             var uri = new Uri(iconPath!);
@@ -125,18 +125,18 @@ public partial class App : Application, ITrayCommandController
             {
                 Icon = new WindowIcon(stream),
                 ToolTipText = "Clingies",
-                Menu = _menuFactory.BuildTrayMenu(),
+                Menu = _menuFactory!.BuildTrayMenu(),
                 IsVisible = true
             };
 
             trayIcon.Clicked += OnTrayIconClicked;
         }
-        else _logger.Error(new Exception(), "Could not find main tray icon in DB");
+        else _logger!.Error(new Exception(), "Could not find main tray icon in DB");
     }
 
     private void RunMigrations()
     {
-        _logger.Info("Running migrations");
+        _logger!.Info("Running migrations");
         // Path to your SQLite DB file, e.g., in user app data folder
         var dbPath = Path.Combine(Environment
                 .GetFolderPath(Environment.SpecialFolder.ApplicationData),

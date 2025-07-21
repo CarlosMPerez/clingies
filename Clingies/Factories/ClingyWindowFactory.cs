@@ -8,14 +8,12 @@ using Clingies.ApplicationLogic.CustomEventArgs;
 using Clingies.Domain.Interfaces;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Services;
-using Avalonia.Media;
 
 namespace Clingies.Factories;
 
 public class ClingyWindowFactory(ClingyService noteService,
                                 IClingiesLogger logger,
-                                Func<IContextCommandController, IContextCommandProvider> providerFactory,
-                                UtilsService utils)
+                                Func<IContextCommandController, IContextCommandProvider> providerFactory)
 {
     private readonly List<Clingy> _activeClingies = new List<Clingy>();
     private readonly List<ClingyWindow> _activeWindows = new List<ClingyWindow>();
@@ -69,6 +67,7 @@ public class ClingyWindowFactory(ClingyService noteService,
         window.ContentChangeRequested += HandleContentChangeRequested;
         window.TitleChangeRequested += HandleTitleChangeRequested;
         window.UpdateWindowWidthRequested += HandleUpdateWindowWidthRequested;
+        window.UpdateWindowHeightRequested += HandleUpdateWindowHeightRequested;
         window.RollRequested += HandleRollRequested;
         window.LockRequested += HandleLockRequested;
     }
@@ -196,23 +195,6 @@ public class ClingyWindowFactory(ClingyService noteService,
         }
     }
 
-    private void HandleSizeChangeRequested(object? sender, SizeChangeRequestedEventArgs args)
-    {
-        try
-        {
-            var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
-            var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            window.Height = args.Height;
-            clingy.Resize(clingy.Width, args.Height);
-            noteService.Update(clingy);
-        }
-        catch (Exception ex)
-        {
-            logger.Error(ex, "Error at HandleSizeChangeRequested");
-            throw;
-        }
-    }
-
     private void HandleUpdateWindowWidthRequested(object? sender, UpdateWindowWidthRequestedEventArgs args)
     {
         try
@@ -230,6 +212,22 @@ public class ClingyWindowFactory(ClingyService noteService,
         }
     }
 
+    private void HandleUpdateWindowHeightRequested(object? sender, UpdateWindowHeightRequestedEventArgs args)
+    {
+        try
+        {
+            var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
+            var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
+            window.Height = args.Height;
+            clingy.Resize(window.Width, args.Height);
+            noteService.Update(clingy);
+        }
+        catch (Exception ex)
+        {
+            logger.Error(ex, "Error at HandleUpdateWindowHeightRequested");
+            throw;
+        }
+    }
     private void HandleRollRequested(object? sender, RollRequestedEventArgs args)
     {
         try
