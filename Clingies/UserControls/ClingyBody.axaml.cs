@@ -48,13 +48,8 @@ public partial class ClingyBody : UserControl
     {
         InitializeComponent();
         this.AttachedToVisualTree += OnAttachedToVisualTree;
-        BorderLeft.PointerPressed += OnResizeLeftBegin;
-        BorderRight.PointerPressed += OnResizeRightBegin;
-        BorderBottom.PointerPressed += OnResizeDownBegin;
-        BorderLeft.PointerReleased += OnResizeLeftEnd;
-        BorderRight.PointerReleased += OnResizeRightEnd;
-        BorderBottom.PointerReleased += OnResizeDownEnd;
     }
+
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
         _parentWindow = (ClingyWindow)this.GetVisualRoot()!;
@@ -64,35 +59,5 @@ public partial class ClingyBody : UserControl
     {
         get { return _id; }
         set { _id = value; }
-    }
-
-    private void OnResizeRightBegin(object? sender, PointerPressedEventArgs e)
-    {
-        _parentWindow!.BeginResizeDrag(WindowEdge.East, e);
-    }
-
-    private void OnResizeLeftBegin(object? sender, PointerPressedEventArgs e)
-    {
-        _parentWindow!.BeginResizeDrag(WindowEdge.West, e);
-    }
-
-    private void OnResizeDownBegin(object? sender, PointerPressedEventArgs e)
-    {
-        _parentWindow!.BeginResizeDrag(WindowEdge.South, e);
-    }
-
-    private void OnResizeRightEnd(object? sender, PointerReleasedEventArgs e)
-    {
-        _parentWindow!.WidthChangeRequest();
-    }
-
-    private void OnResizeLeftEnd(object? sender, PointerReleasedEventArgs e)
-    {
-        _parentWindow!.WidthChangeRequest();
-    }
-
-    private void OnResizeDownEnd(object? sender, PointerReleasedEventArgs e)
-    {
-        _parentWindow!.HeightChangeRequest();
     }
 }

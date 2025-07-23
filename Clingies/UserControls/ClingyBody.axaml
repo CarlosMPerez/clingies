@@ -38,54 +38,37 @@
       MinHeight="0" Margin="0" Padding="0"
       Background="#FFFFAA"
     >
-      <Grid RowDefinitions="*, 10">
-        <Grid x:Name="BodyGrid" Grid.Row="0" ColumnDefinitions="10,*,10">
-          <Border Grid.Column="0"
-            x:Name="BorderLeft"
-            Background="#FFFFAA"
-            Cursor="LeftSide" 
-          />
-          <!-- Your main clingy layout goes here -->
-          <Border x:Name="ContentContainerBorder" 
-            Grid.Column="1"
-            BorderBrush="Transparent"
-            BorderThickness="1"
+      <Grid x:Name="BodyGrid" ColumnDefinitions="*">
+        <!-- Your main clingy layout goes here -->
+        <Border x:Name="ContentContainerBorder" 
+          Grid.Column="1"
+          BorderBrush="Transparent"
+          BorderThickness="1"
+        >
+          <!-- CONTENT -->
+          <StackPanel x:Name="LayoutRoot"
+            Grid.Row="1"
+            Orientation="Vertical"
+            Margin="0"
+            Spacing="0"
+            MinHeight="40"
           >
-            <!-- CONTENT -->
-            <StackPanel x:Name="LayoutRoot"
-              Grid.Row="1"
-              Orientation="Vertical"
+            <TextBox
+              x:Name="ContentBox"
+              AcceptsReturn="True"
+              TextWrapping="Wrap"
+              BorderThickness="0"
+              VerticalAlignment="Stretch"
+              HorizontalAlignment="Stretch"
+              Background="Transparent"
+              Foreground="Black"
+              FontSize="14"
+              MaxLines="1500"
               Margin="0"
-              Spacing="0"
-              MinHeight="40"
-            >
-              <TextBox
-                x:Name="ContentBox"
-                AcceptsReturn="True"
-                TextWrapping="Wrap"
-                BorderThickness="0"
-                VerticalAlignment="Stretch"
-                HorizontalAlignment="Stretch"
-                Background="Transparent"
-                Foreground="Black"
-                FontSize="14"
-                MaxLines="1500"
-                Margin="0"
-                MinHeight="20" 
-              />
-            </StackPanel>
-          </Border>    
-          <!-- Right resizable edge -->
-          <Border Grid.Column="2"
-            x:Name="BorderRight"
-            Background="#FFFFAA"
-            Cursor="RightSide" 
-          />
-        </Grid>
-        <Border Grid.Row="1"
-            x:Name="BorderBottom"
-            Background="#FFFFAA"
-            Cursor="BottomSide" />
+              MinHeight="20" 
+            />
+          </StackPanel>
+        </Border>    
       </Grid>
     </Border>
 

@@ -3,10 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using Avalonia.VisualTree;
-using Clingies.Domain.Interfaces;
 using Clingies.Services;
 using Clingies.Windows;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,8 +18,6 @@ public partial class ClingyTitle : UserControl
     private bool _isLocked;
     private string? _title;
     private ClingyWindow? _parentWindow;
-
-    IIconPathRepository _iconRepo;
     UtilsService _utils;
 
     public ClingyTitle()
@@ -30,7 +25,7 @@ public partial class ClingyTitle : UserControl
         InitializeComponent();
         this.AttachedToVisualTree += OnAttachedToVisualTree;
 
-        _utils = App.Services.GetRequiredService<UtilsService>();
+        _utils = App.Services!.GetRequiredService<UtilsService>();
         CloseButtonImage.Source = _utils.LoadBitmap("clingy_close");
     }
 

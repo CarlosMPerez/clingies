@@ -21,14 +21,16 @@ public partial class ClingyWindow : Window, IContextCommandController
     public event EventHandler<PositionChangeRequestedEventArgs>? PositionChangeRequested;
     public event EventHandler<RollRequestedEventArgs>? RollRequested;
     public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
-    public event EventHandler<UpdateWindowWidthRequestedEventArgs>? UpdateWindowWidthRequested;
-    public event EventHandler<UpdateWindowHeightRequestedEventArgs>? UpdateWindowHeightRequested;
+    //public event EventHandler<UpdateWindowWidthRequestedEventArgs>? UpdateWindowWidthRequested;
+    public event EventHandler<UpdateWindowSizeRequestedEventArgs>? UpdateWindowSizeRequested;
+    //public event EventHandler<UpdateWindowHeightRequestedEventArgs>? UpdateWindowHeightRequested;
     public event EventHandler<LockRequestedEventArgs>? LockRequested;
-    public IContextCommandProvider CommandProvider { get; private set; }
+    public IContextCommandProvider? CommandProvider { get; private set; }
 
     public ClingyWindow(Clingy clingy)
     {
         InitializeComponent();
+        //OnPointerPressed += OnResizeGripPressed;
         _clingy = clingy;
 
         Position = new PixelPoint((int)clingy.PositionX, (int)clingy.PositionY);
@@ -48,8 +50,57 @@ public partial class ClingyWindow : Window, IContextCommandController
         ClingyBody.IsLocked = _clingy.IsLocked;
 
         PositionChanged += OnPositionChanged;
+        SizeChanged += (_, e) =>
+        {
+            var newSize = e.NewSize;
+            SizeChangeRequest(newSize.Width, newSize.Height);
+        };
+
         _menuFactory = App.Services!.GetRequiredService<MenuFactory>();
     }
+
+    private void OnResizeGripMoved(object? sender, PointerEventArgs e)
+    {
+        int GripThreshold = 8;
+        var point = e.GetPosition(this);
+
+        bool onLeft = point.X <= GripThreshold;
+        bool onRight = point.X >= Bounds.Width - GripThreshold;
+        bool onBottom = point.Y >= Bounds.Height - GripThreshold;
+
+        if (onLeft || onRight)
+            this.Cursor = new Cursor(StandardCursorType.SizeWestEast);
+        else if (onBottom)
+            this.Cursor = new Cursor(StandardCursorType.SizeNorthSouth);
+        else
+            this.Cursor = new Cursor(StandardCursorType.Ibeam); // Or Arrow
+    }
+
+    private void OnResizeGripLeave(object? sender, PointerEventArgs e)
+    {
+        this.Cursor = new Cursor(StandardCursorType.Ibeam);
+    }
+
+    private void OnResizeGripPressed(object? sender, PointerPressedEventArgs e)
+    {
+        var point = e.GetPosition(this);
+        const int gripSize = 4;
+
+        // Determine which edge was pressed based on pointer location
+        var onLeft = point.X <= gripSize;
+        var onRight = point.X >= Bounds.Width - gripSize;
+        var onBottom = point.Y >= Bounds.Height - gripSize;
+
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            if (onLeft)
+                BeginResizeDrag(WindowEdge.West, e);
+            else if (onRight)
+                BeginResizeDrag(WindowEdge.East, e);
+            else if (onBottom)
+                BeginResizeDrag(WindowEdge.South, e);
+        }
+    }    
 
     public void SetContextCommandProvider(IContextCommandProvider provider)
     {
@@ -90,18 +141,10 @@ public partial class ClingyWindow : Window, IContextCommandController
         ContentChangeRequested?.Invoke(this, args);
     }
 
-    public void WidthChangeRequest()
+    public void SizeChangeRequest(double newWidth, double newHeight)
     {
-        Console.WriteLine(Width);
-        var args = new UpdateWindowWidthRequestedEventArgs(ClingyId, Width);
-        UpdateWindowWidthRequested?.Invoke(this, args);
-    }
-
-    public void HeightChangeRequest()
-    {
-        Console.WriteLine(Height);
-        var args = new UpdateWindowHeightRequestedEventArgs(ClingyId, Height);
-        UpdateWindowHeightRequested?.Invoke(this, args);
+        var args = new UpdateWindowSizeRequestedEventArgs(ClingyId, newWidth, newHeight);
+        UpdateWindowSizeRequested?.Invoke(this, args);
     }
 
     public void CloseRequest()
