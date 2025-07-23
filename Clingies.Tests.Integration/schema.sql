@@ -1,15 +1,15 @@
 CREATE TABLE IF NOT EXISTS Clingies (
-    Id TEXT PRIMARY KEY,
-    Title TEXT,
-    Content TEXT,
-    IsDeleted BOOLEAN,
-    IsPinned BOOLEAN,
-    PositionX REAL,
-    PositionY REAL,
-    Width REAL,
-    Height REAL,
-    CreatedAt TEXT,
-    ModifiedAt TEXT,
-    IsRolled BOOLEAN,
-    IsLocked BOOLEAN
+    id TEXT PRIMARY KEY,
+    title TEXT,
+    content TEXT,
+    is_deleted BOOLEAN,
+    is_pinned BOOLEAN,
+    position_X REAL,
+    position_y REAL,
+    width REAL,
+    height REAL,
+    created_at TEXT,
+    modified_at TEXT,
+    is_rolled BOOLEAN,
+    is_locked BOOLEAN
 );

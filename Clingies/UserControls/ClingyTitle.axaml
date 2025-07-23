@@ -46,6 +46,7 @@
                 VerticalAlignment="Center"
                 Foreground="Black"
                 FontWeight="Bold"
+                FontFamily="Arial"
                 TextTrimming="CharacterEllipsis"
             />
             <Button x:Name="CloseButton"

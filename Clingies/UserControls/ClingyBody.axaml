@@ -61,6 +61,7 @@
               VerticalAlignment="Stretch"
               HorizontalAlignment="Stretch"
               Background="Transparent"
+              FontFamily="Arial"
               Foreground="Black"
               FontSize="14"
               MaxLines="1500"

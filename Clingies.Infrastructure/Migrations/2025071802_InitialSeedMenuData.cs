@@ -162,6 +162,10 @@ public class _2025071802_InitialSeedMenuData : Migration
             "avares://Clingies/Assets/clingy_icon_light.png",
             "avares://Clingies/Assets/clingy_icon_dark.png");
         Execute.Sql(sql);
+        sql = SqlBuilder.BuildInsertSystemTrayIcon("clingy_locked",
+            "avares://Clingies/Assets/clingy_locked.png",
+            "avares://Clingies/Assets/clingy_locked.png");
+        Execute.Sql(sql);
     }
 
     public override void Down()
@@ -206,5 +210,6 @@ public class _2025071802_InitialSeedMenuData : Migration
         Delete.FromTable("system_icon_path").Row(new { id = "clingy_pinned" });
         Delete.FromTable("system_icon_path").Row(new { id = "clingy_unpinned" });
         Delete.FromTable("system_icon_path").Row(new { id = "clingy_icon" });
+        Delete.FromTable("system_icon_path").Row(new { id = "clingy_locked" });
     }
 }

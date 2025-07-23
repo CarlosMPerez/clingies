@@ -15,11 +15,11 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             List<Clingy> clingies = new List<Clingy>();
             var sql = """
-                SELECT Id, Title, Content, CreatedAt, ModifiedAt, 
-                    IsDeleted, IsPinned, IsRolled, IsLocked,
-                    PositionX, PositionY, Width, Height
-                FROM Clingies
-                WHERE IsDeleted = 0
+                SELECT id, title, content, created_at, modified_at, 
+                    is_deleted, is_pinned, is_rolled, is_locked,
+                    position_x, position_y, width, height
+                FROM clingies
+                WHERE is_deleted = 0
             """;
             var dtos = Conn.Query<ClingyDto>(sql).ToList();
             clingies = dtos.Select(dto => ClingyEntityFactory.FromDto(dto)).ToList();
@@ -38,11 +38,11 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             var parms = new Dictionary<string, object> { { "@Id", id } };
             var sql = """
-                SELECT Id, Title, Content, CreatedAt, ModifiedAt, 
-                    IsDeleted, IsPinned, IsRolled, IsLocked,
-                    PositionX, PositionY, Width, Height
-                FROM Clingies
-                WHERE Id = @Id
+                SELECT id, title, content, created_at, modified_at, 
+                    is_deleted, is_pinned, is_rolled, is_locked,
+                    position_x, position_y, width, height
+                FROM clingies
+                WHERE id = @Id
             """;
             var dtos = Conn.Query<ClingyDto>(sql, parms);
             var clingy = dtos.Select(dto => ClingyEntityFactory.FromDto(dto)).FirstOrDefault();
@@ -61,9 +61,9 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         try
         {
             var sql = """
-                INSERT INTO Clingies (Id, Title, Content, CreatedAt, ModifiedAt, 
-                    IsDeleted, IsPinned, IsRolled, IsLocked, 
-                    PositionX, PositionY, Width, Height)
+                INSERT INTO Clingies (id, title, content, created_at, modified_at, 
+                    is_deleted, is_pinned, is_rolled, is_locked,
+                    position_x, position_y, width, height)
                 VALUES (@Id, @Title, @Content, @CreatedAt, @ModifiedAt, 
                     @IsDeleted, @IsPinned, @IsRolled, @IsLocked, 
                     @PositionX, @PositionY, @Width, @Height)
@@ -85,18 +85,18 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             var sql = """
                 UPDATE Clingies SET 
-                    Title = @Title, 
-                    Content = @Content, 
-                    ModifiedAt = @ModifiedAt, 
-                    IsDeleted = @IsDeleted, 
-                    IsPinned = @IsPinned,
-                    IsRolled = @IsRolled,
-                    IsLocked = @IsLocked,
-                    PositionX = @PositionX, 
-                    PositionY = @PositionY, 
-                    Width = @Width, 
-                    Height = @Height
-                WHERE Id = @Id
+                    title = @Title, 
+                    content = @Content, 
+                    modified_at = @ModifiedAt, 
+                    is_deleted = @IsDeleted, 
+                    is_pinned = @IsPinned,
+                    is_rolled = @IsRolled,
+                    is_locked = @IsLocked,
+                    position_x = @PositionX, 
+                    position_y = @PositionY, 
+                    width = @Width, 
+                    height = @Height
+                WHERE id = @Id
                 """;
             Conn.Execute(sql, clingy);
             return clingy.Id;
@@ -114,8 +114,8 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             var parms = new Dictionary<string, object> { { "@Id", id } };
             var sql = """
-                DELETE FROM Clingies 
-                WHERE Id = @Id
+                DELETE FROM clingies 
+                WHERE id = @Id
                 """;
 
             Conn.Execute(sql, parms);
@@ -133,9 +133,9 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             var parms = new Dictionary<string, object> { { "@Id", id } };
             var sql = """
-                UPDATE Clingies SET 
-                    IsDeleted = 1 
-                WHERE Id = @Id
+                UPDATE clingies SET 
+                    is_deleted = 1 
+                WHERE id = @Id
                 """;
 
             Conn.Execute(sql, parms);

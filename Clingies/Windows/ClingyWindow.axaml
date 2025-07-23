@@ -24,7 +24,7 @@
             BorderThickness="4,4,4,0"
             Background="Transparent"
         >
-            <controls:ClingyTitle x:Name="ClingyTitleBar" Grid.Row="0" />
+            <controls:ClingyTitle x:Name="ClingyTitleBar" Grid.Row="0" Cursor="Arrow" />
         </Border>
 
         <Border Grid.Row="1" 
