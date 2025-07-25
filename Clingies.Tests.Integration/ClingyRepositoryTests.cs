@@ -3,19 +3,18 @@ using Clingies.Infrastructure.Data; // assuming ClingyRepository + IConnectionFa
 using Dapper;
 using Microsoft.Data.Sqlite;
 using Clingies.Domain.Models;
-using Clingies.Domain.Factories;
 using Clingies.Domain.Interfaces;
 
 namespace Clingies.Tests.Integration
 {
-    [Collection("RepositoryTests")]
-    public class RepositoryTests : IDisposable
+    [Collection("ClingiesRepositoriesTests")]
+    public class ClingyRepositoryTests : IDisposable
     {
         private readonly SqliteConnection _connection;
         private readonly IConnectionFactory _connectionFactory;
         private readonly ClingyRepository _repository;
 
-        public RepositoryTests()
+        public ClingyRepositoryTests()
         {
             // Use in-memory SQLite, keep connection open for test duration
             if (_connection == null || _connection.State != ConnectionState.Open)
@@ -25,7 +24,7 @@ namespace Clingies.Tests.Integration
             }
 
             // Create schema 
-            var schema = File.ReadAllText("schema.sql");
+            var schema = File.ReadAllText("schema_clingies.sql");
             _connection.Execute(schema);
 
             // Setup ConnectionFactory that returns this in-memory connection
@@ -43,6 +42,7 @@ namespace Clingies.Tests.Integration
             Assert.NotNull(sut);
             Assert.Equal("TEST CLINGY", sut!.Title);
             Assert.Equal("This is a clingy text content for tests", sut.Content);
+            Assert.Equal("default", sut.Style);
             Assert.Equal(100, sut.PositionX);
             Assert.Equal(200, sut.PositionY);
         }
@@ -64,15 +64,39 @@ namespace Clingies.Tests.Integration
         }
 
         [Fact]
+        public void Can_Get_Clingy_By_Id()
+        {
+            var clingy = CreatedDetailedTestClingy();
+            int id = _repository.Create(clingy);
+
+            var sut = _repository.Get(id);
+
+            Assert.NotNull(sut);
+            //"", ""
+            Assert.Equal("DETAILED CLINGY", sut.Title);
+            Assert.Equal("This is a detailed clingy for tests", sut.Content);
+            Assert.Equal(250, sut.Width);
+            Assert.Equal(500, sut.Height);
+            Assert.Equal(500, sut.PositionX);
+            Assert.Equal(750, sut.PositionY);
+            Assert.True(sut.IsLocked);
+            Assert.True(sut.IsPinned);
+            Assert.False(sut.IsDeleted);
+            Assert.Equal("dark", sut.Style);
+        }
+
+        [Fact]
         public void Can_Update_Clingy()
         {
             var clingy = CreateTestClingy();
             var id = _repository.Create(clingy);
 
-            clingy.UpdateTitle("UPDATED TITLE");
-            clingy.UpdateContent("This is an updated content");
-            clingy.SetPinState(true);
-            clingy.SetRolledState(true);
+            clingy.Id = id;
+            clingy.Title = "UPDATED TITLE";
+            clingy.Content = "This is an updated content";
+            clingy.IsPinned = true;
+            clingy.IsRolled = true;
+            clingy.Style = "lemon";
             _repository.Update(clingy);
 
             var sut = _repository.Get(id);
@@ -80,6 +104,7 @@ namespace Clingies.Tests.Integration
             Assert.NotNull(sut);
             Assert.Equal("UPDATED TITLE", sut.Title);
             Assert.Equal("This is an updated content", sut.Content);
+            Assert.Equal("lemon", sut.Style);
             Assert.True(sut.IsRolled);
             Assert.True(sut.IsPinned);
         }
@@ -113,7 +138,7 @@ namespace Clingies.Tests.Integration
 
         public void Dispose()
         {
-            _connection.Execute("DELETE FROM Clingies;");
+            _connection.Execute("DELETE FROM clingies;");
             _connection.Execute("VACUUM;");
         }
 
@@ -144,16 +169,41 @@ namespace Clingies.Tests.Integration
 
         private Clingy CreateTestClingy()
         {
-            return ClingyEntityFactory.CreateNew("TEST CLINGY",
-            "This is a clingy text content for tests", 100, 200);
+            return new Clingy
+            {
+                Title = "TEST CLINGY",
+                Content = "This is a clingy text content for tests",
+                PositionX = 100,
+                PositionY = 200
+            };
+        }
+
+        private Clingy CreatedDetailedTestClingy()
+        {
+            return new Clingy
+            {
+                Title = "DETAILED CLINGY",
+                Content = "This is a detailed clingy for tests",
+                PositionX = 500,
+                PositionY = 750,
+                Width = 250,
+                Height = 500,
+                Style = "dark",
+                IsLocked = true,
+                IsPinned = true,
+            };
         }
 
         private Clingy CreateSoftDeletedTestClingy()
         {
-            var clg = ClingyEntityFactory.CreateNew("TEST CLINGY",
-                    "This is a clingy text content for tests", 100, 200);
-            clg.MarkDeleted();
-            return clg;
+            return new Clingy
+            {
+                Title = "TEST CLINGY",
+                Content = "This is a clingy text content for tests",
+                PositionX = 100,
+                PositionY = 200,
+                IsDeleted = true
+            };
         }
     }
 }

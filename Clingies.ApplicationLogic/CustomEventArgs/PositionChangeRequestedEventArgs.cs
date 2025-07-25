@@ -4,12 +4,12 @@ namespace Clingies.ApplicationLogic.CustomEventArgs;
 
 public class PositionChangeRequestedEventArgs : EventArgs
 {
-    public Guid ClingyId { get; }
+    public int ClingyId { get; }
 
     public int PositionX;
     public int PositionY;
 
-    public PositionChangeRequestedEventArgs(Guid id, int positionX, int positionY)
+    public PositionChangeRequestedEventArgs(int id, int positionX, int positionY)
     {
         ClingyId = id;
         PositionX = positionX;

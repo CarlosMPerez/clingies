@@ -1,8 +1,9 @@
 using System.Data;
-using Clingies.Domain.Factories;
+using Clingies.Domain.Dtos;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
 using Dapper;
+using Microsoft.Data.Sqlite;
 
 namespace Clingies.Infrastructure.Data;
 
@@ -15,62 +16,64 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             List<Clingy> clingies = new List<Clingy>();
             var sql = """
-                SELECT id, title, content, created_at, modified_at, 
-                    is_deleted, is_pinned, is_rolled, is_locked,
-                    position_x, position_y, width, height
+                SELECT id, title, content, position_x, position_y, 
+                    width, height, style, is_pinned, is_locked, is_rolled, 
+                    is_deleted,  created_at, modified_at
                 FROM clingies
                 WHERE is_deleted = 0
             """;
-            var dtos = Conn.Query<ClingyDto>(sql).ToList();
-            clingies = dtos.Select(dto => ClingyEntityFactory.FromDto(dto)).ToList();
+            var dtos = Conn.Query<ClingyDto>(sql);
+            clingies = dtos.Select(dto => dto.ToEntity()).ToList();
 
             return clingies;
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "Error at GetAllActive");
+            logger.Error(ex, "Error at ClingyRepository.GetAllActive");
             throw;
         }
     }
-    public Clingy? Get(Guid id)
+    public Clingy? Get(int id)
     {
         try
         {
-            var parms = new Dictionary<string, object> { { "@Id", id } };
+            var parms = new Dictionary<string, object> { { "@id", id } };
             var sql = """
-                SELECT id, title, content, created_at, modified_at, 
-                    is_deleted, is_pinned, is_rolled, is_locked,
-                    position_x, position_y, width, height
+                SELECT id, title, content, position_x, position_y, 
+                    width, height, style, is_pinned, is_locked, is_rolled, 
+                    is_deleted,  created_at, modified_at
                 FROM clingies
-                WHERE id = @Id
+                WHERE id = @id
             """;
             var dtos = Conn.Query<ClingyDto>(sql, parms);
-            var clingy = dtos.Select(dto => ClingyEntityFactory.FromDto(dto)).FirstOrDefault();
+            var clingy = dtos.Select(dto => dto.ToEntity()).FirstOrDefault();
 
             return clingy;
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "Error at Get {0}", id);
+            logger.Error(ex, "Error at ClingyRepository.Get {0}", id);
             throw;
         }
     }
 
-    public Guid Create(Clingy clingy)
+    public int Create(Clingy clingy)
     {
         try
         {
+            var dto = clingy.ToDto();
             var sql = """
-                INSERT INTO Clingies (id, title, content, created_at, modified_at, 
-                    is_deleted, is_pinned, is_rolled, is_locked,
-                    position_x, position_y, width, height)
-                VALUES (@Id, @Title, @Content, @CreatedAt, @ModifiedAt, 
-                    @IsDeleted, @IsPinned, @IsRolled, @IsLocked, 
-                    @PositionX, @PositionY, @Width, @Height)
+                INSERT INTO clingies (title, content, position_x, position_y, 
+                    width, height, style, is_pinned, is_locked, is_rolled, is_deleted,
+                    created_at, modified_at)
+                VALUES (@title, @content, @position_x, @position_y, 
+                    @width, @height, @style, @is_pinned, @is_locked, @is_rolled, @is_deleted,
+                    @created_at, @modified_at);
                 """;
 
-            Conn.Execute(sql, clingy);
-            return clingy.Id;
+            Conn.Execute(sql, dto);
+            sql = "select last_insert_rowid();";
+            return (int)Conn.ExecuteScalar<long>(sql);
         }
         catch (Exception ex)
         {
@@ -79,26 +82,28 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
-    public Guid Update(Clingy clingy)
+    public int Update(Clingy clingy)
     {
         try
         {
+            var dto = clingy.ToDto();
             var sql = """
-                UPDATE Clingies SET 
-                    title = @Title, 
-                    content = @Content, 
-                    modified_at = @ModifiedAt, 
-                    is_deleted = @IsDeleted, 
-                    is_pinned = @IsPinned,
-                    is_rolled = @IsRolled,
-                    is_locked = @IsLocked,
-                    position_x = @PositionX, 
-                    position_y = @PositionY, 
-                    width = @Width, 
-                    height = @Height
-                WHERE id = @Id
+                UPDATE clingies SET 
+                    title = @title, 
+                    content = @content, 
+                    position_x = @position_x, 
+                    position_y = @position_y, 
+                    width = @width, 
+                    height = @height,
+                    style = @style,
+                    is_pinned = @is_pinned,
+                    is_locked = @is_locked,
+                    is_rolled = @is_rolled,
+                    is_deleted = @is_deleted, 
+                    modified_at = @modified_at
+                WHERE id = @id
                 """;
-            Conn.Execute(sql, clingy);
+            Conn.Execute(sql, dto);
             return clingy.Id;
         }
         catch (Exception ex)
@@ -108,14 +113,14 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
-    public void HardDelete(Guid id)
+    public void HardDelete(int id)
     {
         try
         {
-            var parms = new Dictionary<string, object> { { "@Id", id } };
+            var parms = new Dictionary<string, object> { { "@id", id } };
             var sql = """
                 DELETE FROM clingies 
-                WHERE id = @Id
+                WHERE id = @id
                 """;
 
             Conn.Execute(sql, parms);
@@ -127,15 +132,15 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
-    public void SoftDelete(Guid id)
+    public void SoftDelete(int id)
     {
         try
         {
-            var parms = new Dictionary<string, object> { { "@Id", id } };
+            var parms = new Dictionary<string, object> { { "@id", id } };
             var sql = """
                 UPDATE clingies SET 
                     is_deleted = 1 
-                WHERE id = @Id
+                WHERE id = @id
                 """;
 
             Conn.Execute(sql, parms);

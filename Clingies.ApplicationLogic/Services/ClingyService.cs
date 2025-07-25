@@ -1,4 +1,3 @@
-using Clingies.Domain.Factories;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
 
@@ -19,7 +18,7 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
     }
 
-    public Clingy? Get(Guid id)
+    public Clingy? Get(int id)
     {
         try
         {
@@ -37,8 +36,15 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
     {
         try
         {
-            var clingy = ClingyEntityFactory.CreateNew(title, content, posX, posY);
-            repo.Create(clingy);
+            var clingy = new Clingy
+            {
+                Title = title,
+                Content = content,
+                PositionX = posX,
+                PositionY = posY
+            };
+            int id = repo.Create(clingy);
+            clingy.Id = id;
             return clingy;
         }
         catch (Exception ex)
@@ -61,7 +67,7 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
     }
 
-    public void SoftDelete(Guid id)
+    public void SoftDelete(int id)
     {
         try
         {
@@ -74,7 +80,7 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
     }
 
-    public void HardDelete(Guid id)
+    public void HardDelete(int id)
     {
         try
         {

@@ -13,9 +13,9 @@ namespace Clingies.Windows;
 public partial class ClingyWindow : Window, IContextCommandController
 {
     private readonly Clingy _clingy;
-    public Guid ClingyId => _clingy.Id;
+    public int ClingyId => _clingy.Id;
     private MenuFactory _menuFactory;
-    public event EventHandler<Guid>? CloseRequested;
+    public event EventHandler<int>? CloseRequested;
     public event EventHandler<PinRequestedEventArgs>? PinRequested;
     public event EventHandler<TitleChangeRequestedEventArgs>? TitleChangeRequested;
     public event EventHandler<PositionChangeRequestedEventArgs>? PositionChangeRequested;

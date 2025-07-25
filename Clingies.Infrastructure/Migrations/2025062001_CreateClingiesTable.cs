@@ -10,7 +10,7 @@ public class _2025062001_CreateClingiesTable : Migration
         if (!Schema.Table("clingies").Exists())
         {
             Create.Table("clingies")
-                .WithColumn("id").AsGuid().PrimaryKey()
+                .WithColumn("id").AsInt64().PrimaryKey().Identity()
                 .WithColumn("title").AsString().NotNullable()
                 .WithColumn("content").AsString().NotNullable()
                 .WithColumn("position_x").AsDouble().NotNullable()

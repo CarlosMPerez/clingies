@@ -89,7 +89,7 @@ public class ClingyWindowFactory(ClingyService noteService,
     }
 
     #region EventHandlers
-    private void HandleCloseRequested(object? sender, Guid id)
+    private void HandleCloseRequested(object? sender, int id)
     {
         try
         {
@@ -114,7 +114,7 @@ public class ClingyWindowFactory(ClingyService noteService,
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             window.Topmost = args.IsPinned;
-            clingy.SetPinState(args.IsPinned);
+            clingy.IsPinned = args.IsPinned;
             noteService.Update(clingy);
         }
         catch (Exception ex)
@@ -132,7 +132,7 @@ public class ClingyWindowFactory(ClingyService noteService,
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             window.ClingyTitleBar.IsLocked = args.IsLocked;
             window.ClingyBody.IsLocked = args.IsLocked;
-            clingy.SetLockState(args.IsLocked);
+            clingy.IsLocked = args.IsLocked;
             noteService.Update(clingy);
         }
         catch (Exception ex)
@@ -150,7 +150,8 @@ public class ClingyWindowFactory(ClingyService noteService,
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             window.Position = new Avalonia.PixelPoint(args.PositionX, args.PositionY);
-            clingy.Move(args.PositionX, args.PositionY);
+            clingy.PositionX = args.PositionX;
+            clingy.PositionY = args.PositionY;
             noteService.Update(clingy);
         }
         catch (Exception ex)
@@ -166,7 +167,7 @@ public class ClingyWindowFactory(ClingyService noteService,
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            clingy.UpdateContent(string.IsNullOrEmpty(args.Content) ? "" : args.Content);
+            clingy.Content = string.IsNullOrEmpty(args.Content) ? "" : args.Content;
             noteService.Update(clingy);
         }
         catch (Exception ex)
@@ -182,7 +183,7 @@ public class ClingyWindowFactory(ClingyService noteService,
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            clingy.UpdateTitle(args.NewTitle);
+            clingy.Title = args.NewTitle;
             noteService.Update(clingy);
         }
         catch (Exception ex)
@@ -200,7 +201,8 @@ public class ClingyWindowFactory(ClingyService noteService,
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             window.Width = args.Width;
             window.Height = args.Height;
-            clingy.Resize(args.Width, args.Height);
+            clingy.Width = args.Width;
+            clingy.Height = args.Height;
             noteService.Update(clingy);
         }
         catch (Exception ex)
@@ -217,7 +219,7 @@ public class ClingyWindowFactory(ClingyService noteService,
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             window.ClingyBody.IsRolled = args.IsRolled;
-            clingy.SetRolledState(args.IsRolled);
+            clingy.IsRolled = args.IsRolled;
             noteService.Update(clingy);
         }
         catch (Exception ex)

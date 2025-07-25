@@ -4,15 +4,16 @@ namespace Clingies.ApplicationLogic.CustomEventArgs;
 
 public class SizeChangeRequestedEventArgs : EventArgs
 {
-    public Guid ClingyId { get; }
+    public int ClingyId { get; }
 
     public double Width { get; }
 
     public double Height { get; }
 
-    public SizeChangeRequestedEventArgs(Guid id, double height)
+    public SizeChangeRequestedEventArgs(int id, double width, double height)
     {
         ClingyId = id;
+        Width = width;
         Height = height;
     }
 

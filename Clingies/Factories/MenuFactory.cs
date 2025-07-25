@@ -9,7 +9,7 @@ using Clingies.Services;
 
 namespace Clingies.Factories;
 
-public class MenuFactory(IMenuRepository repo, 
+public class MenuFactory(IMenuRepository repo,
                             IClingiesLogger logger,
                             ITrayCommandProvider trayCommandProvider,
                             Func<IContextCommandController, IContextCommandProvider> contextProviderFactory,
@@ -43,7 +43,7 @@ public class MenuFactory(IMenuRepository repo,
         return menu;
     }
 
-    private MenuItem BuildContextMenuItemRecursive(TrayMenuItem item, IMenuRepository repo)
+    private MenuItem BuildContextMenuItemRecursive(SystemMenu item, IMenuRepository repo)
     {
         var children = repo.GetChildrenByParentId(item.Id)
                         .OrderBy(c => c.SortOrder)
@@ -110,7 +110,7 @@ public class MenuFactory(IMenuRepository repo,
 
     }
 
-    private NativeMenuItemBase BuildNativeTrayMenuItemRecursive(TrayMenuItem item, IMenuRepository repo)
+    private NativeMenuItemBase BuildNativeTrayMenuItemRecursive(SystemMenu item, IMenuRepository repo)
     {
         var children = repo.GetChildrenByParentId(item.Id)
                         .OrderBy(c => c.SortOrder)

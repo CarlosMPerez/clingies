@@ -2,10 +2,10 @@ namespace Clingies.ApplicationLogic.CustomEventArgs;
 
 public class PinRequestedEventArgs : EventArgs
 {
-    public Guid ClingyId { get; }
+    public int ClingyId { get; }
     public bool IsPinned { get; }
 
-    public PinRequestedEventArgs(Guid id, bool isPinned)
+    public PinRequestedEventArgs(int id, bool isPinned)
     {
         ClingyId = id;
         IsPinned = isPinned;

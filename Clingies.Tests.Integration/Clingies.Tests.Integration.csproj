@@ -16,7 +16,13 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Update="schema.sql">
+    <None Update="schema_clingies.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="schema_menu.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="schema_styles.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>  

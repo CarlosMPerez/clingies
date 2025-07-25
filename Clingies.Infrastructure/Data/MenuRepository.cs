@@ -1,4 +1,5 @@
 using System.Data;
+using Clingies.Domain.Dtos;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
 using Dapper;
@@ -9,7 +10,7 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
 {
     private IDbConnection Conn => connectionFactory.GetConnection();
 
-    public List<TrayMenuItem> GetAllParents(string menuType)
+    public List<SystemMenu> GetAllParents(string menuType)
     {
         try
         {
@@ -20,17 +21,19 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
                 AND parent_id IS NULL
                 ORDER BY sort_order
             """;
-            var items = Conn.Query<TrayMenuItem>(sql, parms).ToList();
+            var dtos = Conn.Query<SystemMenuDto>(sql, parms);
+            var items = dtos.Select(dto => dto.ToEntity()).ToList();
+
             return items;
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "Error at GetAllParents");
+            logger.Error(ex, "Error at MenuRepository.GetAllParents");
             throw;
         }
     }
 
-    public List<TrayMenuItem> GetChildrenByParentId(string parentId)
+    public List<SystemMenu> GetChildrenByParentId(string parentId)
     {
         try
         {
@@ -41,12 +44,14 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
                 WHERE parent_id = @parentId
                 ORDER BY sort_order
             """;
-            var items = Conn.Query<TrayMenuItem>(sql, parms).ToList();
+            var dtos = Conn.Query<SystemMenuDto>(sql, parms);
+            var items = dtos.Select(dto => dto.ToEntity()).ToList();
+
             return items;
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "Error at GetChildrenByParentId");
+            logger.Error(ex, "Error at MenuRepository.GetChildrenByParentId");
             throw;
         }
     }
