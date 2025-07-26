@@ -17,7 +17,7 @@ public class _2025062001_CreateClingiesTable : Migration
                 .WithColumn("position_y").AsDouble().NotNullable()
                 .WithColumn("width").AsDouble().NotNullable()
                 .WithColumn("height").AsDouble().NotNullable()
-                .WithColumn("style").AsString().NotNullable().WithDefaultValue("default")
+                .WithColumn("style").AsString().Nullable()
                 .WithColumn("is_pinned").AsBoolean().NotNullable()
                 .WithColumn("is_locked").AsBoolean().NotNullable()
                 .WithColumn("is_rolled").AsBoolean().NotNullable()

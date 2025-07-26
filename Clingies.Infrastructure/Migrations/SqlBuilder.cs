@@ -26,17 +26,19 @@ public static class SqlBuilder
     public static string BuildInsertStyle(string id, string bodyColor, string titleColor, string bodyFont,
                                         int bodyFontSize, string bodyFontColor, string? bodyFontDecorations,
                                         string titleFont, int titleFontSize, string titleFontColor, 
-                                        string? titleFontDecorations)
+                                        string? titleFontDecorations, bool isDefault, bool isActive)
     {
         return string.Format(@"
             INSERT INTO styles (id, body_color, title_color, body_font, 
                                 body_font_color, body_font_size, body_font_decorations, 
-                                title_font, title_font_size, title_font_color, title_font_decorations)
-            SELECT {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}
+                                title_font, title_font_size, title_font_color, title_font_decorations, 
+                                is_default, is_active)
+            SELECT {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}
             WHERE NOT EXISTS (SELECT 1 FROM styles WHERE id = {0})
         ", SanitizeString(id), SanitizeString(bodyColor), SanitizeString(titleColor), SanitizeString(bodyFont),
         SanitizeString(bodyFontColor), bodyFontSize, SanitizeString(bodyFontDecorations!),
-        SanitizeString(titleFont), titleFontSize, SanitizeString(titleFontColor), SanitizeString(titleFontDecorations!));
+        SanitizeString(titleFont), titleFontSize, SanitizeString(titleFontColor), SanitizeString(titleFontDecorations!), 
+        isDefault, isActive);
     }
 
     private static string SanitizeString(string val)

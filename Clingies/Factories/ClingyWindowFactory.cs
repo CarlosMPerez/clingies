@@ -7,10 +7,14 @@ using Clingies.Windows;
 using Clingies.ApplicationLogic.CustomEventArgs;
 using Clingies.Domain.Interfaces;
 using Clingies.ApplicationLogic.Interfaces;
+using Avalonia.Media;
+using Clingies.UserControls;
+using Avalonia.Controls;
 
 namespace Clingies.Factories;
 
 public class ClingyWindowFactory(ClingyService noteService,
+                                StyleService styleService,
                                 IClingiesLogger logger,
                                 Func<IContextCommandController, IContextCommandProvider> providerFactory)
 {
@@ -27,6 +31,7 @@ public class ClingyWindowFactory(ClingyService noteService,
             SubscribeWindowToEvents(window);
             _activeWindows.Add(window);
             _activeClingies.Add(clingy);
+            ApplyStyle(clingy, window);
             window.Show();
         }
         catch (Exception ex)
@@ -48,6 +53,7 @@ public class ClingyWindowFactory(ClingyService noteService,
                 SubscribeWindowToEvents(window);
                 _activeClingies.Add(clingy);
                 _activeWindows.Add(window);
+                ApplyStyle(clingy, window);
                 window.Show();
             }
         }
@@ -56,6 +62,31 @@ public class ClingyWindowFactory(ClingyService noteService,
             logger.Error(ex, "Error loading all active Clingies");
             throw;
         }
+    }
+
+    private void ApplyStyle(Clingy clingy, ClingyWindow window)
+    {
+        Style style = clingy.Style != null ? styleService.Get(clingy.Style) : styleService.GetDefault();
+        Console.WriteLine("Applying style {0}", style.Id);
+        window.ClingyBody.ClearValue(Panel.BackgroundProperty);
+        window.ClingyBody.Background = Brush.Parse(style.BodyColor);
+        window.ClingyBody.ContentBox.ClearValue(TextBox.FontFamilyProperty);
+        window.ClingyBody.ContentBox.FontFamily = new FontFamily(style.BodyFont);
+        window.ClingyBody.ContentBox.ClearValue(TextBox.FontSizeProperty);
+        window.ClingyBody.ContentBox.FontSize = (double)style.BodyFontSize;
+        window.ClingyBody.ContentBox.ClearValue(TextBox.ForegroundProperty);
+        window.ClingyBody.ContentBox.Foreground = Brush.Parse(style.BodyFontColor);
+        // TODO Text decorations
+
+        window.ClingyTitleBar.ClearValue(Panel.BackgroundProperty);
+        window.ClingyTitleBar.Background = Brush.Parse(style.TitleColor);
+        window.ClingyTitleBar.TitleText.ClearValue(TextBox.FontFamilyProperty);
+        window.ClingyTitleBar.FontFamily = new FontFamily(style.TitleFont);
+        window.ClingyTitleBar.TitleText.ClearValue(TextBox.FontSizeProperty);
+        window.ClingyTitleBar.FontSize = (double)style.TitleFontSize;
+        window.ClingyTitleBar.TitleText.ClearValue(TextBox.ForegroundProperty);
+        window.ClingyTitleBar.TitleText.Foreground = Brush.Parse(style.TitleFontColor);
+        // TODO Text decorations
     }
 
     private void SubscribeWindowToEvents(ClingyWindow window)

@@ -100,7 +100,6 @@ namespace Clingies.Tests.Integration
             _repository.Update(clingy);
 
             var sut = _repository.Get(id);
-
             Assert.NotNull(sut);
             Assert.Equal("UPDATED TITLE", sut.Title);
             Assert.Equal("This is an updated content", sut.Content);
@@ -118,7 +117,6 @@ namespace Clingies.Tests.Integration
             _repository.SoftDelete(id);
 
             var sut = _repository.Get(id);
-
             Assert.NotNull(sut);
             Assert.True(sut.IsDeleted);
         }

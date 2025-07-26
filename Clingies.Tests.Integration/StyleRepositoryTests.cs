@@ -1,6 +1,7 @@
 using System.Data;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
+using Clingies.Infrastructure.CustomExceptions;
 using Clingies.Infrastructure.Data;
 using Dapper;
 using Microsoft.Data.Sqlite;
@@ -41,9 +42,9 @@ namespace Clingies.Tests.Integration
         [Fact]
         public void Can_Create_And_Read_Style()
         {
-            var def = CreateDefaultTestStyle();
+            var def = ReturnActiveDefaultTestStyle();
             _repository.Create(def);
-            var sut = _repository.Get("default");
+            var sut = _repository.Get("default_test");
 
             Assert.NotNull(sut);
             Assert.Equal("Arial", sut.BodyFont);
@@ -53,13 +54,78 @@ namespace Clingies.Tests.Integration
         }
 
         [Fact]
+        public void Cannot_Create_Styles_With_Repeated_Names()
+        {
+            var def = ReturnActiveDefaultTestStyle();
+            _repository.Create(def);
+            var def2 = ReturnActiveDefaultTestStyle();
+
+            var ex = Assert.Throws<SqliteException>(() =>
+            {
+                _repository.Create(def2);
+            });
+
+            Assert.Equal(19, ex.SqliteErrorCode);
+            Assert.Contains("UNIQUE", ex.Message.ToUpperInvariant());
+            Assert.Contains("id", ex.Message);
+        }
+
+        [Fact]
+        public void Cannot_Have_More_Than_10_Active_Styles()
+        {
+            Create10ActiveStyles();
+            var sut = ReturnActiveDefaultTestStyle();
+
+            Assert.Throws<TooManyActiveStylesException>(() =>
+            {
+                _repository.Create(sut);
+            });
+        }
+
+        [Fact]
+        public void Cannot_Delete_Active_Style()
+        {
+            _repository.Create(ReturnActiveDefaultTestStyle());
+            Assert.Throws<CannotDeleteActiveStyle>(() =>
+            {
+                _repository.Delete("default_test");
+            });
+        }
+
+        [Fact]
+        public void Cannot_Delete_System_Style()
+        {
+            _repository.Create(ReturnSystemTestStyle());
+            Assert.Throws<CannotDeleteSystemStyleException>(() =>
+            {
+                _repository.Delete("system");
+            });
+        }
+
+        [Fact]
+        public void Cannot_Update_System_Style()
+        {
+            var sut = ReturnSystemTestStyle();
+            _repository.Create(sut);
+
+            sut.IsActive = false;
+            sut.BodyColor = COLOR_RED;
+            sut.TitleColor = COLOR_YELLOW;
+
+            Assert.Throws<CannotUpdateSystemStyleException>(() =>
+            {
+                _repository.Update(sut);
+            });
+        }
+
+        [Fact]
         public void Can_Get_All()
         {
-            var def = CreateDefaultTestStyle();
+            var def = ReturnActiveDefaultTestStyle();
             _repository.Create(def);
-            var light = CreateLightTestStyle();
+            var light = ReturnLightTestStyle();
             _repository.Create(light);
-            var dark = CreateDarkTestStyle();
+            var dark = ReturnDarkTestStyle();
             _repository.Create(dark);
 
             var sut = _repository.GetAll();
@@ -78,7 +144,7 @@ namespace Clingies.Tests.Integration
         [Fact]
         public void Can_Get_Style_By_Id()
         {
-            var light = CreateLightTestStyle();
+            var light = ReturnLightTestStyle();
             _repository.Create(light);
 
             var sut = _repository.Get("light");
@@ -93,7 +159,7 @@ namespace Clingies.Tests.Integration
         [Fact]
         public void Can_Update_Style()
         {
-            _repository.Create(CreateLightTestStyle());
+            _repository.Create(ReturnLightTestStyle());
 
             var upd = new Style
             {
@@ -107,10 +173,10 @@ namespace Clingies.Tests.Integration
                 TitleFont = "roboto",
                 TitleFontSize = 15,
                 TitleFontColor = COLOR_BLUE,
-                TitleFontDecorations = "italics;"
+                TitleFontDecorations = "italics;",
+                IsActive = true,
+                IsDefault = false
             };
-
-            Console.WriteLine("Updating with TitleFontColor: " + upd.TitleFontColor);
 
             _repository.Update(upd);
 
@@ -133,10 +199,11 @@ namespace Clingies.Tests.Integration
         [Fact]
         public void Can_Delete_Style()
         {
-            var def = CreateDefaultTestStyle();
-            _repository.Delete("default");
+            var def = ReturnDarkTestStyle();
+            _repository.Create(def);
+            _repository.Delete("dark");
 
-            var sut = _repository.Get("default");
+            var sut = _repository.Get("dark");
 
             Assert.Null(sut);
         }
@@ -173,11 +240,11 @@ namespace Clingies.Tests.Integration
             }
         }
 
-        private Style CreateDefaultTestStyle()
+        private Style ReturnSystemTestStyle()
         {
             return new Style
             {
-                Id = "default",
+                Id = "system",
                 BodyColor = COLOR_YELLOW,
                 TitleColor = COLOR_BLACK,
                 BodyFont = "Arial",
@@ -187,11 +254,66 @@ namespace Clingies.Tests.Integration
                 TitleFont = "Verdana",
                 TitleFontColor = COLOR_BLACK,
                 TitleFontSize = 10,
-                TitleFontDecorations = "bold;"
+                TitleFontDecorations = "bold;",
+                IsActive = true,
+                IsDefault = true
+            };
+        }
+        private Style ReturnActiveDefaultTestStyle()
+        {
+            return new Style
+            {
+                Id = "default_test",
+                BodyColor = COLOR_YELLOW,
+                TitleColor = COLOR_BLACK,
+                BodyFont = "Arial",
+                BodyFontColor = COLOR_BLACK,
+                BodyFontSize = 10,
+                BodyFontDecorations = "none;",
+                TitleFont = "Verdana",
+                TitleFontColor = COLOR_BLACK,
+                TitleFontSize = 10,
+                TitleFontDecorations = "bold;",
+                IsActive = true,
+                IsDefault = true
             };
         }
 
-        private Style CreateLightTestStyle()
+        private void Create10ActiveStyles()
+        {
+            _repository.Create(new Style { Id = "s1", BodyColor = COLOR_YELLOW, TitleColor = COLOR_BLACK, BodyFont = "Arial",
+                BodyFontColor = COLOR_BLACK, BodyFontSize = 10, BodyFontDecorations = "none;", TitleFont = "Verdana",
+                TitleFontColor = COLOR_BLACK, TitleFontSize = 10, TitleFontDecorations = "bold;", IsActive = true, IsDefault = false });
+            _repository.Create(new Style { Id = "s2", BodyColor = COLOR_YELLOW, TitleColor = COLOR_BLACK, BodyFont = "Arial",
+                BodyFontColor = COLOR_BLACK, BodyFontSize = 10, BodyFontDecorations = "none;", TitleFont = "Verdana",
+                TitleFontColor = COLOR_BLACK, TitleFontSize = 10, TitleFontDecorations = "bold;", IsActive = true, IsDefault = false });
+            _repository.Create(new Style { Id = "s3", BodyColor = COLOR_YELLOW, TitleColor = COLOR_BLACK, BodyFont = "Arial",
+                BodyFontColor = COLOR_BLACK, BodyFontSize = 10, BodyFontDecorations = "none;", TitleFont = "Verdana",
+                TitleFontColor = COLOR_BLACK, TitleFontSize = 10, TitleFontDecorations = "bold;", IsActive = true, IsDefault = false });
+            _repository.Create(new Style { Id = "s4", BodyColor = COLOR_YELLOW, TitleColor = COLOR_BLACK, BodyFont = "Arial",
+                BodyFontColor = COLOR_BLACK, BodyFontSize = 10, BodyFontDecorations = "none;", TitleFont = "Verdana",
+                TitleFontColor = COLOR_BLACK, TitleFontSize = 10, TitleFontDecorations = "bold;", IsActive = true, IsDefault = false });
+            _repository.Create(new Style { Id = "s5", BodyColor = COLOR_YELLOW, TitleColor = COLOR_BLACK, BodyFont = "Arial",
+                BodyFontColor = COLOR_BLACK, BodyFontSize = 10, BodyFontDecorations = "none;", TitleFont = "Verdana",
+                TitleFontColor = COLOR_BLACK, TitleFontSize = 10, TitleFontDecorations = "bold;", IsActive = true, IsDefault = false });
+            _repository.Create(new Style { Id = "s6", BodyColor = COLOR_YELLOW, TitleColor = COLOR_BLACK, BodyFont = "Arial",
+                BodyFontColor = COLOR_BLACK, BodyFontSize = 10, BodyFontDecorations = "none;", TitleFont = "Verdana",
+                TitleFontColor = COLOR_BLACK, TitleFontSize = 10, TitleFontDecorations = "bold;", IsActive = true, IsDefault = false });
+            _repository.Create(new Style { Id = "s7", BodyColor = COLOR_YELLOW, TitleColor = COLOR_BLACK, BodyFont = "Arial",
+                BodyFontColor = COLOR_BLACK, BodyFontSize = 10, BodyFontDecorations = "none;", TitleFont = "Verdana",
+                TitleFontColor = COLOR_BLACK, TitleFontSize = 10, TitleFontDecorations = "bold;", IsActive = true, IsDefault = false });
+            _repository.Create(new Style { Id = "s8", BodyColor = COLOR_YELLOW, TitleColor = COLOR_BLACK, BodyFont = "Arial",
+                BodyFontColor = COLOR_BLACK, BodyFontSize = 10, BodyFontDecorations = "none;", TitleFont = "Verdana",
+                TitleFontColor = COLOR_BLACK, TitleFontSize = 10, TitleFontDecorations = "bold;", IsActive = true, IsDefault = false });
+            _repository.Create(new Style { Id = "s9", BodyColor = COLOR_YELLOW, TitleColor = COLOR_BLACK, BodyFont = "Arial",
+                BodyFontColor = COLOR_BLACK, BodyFontSize = 10, BodyFontDecorations = "none;", TitleFont = "Verdana",
+                TitleFontColor = COLOR_BLACK, TitleFontSize = 10, TitleFontDecorations = "bold;", IsActive = true, IsDefault = false });
+            _repository.Create(new Style { Id = "s10", BodyColor = COLOR_YELLOW, TitleColor = COLOR_BLACK, BodyFont = "Arial",
+                BodyFontColor = COLOR_BLACK, BodyFontSize = 10, BodyFontDecorations = "none;", TitleFont = "Verdana",
+                TitleFontColor = COLOR_BLACK, TitleFontSize = 10, TitleFontDecorations = "bold;", IsActive = true, IsDefault = false });
+        }
+
+        private Style ReturnLightTestStyle()
         {
             return new Style
             {
@@ -205,11 +327,13 @@ namespace Clingies.Tests.Integration
                 TitleFont = "Times News Roman",
                 TitleFontColor = COLOR_BLACK,
                 TitleFontSize = 12,
-                TitleFontDecorations = "bold;"
+                TitleFontDecorations = "bold;",
+                IsActive = true,
+                IsDefault = false
             };
         }
 
-        private Style CreateDarkTestStyle()
+        private Style ReturnDarkTestStyle()
         {
             return new Style
             {
@@ -223,7 +347,9 @@ namespace Clingies.Tests.Integration
                 TitleFont = "Windigs",
                 TitleFontColor = COLOR_WHITE,
                 TitleFontSize = 14,
-                TitleFontDecorations = "bold;"
+                TitleFontDecorations = "bold;",
+                IsActive = false,
+                IsDefault = false
             };
         }
     }

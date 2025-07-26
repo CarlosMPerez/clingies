@@ -9,7 +9,7 @@ public class Clingy
     public string Title { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ModifiedAt { get; set; }
-    public string Style { get; set; } = "default";
+    public string? Style { get; set; } = null;
     public bool IsDeleted { get; set; } = false;
     public bool IsPinned { get; set; } = false;
     public bool IsRolled { get; set; } = false;

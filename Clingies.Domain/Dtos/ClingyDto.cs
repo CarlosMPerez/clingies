@@ -12,7 +12,7 @@ public class ClingyDto
     public string? title { get; set; }
     public DateTime created_at { get; set; }
     public DateTime? modified_at { get; set; }
-    public string style { get; set; } = "default";
+    public string? style { get; set; } = null;
     public bool is_deleted { get; set; }
     public bool is_pinned { get; set; }
     public bool is_rolled { get; set; }

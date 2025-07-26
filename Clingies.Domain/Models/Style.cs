@@ -16,6 +16,8 @@ public class Style
     public required int TitleFontSize { get; set; }
     public required string TitleFontColor { get; set; }
     public required string TitleFontDecorations { get; set; }
+    public required bool IsDefault { get; set; }
+    public required bool IsActive { get; set; }
 
     public StyleDto ToDto()
     {
@@ -31,7 +33,9 @@ public class Style
             title_font = TitleFont,
             title_font_size = TitleFontSize,
             title_font_color = TitleFontColor,
-            title_font_decorations = TitleFontDecorations
+            title_font_decorations = TitleFontDecorations,
+            is_default = IsDefault,
+            is_active = IsActive
         };
     }
 }

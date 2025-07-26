@@ -58,11 +58,13 @@ internal sealed class Program
             });
             services.AddSingleton<IClingyRepository, ClingyRepository>();
             services.AddSingleton<IMenuRepository, MenuRepository>();
+            services.AddSingleton<IStyleRepository, StyleRepository>();
             services.AddSingleton<IIconPathRepository, IconPathRepository>();
             services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
             services.AddSingleton<MenuFactory>();
             services.AddSingleton<ClingyWindowFactory>();
             services.AddSingleton<ClingyService>();
+            services.AddSingleton<StyleService>();
             services.AddSingleton(sp => (ITrayCommandController)Application.Current!);
             services.AddSingleton<Func<IContextCommandController, IContextCommandProvider>>(sp =>
                                     controller => new ContextCommandProvider(controller));

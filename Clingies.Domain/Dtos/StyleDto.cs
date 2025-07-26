@@ -18,6 +18,8 @@ public class StyleDto
     public required int title_font_size { get; set; }
     public required string title_font_color { get; set; }
     public required string title_font_decorations { get; set; }
+    public required bool is_default { get; set; }
+    public required bool is_active { get; set; }
 
     public Style ToEntity()
     {
@@ -33,7 +35,9 @@ public class StyleDto
             TitleFont = title_font,
             TitleFontSize = title_font_size,
             TitleFontColor = title_font_color,
-            TitleFontDecorations = title_font_decorations
-        };        
+            TitleFontDecorations = title_font_decorations,
+            IsDefault = is_default,
+            IsActive = is_active
+        };
     }
 }

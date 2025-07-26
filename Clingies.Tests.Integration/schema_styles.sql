@@ -9,5 +9,7 @@ CREATE TABLE IF NOT EXISTS styles (
     [title_font] TEXT,
     [title_font_size] INTEGER,
     [title_font_color] TEXT,
-    [title_font_decorations] TEXT
+    [title_font_decorations] TEXT,
+    [is_default] BOOLEAN,
+    [is_active] BOOLEAN
 );
