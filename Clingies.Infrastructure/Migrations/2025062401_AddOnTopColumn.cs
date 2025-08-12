@@ -2,8 +2,8 @@ using FluentMigrator;
 
 
 namespace Clingies.Infrastructure.Migrations;
-[Migration(20250624)]
-public class _20250624_AddOnTopColumn : Migration
+[Migration(2025062401)]
+public class _2025062401_AddOnTopColumn : Migration
 {
     public override void Up()
     {

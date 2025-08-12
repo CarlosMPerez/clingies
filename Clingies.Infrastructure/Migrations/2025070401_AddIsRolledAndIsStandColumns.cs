@@ -2,8 +2,8 @@ using FluentMigrator;
 
 
 namespace Clingies.Infrastructure.Migrations;
-[Migration(20250704)]
-public class _202500704_AddIsRolledAndIsStandColumns : Migration
+[Migration(2025070401)]
+public class _20250070401_AddIsRolledAndIsStandColumns : Migration
 {
     public override void Up()
     {

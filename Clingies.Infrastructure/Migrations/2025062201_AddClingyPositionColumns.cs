@@ -8,16 +8,16 @@ public class AddClingyPositionColumns : Migration
     public override void Up()
     {
         Alter.Table("Clingies")
-            .AddColumn("PositionX").AsDouble().NotNullable();
+            .AddColumn("PositionX").AsDouble().NotNullable().WithDefaultValue(100);
 
         Alter.Table("Clingies")
-            .AddColumn("PositionY").AsDouble().NotNullable();
+            .AddColumn("PositionY").AsDouble().NotNullable().WithDefaultValue(100);
 
         Alter.Table("Clingies")
-            .AddColumn("Width").AsDouble().NotNullable();
+            .AddColumn("Width").AsDouble().NotNullable().WithDefaultValue(300);
 
         Alter.Table("Clingies")
-            .AddColumn("Height").AsDouble().NotNullable();
+            .AddColumn("Height").AsDouble().NotNullable().WithDefaultValue(100);
     }
 
     public override void Down()
@@ -25,6 +25,6 @@ public class AddClingyPositionColumns : Migration
         Delete.Column("PositionX").FromTable("Clingies");
         Delete.Column("PositionY").FromTable("Clingies");
         Delete.Column("Width").FromTable("Clingies");
-        Delete.Column("Height").FromTable("Clingies");        
+        Delete.Column("Height").FromTable("Clingies");
     }
 }
