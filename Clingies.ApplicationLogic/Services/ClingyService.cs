@@ -47,11 +47,11 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
     }
 
-    public int Update(ClingyDto clingy)
+    public void Update(ClingyDto clingy)
     {
         try
         {
-            return repo.Update(clingy.ToEntity());
+            repo.Update(clingy.ToEntity());
         }
         catch (Exception ex)
         {

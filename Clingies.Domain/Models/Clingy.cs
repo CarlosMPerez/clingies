@@ -125,8 +125,10 @@ public class Clingy
         }
     }
 
+    [IgnoreComparisonFieldAttribute]
     public DateTime CreatedAt { get; set; }
 
+    [IgnoreComparisonFieldAttribute]
     public DateTime? ModifiedAt { get; private set; }
 
     public Clingy() { }
