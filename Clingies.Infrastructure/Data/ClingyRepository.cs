@@ -1,5 +1,5 @@
 using System.Data;
-using Clingies.Domain.Factories;
+using System.Reflection;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
 using Dapper;
@@ -15,14 +15,13 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             List<Clingy> clingies = new List<Clingy>();
             var sql = """
-                SELECT Id, Title, Content, CreatedAt, ModifiedAt, 
-                    IsDeleted, IsPinned, IsRolled, IsLocked,
-                    PositionX, PositionY, Width, Height
+                SELECT Id, Title, Content, PositionX, PositionY, Width, Height, 
+                    IsPinned, IsRolled, IsLocked, IsStanding, IsDeleted, CreatedAt, ModifiedAt
                 FROM Clingies
                 WHERE IsDeleted = 0
             """;
             var dtos = Conn.Query<ClingyDto>(sql).ToList();
-            clingies = dtos.Select(dto => ClingyEntityFactory.FromDto(dto)).ToList();
+            clingies = dtos.Select(dto => dto.ToEntity()).ToList();
 
             return clingies;
         }
@@ -32,20 +31,19 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             throw;
         }
     }
-    public Clingy? Get(Guid id)
+    public Clingy? Get(int id)
     {
         try
         {
             var parms = new Dictionary<string, object> { { "@Id", id } };
             var sql = """
-                SELECT Id, Title, Content, CreatedAt, ModifiedAt, 
-                    IsDeleted, IsPinned, IsRolled, IsLocked,
-                    PositionX, PositionY, Width, Height
+                SELECT Id, Title, Content, PositionX, PositionY, Width, Height, 
+                    IsPinned, IsRolled, IsLocked, IsStanding, IsDeleted, CreatedAt, ModifiedAt
                 FROM Clingies
                 WHERE Id = @Id
             """;
             var dtos = Conn.Query<ClingyDto>(sql, parms);
-            var clingy = dtos.Select(dto => ClingyEntityFactory.FromDto(dto)).FirstOrDefault();
+            var clingy = dtos.Select(dto => dto.ToEntity()).FirstOrDefault();
 
             return clingy;
         }
@@ -56,17 +54,15 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
-    public Guid Create(Clingy clingy)
+    public int Create(Clingy clingy)
     {
         try
         {
             var sql = """
-                INSERT INTO Clingies (Id, Title, Content, CreatedAt, ModifiedAt, 
-                    IsDeleted, IsPinned, IsRolled, IsLocked, 
-                    PositionX, PositionY, Width, Height)
-                VALUES (@Id, @Title, @Content, @CreatedAt, @ModifiedAt, 
-                    @IsDeleted, @IsPinned, @IsRolled, @IsLocked, 
-                    @PositionX, @PositionY, @Width, @Height)
+                INSERT INTO Clingies (Title, Content, PositionX, PositionY, Width, Height, 
+                    IsPinned, IsRolled, IsLocked, IsStanding, IsDeleted, CreatedAt, ModifiedAt)
+                VALUES (@Title, @Content, @PositionX, @PositionY, @Width, @Height, 
+                    @IsPinned, @IsRolled, @IsLocked, @IsStanding, @IsDeleted, @CreatedAt, @ModifiedAt)
                 """;
 
             Conn.Execute(sql, clingy);
@@ -79,26 +75,33 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
-    public Guid Update(Clingy clingy)
+    public int Update(Clingy clingy)
     {
         try
         {
-            var sql = """
+            var oldVersion = Get(clingy.Id);
+            if (!IsEqual<Clingy>(oldVersion!, clingy))
+            {
+                var sql = """
                 UPDATE Clingies SET 
                     Title = @Title, 
                     Content = @Content, 
-                    ModifiedAt = @ModifiedAt, 
-                    IsDeleted = @IsDeleted, 
-                    IsPinned = @IsPinned,
-                    IsRolled = @IsRolled,
-                    IsLocked = @IsLocked,
                     PositionX = @PositionX, 
                     PositionY = @PositionY, 
                     Width = @Width, 
-                    Height = @Height
+                    Height = @Height, 
+                    IsPinned = @IsPinned, 
+                    IsRolled = @IsRolled, 
+                    IsLocked = @IsLocked, 
+                    IsStanding = @IsStanding, 
+                    IsDeleted = @IsDeleted, 
+                    CreatedAt = @CreatedAt, 
+                    ModifiedAt = @ModifiedAt
                 WHERE Id = @Id
                 """;
-            Conn.Execute(sql, clingy);
+                Conn.Execute(sql, clingy);
+            }
+            
             return clingy.Id;
         }
         catch (Exception ex)
@@ -108,7 +111,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
-    public void HardDelete(Guid id)
+    public void HardDelete(int id)
     {
         try
         {
@@ -127,7 +130,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
-    public void SoftDelete(Guid id)
+    public void SoftDelete(int id)
     {
         try
         {
@@ -145,5 +148,40 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             logger.Error(ex, "Error soft deleting clingy");
             throw;
         }
+    }
+
+    private bool IsEqual<T>(T obj1, T obj2)
+    {
+        if (obj1 is null || obj2 is null) return false;
+        if (ReferenceEquals(obj1, obj2)) return true;
+
+        var type = typeof(T);
+        foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            // Optional: skip non-readable or indexer properties
+            if (!prop.CanRead || prop.GetIndexParameters().Length > 0)
+                continue;
+
+            var val1 = prop.GetValue(obj1);
+            var val2 = prop.GetValue(obj2);
+
+            // Special case: DateTime (ignore tick-level differences)
+            if (val1 is DateTime dt1 && val2 is DateTime dt2)
+            {
+                if (dt1.ToUniversalTime().Date != dt2.ToUniversalTime().Date ||
+                    dt1.ToUniversalTime().Hour != dt2.ToUniversalTime().Hour ||
+                    dt1.ToUniversalTime().Minute != dt2.ToUniversalTime().Minute ||
+                    dt1.ToUniversalTime().Second != dt2.ToUniversalTime().Second)
+                {
+                    return false;
+                }
+            }
+            else if (!Equals(val1, val2))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

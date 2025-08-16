@@ -12,7 +12,7 @@ namespace Clingies.UserControls;
 
 public partial class ClingyTitle : UserControl
 {
-    private Guid _id;
+    private int _id;
     private bool _isRolled;
     private bool _isPinned;
     private bool _isLocked;
@@ -40,7 +40,7 @@ public partial class ClingyTitle : UserControl
         set { _isRolled = value; }
     }
 
-    public Guid ClingyId
+    public int ClingyId
     {
         get { return _id; }
         set { _id = value; }

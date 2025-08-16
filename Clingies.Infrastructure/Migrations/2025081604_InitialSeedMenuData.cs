@@ -2,8 +2,8 @@ using FluentMigrator;
 
 namespace Clingies.Infrastructure.Migrations;
 
-[Migration(2025071802)]
-public class _2025071802_InitialSeedMenuData : Migration
+[Migration(2025081604)]
+public class _2025081604_InitialSeedMenuData : Migration
 {
     public override void Up()
     {

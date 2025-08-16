@@ -1,4 +1,3 @@
-using Clingies.Domain.Factories;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
 
@@ -6,11 +5,11 @@ namespace Clingies.ApplicationLogic.Services;
 
 public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
 {
-    public List<Clingy> GetAllActive()
+    public List<ClingyDto> GetAllActive()
     {
         try
         {
-            return repo.GetAllActive();
+            return repo.GetAllActive().Select(dto => dto.ToDto()).ToList();
         }
         catch (Exception ex)
         {
@@ -19,11 +18,11 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
     }
 
-    public Clingy? Get(Guid id)
+    public ClingyDto? Get(int id)
     {
         try
         {
-            return repo.Get(id);
+            return repo.Get(id)?.ToDto();
         }
         catch (Exception ex)
         {
@@ -33,13 +32,13 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
 
     }
 
-    public Clingy Create(string title = "", string content = "", double posX = 0, double posY = 0)
+    public int Create(ClingyDto dto)
     {
         try
         {
-            var clingy = ClingyEntityFactory.CreateNew(title, content, posX, posY);
-            repo.Create(clingy);
-            return clingy;
+            var entity = dto.ToEntity();
+            entity.CreatedAt = DateTime.UtcNow;
+            return repo.Create(entity);
         }
         catch (Exception ex)
         {
@@ -48,11 +47,11 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
     }
 
-    public void Update(Clingy clingy)
+    public int Update(ClingyDto clingy)
     {
         try
         {
-            repo.Update(clingy);
+            return repo.Update(clingy.ToEntity());
         }
         catch (Exception ex)
         {
@@ -61,7 +60,7 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
     }
 
-    public void SoftDelete(Guid id)
+    public void SoftDelete(int id)
     {
         try
         {
@@ -74,7 +73,7 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
     }
 
-    public void HardDelete(Guid id)
+    public void HardDelete(int id)
     {
         try
         {

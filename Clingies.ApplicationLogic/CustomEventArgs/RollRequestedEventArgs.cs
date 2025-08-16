@@ -4,10 +4,10 @@ namespace Clingies.ApplicationLogic.CustomEventArgs;
 
 public class RollRequestedEventArgs : EventArgs
 {
-    public Guid ClingyId { get; }
+    public int ClingyId { get; }
     public bool IsRolled { get; }
 
-    public RollRequestedEventArgs(Guid id, bool isRolled)
+    public RollRequestedEventArgs(int id, bool isRolled)
     {
         ClingyId = id;
         IsRolled = isRolled;

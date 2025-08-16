@@ -5,10 +5,10 @@ namespace Clingies.Domain.Interfaces;
 public interface IClingyRepository
 {
     List<Clingy> GetAllActive();
-    Clingy? Get(Guid id);
-    Guid Create(Clingy clingy);
-    Guid Update(Clingy clingy);
-    void SoftDelete(Guid id);
-    void HardDelete(Guid id);
+    Clingy? Get(int id);
+    int Create(Clingy clingy);
+    int Update(Clingy clingy);
+    void SoftDelete(int id);
+    void HardDelete(int id);
 
 }

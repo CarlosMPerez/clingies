@@ -9,11 +9,13 @@ namespace Clingies.UserControls;
 
 public partial class ClingyBody : UserControl
 {
-    private Guid _id;
+    private int _id;
     private string? _bodyContent;
     private bool _isRolled;
     private bool _isLocked;
     private ClingyWindow? _parentWindow;
+
+    public event EventHandler<string>? ContentChangeRequested;
 
     public string? BodyContent
     {
@@ -55,7 +57,16 @@ public partial class ClingyBody : UserControl
         _parentWindow = (ClingyWindow)this.GetVisualRoot()!;
     }
 
-    public Guid ClingyId
+    private void OnContentChanged(object? sender, TextChangedEventArgs e)
+    {
+        if (IsVisible)
+        {
+            var newText = ContentBox.Text ?? string.Empty;
+            ContentChangeRequested?.Invoke(this, newText);
+        }
+    }    
+
+    public int ClingyId
     {
         get { return _id; }
         set { _id = value; }

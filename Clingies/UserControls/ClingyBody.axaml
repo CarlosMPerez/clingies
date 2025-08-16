@@ -8,7 +8,7 @@
   <!-- 🔧 Custom Styles -->
   <UserControl.Styles>
     <Style Selector="TextBox">
-      <Setter Property="Background" Value="#FFFFAA"/>
+      <Setter Property="Background" Value="#FFFFB4"/>
       <Setter Property="Foreground" Value="Black"/>
       <Setter Property="CaretBrush" Value="Black"/>
       <Setter Property="BorderBrush" Value="Transparent"/>
@@ -19,24 +19,24 @@
     </Style>
 
     <Style Selector="TextBox /template/ Border">
-      <Setter Property="Background" Value="#FFFFAA"/>
+      <Setter Property="Background" Value="#FFFFB4"/>
       <Setter Property="BorderBrush" Value="Transparent"/>
     </Style>
 
     <Style Selector="TextBox:pointerover /template/ Border">
-      <Setter Property="Background" Value="#FFFFAA"/>
+      <Setter Property="Background" Value="#FFFFB4"/>
       <Setter Property="BorderBrush" Value="Transparent"/>
     </Style>
 
     <Style Selector="TextBox:focus /template/ Border">
-      <Setter Property="Background" Value="#FFFFAA"/>
+      <Setter Property="Background" Value="#FFFFB4"/>
       <Setter Property="BorderBrush" Value="Transparent"/>
     </Style>
   </UserControl.Styles>
 
     <Border x:Name="BodyBorder" Grid.Row="1" IsVisible="true" 
       MinHeight="0" Margin="0" Padding="0"
-      Background="#FFFFAA"
+      Background="#FFFFB4"
     >
       <Grid x:Name="BodyGrid" ColumnDefinitions="*">
         <!-- Your main clingy layout goes here -->
@@ -55,6 +55,7 @@
           >
             <TextBox
               x:Name="ContentBox"
+              TextChanged="OnContentChanged"
               AcceptsReturn="True"
               TextWrapping="Wrap"
               BorderThickness="0"

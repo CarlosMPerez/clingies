@@ -2,8 +2,8 @@ using FluentMigrator;
 
 namespace Clingies.Infrastructure.Migrations;
 
-[Migration(2025072001)]
-public class _2025072001_SeedClingyMenu : Migration
+[Migration(2025081603)]
+public class _2025081603_SeedClingyMenu : Migration
 {
     public override void Up()
     {
@@ -78,6 +78,10 @@ public class _2025072001_SeedClingyMenu : Migration
         sql = SqlBuilder.BuildInsertSystemTrayIcon("properties",
             "avares://Clingies/Assets/menu_light/menu_settings.png",
             "avares://Clingies/Assets/menu_dark/menu_settings.png");
+        Execute.Sql(sql);
+        sql = SqlBuilder.BuildInsertSystemTrayIcon("clingy_locked",
+            "avares://Clingies/Assets/clingy_locked.png",
+            "avares://Clingies/Assets/clingy_locked.png");
         Execute.Sql(sql);
     }
     public override void Down()

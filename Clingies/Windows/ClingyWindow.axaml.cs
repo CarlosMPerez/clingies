@@ -12,25 +12,22 @@ namespace Clingies.Windows;
 
 public partial class ClingyWindow : Window, IContextCommandController
 {
-    private readonly Clingy _clingy;
-    public Guid ClingyId => _clingy.Id;
+    private readonly ClingyDto _clingy;
+    public int ClingyId => _clingy.Id;
     private MenuFactory _menuFactory;
-    public event EventHandler<Guid>? CloseRequested;
+    public event EventHandler<int>? CloseRequested;
     public event EventHandler<PinRequestedEventArgs>? PinRequested;
     public event EventHandler<TitleChangeRequestedEventArgs>? TitleChangeRequested;
     public event EventHandler<PositionChangeRequestedEventArgs>? PositionChangeRequested;
     public event EventHandler<RollRequestedEventArgs>? RollRequested;
     public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
-    //public event EventHandler<UpdateWindowWidthRequestedEventArgs>? UpdateWindowWidthRequested;
     public event EventHandler<UpdateWindowSizeRequestedEventArgs>? UpdateWindowSizeRequested;
-    //public event EventHandler<UpdateWindowHeightRequestedEventArgs>? UpdateWindowHeightRequested;
     public event EventHandler<LockRequestedEventArgs>? LockRequested;
     public IContextCommandProvider? CommandProvider { get; private set; }
 
-    public ClingyWindow(Clingy clingy)
+    public ClingyWindow(ClingyDto clingy)
     {
         InitializeComponent();
-        //OnPointerPressed += OnResizeGripPressed;
         _clingy = clingy;
 
         Position = new PixelPoint((int)clingy.PositionX, (int)clingy.PositionY);
@@ -48,6 +45,7 @@ public partial class ClingyWindow : Window, IContextCommandController
         ClingyBody.BodyContent = _clingy.Content;
         ClingyBody.IsRolled = _clingy.IsRolled;
         ClingyBody.IsLocked = _clingy.IsLocked;
+        ClingyBody.ContentChangeRequested += ContentChangeRequest;
 
         PositionChanged += OnPositionChanged;
         SizeChanged += (_, e) =>
@@ -135,9 +133,9 @@ public partial class ClingyWindow : Window, IContextCommandController
         }
     }
 
-    public void ContentChangeRequest(string bodyContent, double height)
+    public void ContentChangeRequest(object? sender, string bodyContent)
     {
-        var args = new ContentChangeRequestedEventArgs(ClingyId, bodyContent, height);
+        var args = new ContentChangeRequestedEventArgs(ClingyId, bodyContent);
         ContentChangeRequested?.Invoke(this, args);
     }
 

@@ -2,104 +2,152 @@ namespace Clingies.Domain.Models;
 
 public class Clingy
 {
-    public Guid Id { get; private set; }
-    public string Content { get; private set; } = string.Empty;
-    public string? Title { get; private set; }
-    public DateTime CreatedAt { get; private set; }
+    public int Id { get; set; }
+
+    private string? _title;
+    public string? Title
+    {
+        get => _title;
+        set
+        {
+            _title = value;
+            ModifiedAt = DateTime.UtcNow;
+        }
+    }
+
+    private string _content = string.Empty;
+    public string Content
+    {
+        get => _content;
+        set
+        {
+            _content = value;
+            ModifiedAt = DateTime.UtcNow;
+        }
+    }
+
+    private double _positionX;
+    public double PositionX
+    {
+        get => _positionX;
+        set
+        {
+            _positionX = value;
+            ModifiedAt = DateTime.UtcNow;
+        }
+    }
+
+    private double _positionY;
+    public double PositionY
+    {
+        get => _positionY;
+        set
+        {
+            _positionY = value;
+            ModifiedAt = DateTime.UtcNow;
+        }
+    }
+
+    private double _width;
+    public double Width
+    {
+        get => _width;
+        set
+        {
+            _width = value;
+            ModifiedAt = DateTime.UtcNow;
+        }
+    }
+
+    private double _height;
+    public double Height
+    {
+        get => _height;
+        set
+        {
+            _height = value;
+            ModifiedAt = DateTime.UtcNow;
+        }
+    }
+
+    private bool _isPinned;
+    public bool IsPinned
+    {
+        get => _isPinned;
+        set
+        {
+            _isPinned = value;
+            ModifiedAt = DateTime.UtcNow;
+        }
+    }
+
+    private bool _isRolled;
+    public bool IsRolled
+    {
+        get => _isRolled;
+        set
+        {
+            _isRolled = value;
+            ModifiedAt = DateTime.UtcNow;
+        }
+    }
+
+    private bool _isLocked;
+    public bool IsLocked
+    {
+        get => _isLocked;
+        set
+        {
+            _isLocked = value;
+            ModifiedAt = DateTime.UtcNow;
+        }
+    }
+
+    private bool _isStanding;
+    public bool IsStanding
+    {
+        get => _isStanding;
+        set
+        {
+            _isStanding = value;
+            ModifiedAt = DateTime.UtcNow;
+        }
+    }
+
+    private bool _isDeleted;
+    public bool IsDeleted
+    {
+        get => _isDeleted;
+        set
+        {
+            _isDeleted = value;
+            ModifiedAt = DateTime.UtcNow;
+        }
+    }
+
+    public DateTime CreatedAt { get; set; }
+
     public DateTime? ModifiedAt { get; private set; }
-    public bool IsDeleted { get; private set; }
-    public bool IsPinned { get; private set; }
-    public bool IsRolled { get; private set; }
-    public bool IsLocked { get; private set; }
-    public double PositionX { get; private set; }
-    public double PositionY { get; private set; }
-    public double Width { get; private set; }
-    public double Height { get; private set; }
 
-    private Clingy() { }
+    public Clingy() { }
 
-    internal Clingy(Guid id, string title, string content, double posX = 100, double posY = 100)
+
+    public ClingyDto ToDto()
     {
-        Id = id;
-        Title = title;
-        Content = content;
-        PositionX = posX;
-        PositionY = posY;
-        Width = 300;
-        Height = 100;
-        IsDeleted = false;
-        IsPinned = false;
-        IsRolled = false;
-        IsLocked = false;
-        CreatedAt = DateTime.UtcNow;
-    }
-
-    internal Clingy(Guid id, string title, string content,
-                    double posX, double posY, double width, double height,
-                    bool isDeleted = false, bool isPinned = false,
-                    bool isRolled = false, bool isLocked = false)
-    {
-        Id = id;
-        Title = title;
-        Content = content;
-        PositionX = posX;
-        PositionY = posY;
-        Width = width;
-        Height = height;
-        IsDeleted = isDeleted;
-        IsPinned = isPinned;
-        IsRolled = isRolled;
-        IsLocked = isLocked;
-        CreatedAt = DateTime.UtcNow;
-    }
-
-    public void UpdateTitle(string newTitle)
-    {
-        Title = newTitle;
-        ModifiedAt = DateTime.UtcNow;
-    }
-
-    public void UpdateContent(string newContent)
-    {
-        Content = newContent;
-        ModifiedAt = DateTime.UtcNow;
-    }
-
-    public void Move(double x, double y)
-    {
-        PositionX = x;
-        PositionY = y;
-        ModifiedAt = DateTime.UtcNow;
-    }
-
-    public void Resize(double width, double height)
-    {
-        Width = width;
-        Height = height;
-        ModifiedAt = DateTime.UtcNow;
-    }
-
-    public void MarkDeleted()
-    {
-        IsDeleted = true;
-        ModifiedAt = DateTime.UtcNow;
-    }
-
-    public void SetPinState(bool pinned)
-    {
-        IsPinned = pinned;
-        ModifiedAt = DateTime.UtcNow;
-    }
-
-    public void SetRolledState(bool rolled)
-    {
-        IsRolled = rolled;
-        ModifiedAt = DateTime.UtcNow;
-    }
-
-    public void SetLockState(bool locked)
-    {
-        IsLocked = locked;
-        ModifiedAt = DateTime.UtcNow;
+        return new ClingyDto()
+        {
+            Id = Id,
+            Title = Title,
+            Content = Content,
+            PositionX = PositionX,
+            PositionY = PositionY,
+            Width = Width,
+            Height = Height,
+            IsPinned = IsPinned,
+            IsLocked = IsLocked,
+            IsRolled = IsRolled,
+            IsStanding = IsStanding,
+            IsDeleted = IsDeleted
+        };
     }
 }
