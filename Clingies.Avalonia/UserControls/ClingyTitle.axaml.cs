@@ -4,11 +4,11 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
-using Clingies.Services;
-using Clingies.Windows;
+using Clingies.Avalonia.Services;
+using Clingies.Avalonia.Windows;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Clingies.UserControls;
+namespace Clingies.Avalonia.UserControls;
 
 public partial class ClingyTitle : UserControl
 {

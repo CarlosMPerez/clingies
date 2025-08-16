@@ -3,8 +3,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        xmlns:controls="clr-namespace:Clingies.UserControls"
-        x:Class="Clingies.Windows.ClingyWindow"
+        xmlns:controls="clr-namespace:Clingies.Avalonia.UserControls"
+        x:Class="Clingies.Avalonia.Windows.ClingyWindow"
         Background="Transparent"
         SystemDecorations="None"
         ExtendClientAreaToDecorationsHint="True"
@@ -12,7 +12,7 @@
         TransparencyLevelHint="AcrylicBlur, Blur, Transparent"        
         CanResize="True"
         MinHeight="100"
-        MinWidth="100"
+        MinWidth="300"
         ShowInTaskbar="False">
     <Grid>
         <Grid.RowDefinitions>
@@ -30,9 +30,6 @@
         <Border Grid.Row="1" 
             BorderThickness="4,0,4,4"
             Background="Transparent"
-            PointerPressed="OnResizeGripPressed"
-            PointerEntered="OnResizeGripMoved"
-            PointerExited="OnResizeGripLeave"
         >
             <controls:ClingyBody x:Name="ClingyBody" Grid.Row="1" Cursor="Ibeam" />
         </Border>

@@ -5,10 +5,10 @@ using Avalonia.Input;
 using Clingies.ApplicationLogic.CustomEventArgs;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Models;
-using Clingies.Factories;
+using Clingies.Avalonia.Factories;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Clingies.Windows;
+namespace Clingies.Avalonia.Windows;
 
 public partial class ClingyWindow : Window, IContextCommandController
 {
@@ -74,41 +74,41 @@ public partial class ClingyWindow : Window, IContextCommandController
             this.Cursor = new Cursor(StandardCursorType.Ibeam); // Or Arrow
     }
 
-    private void OnResizeGripLeave(object? sender, PointerEventArgs e)
-    {
-        this.Cursor = new Cursor(StandardCursorType.Ibeam);
-    }
+    // private void OnResizeGripLeave(object? sender, PointerEventArgs e)
+    // {
+    //     this.Cursor = new Cursor(StandardCursorType.Ibeam);
+    // }
 
-    private void OnResizeGripPressed(object? sender, PointerPressedEventArgs e)
-    {
-        var point = e.GetPosition(this);
-        const int gripSize = 4;
+    // private void OnResizeGripPressed(object? sender, PointerPressedEventArgs e)
+    // {
+    //     var point = e.GetPosition(this);
+    //     const int gripSize = 4;
 
-        // Determine which edge was pressed based on pointer location
-        var onLeft = point.X <= gripSize;
-        var onRight = point.X >= Bounds.Width - gripSize;
-        var onBottom = point.Y >= Bounds.Height - gripSize;
+    //     // Determine which edge was pressed based on pointer location
+    //     var onLeft = point.X <= gripSize;
+    //     var onRight = point.X >= Bounds.Width - gripSize;
+    //     var onBottom = point.Y >= Bounds.Height - gripSize;
 
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-        {
-            if (onLeft)
-                BeginResizeDrag(WindowEdge.West, e);
-            else if (onRight)
-                BeginResizeDrag(WindowEdge.East, e);
-            else if (onBottom)
-                BeginResizeDrag(WindowEdge.South, e);
-        }
-    }    
+    //     if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+    //     {
+    //         if (onLeft)
+    //             BeginResizeDrag(WindowEdge.West, e);
+    //         else if (onRight)
+    //             BeginResizeDrag(WindowEdge.East, e);
+    //         else if (onBottom)
+    //             BeginResizeDrag(WindowEdge.South, e);
+    //     }
+    // }    
 
     public void SetContextCommandProvider(IContextCommandProvider provider)
     {
         CommandProvider = provider ?? throw new ArgumentNullException(nameof(provider));
     }    
 
-    protected override void OnOpened(EventArgs e)
-    {
-        base.OnOpened(e);
-    }
+    // protected override void OnOpened(EventArgs e)
+    // {
+    //     base.OnOpened(e);
+    // }
 
     protected override void OnKeyDown(KeyEventArgs e)
     {

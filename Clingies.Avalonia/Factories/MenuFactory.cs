@@ -5,9 +5,9 @@ using Avalonia.Controls;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
-using Clingies.Services;
+using Clingies.Avalonia.Services;
 
-namespace Clingies.Factories;
+namespace Clingies.Avalonia.Factories;
 
 public class MenuFactory(IMenuRepository repo, 
                             IClingiesLogger logger,

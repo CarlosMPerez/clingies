@@ -7,11 +7,11 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Interfaces;
-using Clingies.Factories;
+using Clingies.Avalonia.Factories;
 using Clingies.Infrastructure.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Clingies;
+namespace Clingies.Avalonia;
 
 public partial class App : Application, ITrayCommandController
 {

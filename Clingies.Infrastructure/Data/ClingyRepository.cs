@@ -62,11 +62,12 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 INSERT INTO Clingies (Title, Content, PositionX, PositionY, Width, Height, 
                     IsPinned, IsRolled, IsLocked, IsStanding, IsDeleted, CreatedAt, ModifiedAt)
                 VALUES (@Title, @Content, @PositionX, @PositionY, @Width, @Height, 
-                    @IsPinned, @IsRolled, @IsLocked, @IsStanding, @IsDeleted, @CreatedAt, @ModifiedAt)
+                    @IsPinned, @IsRolled, @IsLocked, @IsStanding, @IsDeleted, @CreatedAt, @ModifiedAt);
+                SELECT last_insert_rowid();
                 """;
 
-            Conn.Execute(sql, clingy);
-            return clingy.Id;
+            int id = Conn.ExecuteScalar<int>(sql, clingy);
+            return id;
         }
         catch (Exception ex)
         {
@@ -75,7 +76,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
-    public int Update(Clingy clingy)
+    public void Update(Clingy clingy)
     {
         try
         {
@@ -101,8 +102,6 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 """;
                 Conn.Execute(sql, clingy);
             }
-            
-            return clingy.Id;
         }
         catch (Exception ex)
         {
@@ -160,6 +159,9 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             // Optional: skip non-readable or indexer properties
             if (!prop.CanRead || prop.GetIndexParameters().Length > 0)
+                continue;
+
+            if (prop.IsDefined(typeof(IgnoreComparisonFieldAttribute), inherit: true))
                 continue;
 
             var val1 = prop.GetValue(obj1);

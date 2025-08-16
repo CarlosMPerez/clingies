@@ -1,14 +1,15 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Avalonia;
 using Clingies.ApplicationLogic.Services;
 using Clingies.Domain.Models;
-using Clingies.Windows;
+using Clingies.Avalonia.Windows;
 using Clingies.ApplicationLogic.CustomEventArgs;
 using Clingies.Domain.Interfaces;
 using Clingies.ApplicationLogic.Interfaces;
 
-namespace Clingies.Factories;
+namespace Clingies.Avalonia.Factories;
 
 public class ClingyWindowFactory(ClingyService noteService,
                                 IClingiesLogger logger,
@@ -20,7 +21,7 @@ public class ClingyWindowFactory(ClingyService noteService,
     {
         try
         {
-            var clingy = new ClingyDto() { Id = 0 };
+            var clingy = new ClingyDto();
             clingy.Id = noteService.Create(clingy);
             var window = new ClingyWindow(clingy);
             var provider = providerFactory(window);
@@ -150,7 +151,7 @@ public class ClingyWindowFactory(ClingyService noteService,
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            window.Position = new Avalonia.PixelPoint(args.PositionX, args.PositionY);
+            window.Position = new PixelPoint(args.PositionX, args.PositionY);
             clingy.PositionX = args.PositionX;
             clingy.PositionY = args.PositionY;
             noteService.Update(clingy);
