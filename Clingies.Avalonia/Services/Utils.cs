@@ -4,7 +4,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Clingies.Domain.Interfaces;
 
-namespace Clingies.Services;
+namespace Clingies.Avalonia.Services;
 
 public class UtilsService
 {

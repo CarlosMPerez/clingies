@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
-namespace Clingies.Windows;
+namespace Clingies.Avalonia.Windows;
 
 public partial class ClingyTitleDialog : Window
 {

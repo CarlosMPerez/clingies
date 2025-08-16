@@ -3,9 +3,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.VisualTree;
-using Clingies.Windows;
+using Clingies.Avalonia.Windows;
 
-namespace Clingies.UserControls;
+namespace Clingies.Avalonia.UserControls;
 
 public partial class ClingyBody : UserControl
 {

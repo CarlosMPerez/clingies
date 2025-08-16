@@ -3,8 +3,8 @@ namespace Clingies.Domain.Models;
 
 public class ClingyDto
 {
-    public required int Id { get; set; }
-    public string? Title { get; set; }
+    public int Id { get; set; }
+    public string Title { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
     public double PositionX { get; set; }
     public double PositionY { get; set; }
@@ -18,7 +18,14 @@ public class ClingyDto
     public bool IsDeleted { get; set; }
 
 
-    public ClingyDto() { }
+    public ClingyDto()
+    {
+        // default values
+        Id = 0;
+        Title = "";
+        Height = 100;
+        Width = 300;
+    }
 
     public Clingy ToEntity()
     {

@@ -4,7 +4,6 @@
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-        <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <EnableDefaultAvaloniaAnalyzers>true</EnableDefaultAvaloniaAnalyzers>
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
@@ -12,23 +11,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.3.2" />
-        <PackageReference Include="Avalonia.Desktop" Version="11.3.2" />
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2" />
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.2" />
-        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.2">
-            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
-            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
-        </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
         <PackageReference Include="System.Reactive" Version="6.0.1" />
     </ItemGroup>    
     <ItemGroup>
-      <AvaloniaResource Include="Assets/**" />
-    </ItemGroup>
-    <ItemGroup>
       <ProjectReference Include="..\Clingies.ApplicationLogic\Clingies.ApplicationLogic.csproj" />
+      <ProjectReference Include="..\Clingies.Avalonia\Clingies.Avalonia.csproj" />
     </ItemGroup>
 </Project>

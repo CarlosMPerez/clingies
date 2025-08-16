@@ -1,15 +1,16 @@
 ﻿using Avalonia;
 using System;
 using System.IO;
-using Clingies.ApplicationLogic.Services;
-using Clingies.Domain.Interfaces;
-using Clingies.Factories;
-using Clingies.Infrastructure.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Clingies.ApplicationLogic.Services;
+using Clingies.Domain.Interfaces;
+using Clingies.Avalonia.Factories;
+using Clingies.Infrastructure.Data;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.ApplicationLogic.Providers;
-using Clingies.Services;
+using Clingies.Avalonia;
+using Clingies.Avalonia.Services;
 
 namespace Clingies;
 
