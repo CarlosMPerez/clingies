@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Infrastructure", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Avalonia", "Clingies.Avalonia\Clingies.Avalonia.csproj", "{89F805D9-6AA2-4706-BB89-56E2BBF88B5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Gtk", "Clingies.Gtk\Clingies.Gtk.csproj", "{F9317428-30CC-46CC-B47F-10F6F2E5838E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{89F805D9-6AA2-4706-BB89-56E2BBF88B5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89F805D9-6AA2-4706-BB89-56E2BBF88B5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89F805D9-6AA2-4706-BB89-56E2BBF88B5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9317428-30CC-46CC-B47F-10F6F2E5838E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9317428-30CC-46CC-B47F-10F6F2E5838E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9317428-30CC-46CC-B47F-10F6F2E5838E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9317428-30CC-46CC-B47F-10F6F2E5838E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

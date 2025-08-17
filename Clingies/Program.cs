@@ -9,6 +9,7 @@ using Clingies.Avalonia.Factories;
 using Clingies.Infrastructure.Data;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.ApplicationLogic.Providers;
+using Clingies.Gtk;
 using Clingies.Avalonia;
 using Clingies.Avalonia.Services;
 
@@ -29,7 +30,17 @@ internal sealed class Program
         {
             Log.Information("Application started");
             var services = ConfigureServices();
-            BuildAvaloniaApp(services).StartWithClassicDesktopLifetime(args);
+            var mode = args[0]; // TO BE OBTAINED FROM SETTINGS?
+
+            IFrontendHost host = mode switch
+            {
+                "gtk" => new GtkFrontendHost(),
+                "avalonia" => new AvaloniaFrontendHost(),
+                _ => new AvaloniaFrontendHost()
+            };
+
+            host.Run(services, args);
+
         }
         catch (Exception ex)
         {
@@ -77,12 +88,5 @@ internal sealed class Program
             throw;
         }
     }
-
-    private static AppBuilder BuildAvaloniaApp(IServiceProvider services)
-        => AppBuilder
-            .Configure<App>(() => new App(services))
-            .UsePlatformDetect()
-            .UseSkia()
-            .LogToTrace();
 }
 

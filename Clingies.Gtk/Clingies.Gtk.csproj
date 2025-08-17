@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>9.0</LangVersion>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GtkSharp" Version="3.24.24.95" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Clingies.ApplicationLogic\Clingies.ApplicationLogic.csproj" />
+    <ProjectReference Include="..\Clingies.Domain\Clingies.Domain.csproj" />
+    <ProjectReference Include="..\Clingies.Infrastructure\Clingies.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

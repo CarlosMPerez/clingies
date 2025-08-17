@@ -1,0 +1,157 @@
+Phase 1 — Window polish
+
+Frameless sticky note look:
+
+Decorated = false, SkipTaskbarHint = true, SkipPagerHint = true.
+
+CSS for body #FFFFB4, header #87CEFA (you’ve got this).
+
+“Drag window by header”: handle ButtonPressEvent + call BeginMoveDrag(button, xRoot, yRoot, timestamp).
+
+“Resize only from body edges”: pointer events on edges; call BeginResizeDrag(Gdk.WindowEdge, …); do not wire top edge.
+
+Acceptance: header drags; only left/right/bottom edges resize; no accidental resize from the header line.
+
+Phase 2 — Persistence & autosave
+
+Coalesce edits (title/content/geometry) with a debounce:
+
+On change: set dirty flag and GLib.Timeout.Add(250, SaveIfDirty).
+
+On DeleteEvent: force final _repo.Update(_clingy).
+
+Avoid DB churn while dragging: only geometry-save on drag-end (small 200–300ms debounce cleans this up).
+
+Acceptance: rapid typing/dragging causes ≤1 write every ~250ms; closing always saves latest state.
+
+Phase 3 — Note controls: pin, lock, roll
+
+Pin to top: toggle KeepAbove = true/false; persist IsPinned.
+
+Lock: set _content.Editable = false; _titleEntry.IsEditable = false; dim with CSS class .locked.
+
+Roll (collapse): header click toggles body visibility: scroller.Visible = !rolled; HeightRequest shrink when rolled.
+
+Acceptance: each flag is persisted and restored; UI feedback is obvious (cursor/opacity/class).
+
+Phase 4 — Context menu (right-click) + shortcuts
+
+Window context menu:
+
+On right-click (ButtonPressEvent with EventButton.Button==3), popup Menu with items: New, Delete, Pin, Lock, Roll, Close.
+
+Keyboard shortcuts (per-window):
+
+Title rename dialog (Ctrl+Shift+P): simple Dialog with one Entry.
+
+Delete (Shift+Del) ⇒ soft delete + close.
+
+Pin (Ctrl+P), Lock (Ctrl+L), Roll (Ctrl+R).
+
+Use KeyPressEvent (simplest), or add an AccelGroup later.
+
+Acceptance: menu mirrors current Avalonia actions; shortcuts work even with focus in TextView.
+
+Phase 5 — System tray
+
+Linux: try AppIndicator if available; fallback to Gtk.StatusIcon (works everywhere GTK3 runs).
+
+Tray menu: New Note, Show All, Hide All, Exit.
+
+AppIndicator C# bindings exist; if that’s noisy, ship StatusIcon first (you can switch later).
+
+Windows: StatusIcon also works under GTK on Windows.
+
+Acceptance: tray shows up; actions invoke app services; app can run with zero visible notes.
+
+Phase 6 — Images inside notes
+
+Keep Gtk.TextView and embed images via anchors:
+
+var anchor = buffer.CreateChildAnchor(iter);
+
+var img = new Gtk.Image(pixbuf); textView.AddChildAtAnchor(img, anchor);
+
+Drag & drop and paste:
+
+Accept Gdk.DragAction.Copy for URIs & images, load Gdk.Pixbuf.
+
+Clipboard paste: check TargetsIncludeImage; fall back to text.
+
+Persistence:
+
+Reuse your existing storage approach (filesystem with DB paths is simplest).
+
+Inline markers in content (e.g., [img:123]) mapping to files.
+
+Acceptance: paste/drag an image → it appears inline; save/reload round-trip preserves it; text caret navigates across image anchors sanely.
+
+Phase 7 — Multi-note lifecycle & commands
+
+New note (from tray, context menu, or shortcut Ctrl+N):
+
+Create entity, position near mouse (Display.Pointer), focus content.
+
+Soft delete:
+
+Set IsDeleted=true, close window.
+
+Tray action “Restore last deleted” (optional).
+
+Startup layout:
+
+Slight cascade spacing for multiple notes so they don’t overlap exactly.
+
+Acceptance: new/delete flows don’t require restarting; DB state stays consistent.
+
+Phase 8 — Theming & UX niceties
+
+Dark theme detection (optional first pass): read XDG_CURRENT_DESKTOP/GTK_THEME env if you want; or offer a manual toggle.
+
+Provide 2–3 preset themes via CSS files (Yellow/Blue, Kraft Paper, Graph Paper).
+
+Scrollbar slim styling; header button hover/active states.
+
+Acceptance: toggle theme without restart (reload CSS provider); styles don’t bleed across widgets thanks to #ids / .classes.
+
+Phase 9 — Packaging & startup
+
+Linux: .desktop file, autostart option.
+
+Windows: single-file publish; ensure GTK runtime present (document prerequisites or bundle).
+
+Config: JSON settings file for things not per-note (tray behavior, hotkeys, theme).
+
+Acceptance: user can install and have Clingies auto-start and present tray on login.
+
+Phase 10 — Tests & stability
+
+Integration tests for repos already exist—port any Avalonia-specific tests to GTK-agnostic tests.
+
+Smoke test for the GTK host: launch, create one note, change, persist (headless CI is tricky; keep it minimal).
+
+Log with Serilog (you already do); add a rotating file sink to debug styling/state bugs in the field.
+
+Acceptance: green test suite; logs helpful for UI bugs.
+
+Phase 11 — i18n (when you’re ready)
+
+Use NGettext (or similar) for _("…") strings; language files live in locales/.
+
+Labels in menus/tray/dialogs go through gettext; window text can stay raw.
+
+Acceptance: language switch at startup (or live if you’re ambitious), translators work on .po files without code.
+
+Small code breadcrumbs (so you don’t search)
+
+Drag window: BeginMoveDrag(button, (int)xRoot, (int)yRoot, time);
+
+Resize drag: BeginResizeDrag(Gdk.WindowEdge.South, button, xRoot, yRoot, time);
+
+Right-click menu: handle ButtonPressEvent, check EventButton.Button==3, menu.PopupAtPointer(ev.Event);
+
+Debounce: GLib.Timeout.Add(250, () => { SaveIfDirty(); return false; });
+
+Locking: entry.IsEditable=false; textView.Editable=false; (and add/remove a .locked CSS class)
+
+TextView images: TextBuffer.CreateChildAnchor + TextView.AddChildAtAnchor(Gtk.Image, anchor)

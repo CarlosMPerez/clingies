@@ -18,5 +18,6 @@
     <ItemGroup>
       <ProjectReference Include="..\Clingies.ApplicationLogic\Clingies.ApplicationLogic.csproj" />
       <ProjectReference Include="..\Clingies.Avalonia\Clingies.Avalonia.csproj" />
+      <ProjectReference Include="..\Clingies.Gtk\Clingies.Gtk.csproj" />
     </ItemGroup>
 </Project>
