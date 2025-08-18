@@ -14,30 +14,22 @@ namespace Clingies.Gtk.Windows
 
             /* Header bar */
             #clingy-title {
-            background: #87CEFA;            /* blue header */
-            padding: 4px 6px;
+            background: #C9D0D4;            /* grey header */
+            padding: 2px 2px;
             border: none;
             box-shadow: none;
+            background-position: center;
             }
 
             /* Title text field in header */
-            entry#clingy-title-entry {
+            #clingy-title-label {
             background: transparent;
-            color: white;                    /* white text on blue */
+            color: black;                    /* black text on grey */
             border: none;
             box-shadow: none;
-            caret-color: white;
-            }
-
-            /* Close button */
-            #btn-close {
-            background: transparent;
-            border: none;
-            box-shadow: none;
-            color: black;
-            }
-            #btn-close:hover {
-            background: rgba(0,0,0,0.10);
+            font-family: monospace;
+            font-size: 14;
+            font-weight: bold;
             }
 
             /* Scroller + viewport + textview must ALL be painted yellow */
@@ -69,7 +61,20 @@ namespace Clingies.Gtk.Windows
             border: none;
             box-shadow: none;
             }
+
+            /* Icon buttons (pin/lock/close) */
+            #btn-pin, #btn-lock, #btn-close {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            margin: 0; /* margins are set in code for edge-ness */
+            }
+            #btn-pin:hover, #btn-lock:hover, #btn-close:hover {
+            background: rgba(0,0,0,0.10);
+            }
             ";
+
             base.LoadFromData(css);
         }
     }

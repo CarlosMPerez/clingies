@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Assets/**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Clingies.ApplicationLogic\Clingies.ApplicationLogic.csproj" />
     <ProjectReference Include="..\Clingies.Domain\Clingies.Domain.csproj" />
     <ProjectReference Include="..\Clingies.Infrastructure\Clingies.Infrastructure.csproj" />

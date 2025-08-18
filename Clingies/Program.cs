@@ -30,13 +30,13 @@ internal sealed class Program
         {
             Log.Information("Application started");
             var services = ConfigureServices();
-            var mode = args[0]; // TO BE OBTAINED FROM SETTINGS?
+            var mode = (args.Length > 0 ? args[0] : null) ?? "gtk"; // TO BE OBTAINED FROM SETTINGS?
 
             IFrontendHost host = mode switch
             {
                 "gtk" => new GtkFrontendHost(),
                 "avalonia" => new AvaloniaFrontendHost(),
-                _ => new AvaloniaFrontendHost()
+                _ => new GtkFrontendHost()
             };
 
             host.Run(services, args);
