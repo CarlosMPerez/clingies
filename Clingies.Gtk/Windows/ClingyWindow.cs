@@ -1,6 +1,10 @@
 using System;
+using Clingies.ApplicationLogic.CustomEventArgs;
+using Clingies.ApplicationLogic.Interfaces;
 using Clingies.ApplicationLogic.Services;
 using Clingies.Domain.Models;
+using Clingies.Gtk.Factories;
+using Clingies.Gtk.Utils;
 using Gtk;
 
 namespace Clingies.Gtk.Windows
@@ -17,18 +21,33 @@ namespace Clingies.Gtk.Windows
     {
         // --- Dependencies / state ---
         private readonly ClingyDto dto;
-        private readonly ClingyService service;
+        public int ClingyId => dto.Id;
+        private MenuFactory menuFactory;
+        public event EventHandler<int>? CloseRequested;
+        public event EventHandler<PinRequestedEventArgs>? PinRequested;
+        public event EventHandler<TitleChangeRequestedEventArgs>? TitleChangeRequested;
+        public event EventHandler<PositionChangeRequestedEventArgs>? PositionChangeRequested;
+        public event EventHandler<RollRequestedEventArgs>? RollRequested;
+        public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
+        public event EventHandler<UpdateWindowSizeRequestedEventArgs>? UpdateWindowSizeRequested;
+        public event EventHandler<LockRequestedEventArgs>? LockRequested;
+        public IContextCommandProvider? CommandProvider { get; private set; }        
+        private readonly ClingyService _srvClingy;
+        private readonly UtilsService _srvUtils;
         // --- UI elements we need to access after build ---
         private Label titleEntry = default!;
         private TextView contentView = default!;
         private ScrolledWindow scroller = default!;
         private Box titleBar = default!;
 
-        public ClingyWindow(ClingyDto clingyDto, ClingyService srv) : base(clingyDto.Title ?? string.Empty)
+        public ClingyWindow(ClingyDto clingyDto,
+                            ClingyService srvClingy, 
+                            UtilsService srvUtils) : base(clingyDto.Title ?? string.Empty)
         {
 
             dto = clingyDto;
-            service = srv;
+            _srvClingy = srvClingy;
+            _srvUtils = srvUtils;
 
             ApplyWindowChrome();
             InitializeGeometryFromDto(dto);
@@ -165,12 +184,6 @@ namespace Clingies.Gtk.Windows
         /// </summary>
         private Button CreateImageButton(string name, string assetRelativePath, EventHandler onClick)
         {
-            var path = System.IO.Path.Combine(AppContext.BaseDirectory, assetRelativePath);
-            if (!System.IO.File.Exists(path))
-                throw new System.IO.FileNotFoundException($"Close button asset not found: {path}");
-
-            var pixbuf = new Gdk.Pixbuf(path, 12, 12, true); // consider caching or scaling if you ship multiple DPI sizes
-            var img = new Image(pixbuf);
 
             var btn = new Button
             {
@@ -178,7 +191,7 @@ namespace Clingies.Gtk.Windows
                 Relief = ReliefStyle.None,
                 CanFocus = false,
                 // In GTK3, Button.Content = img is not a thing; use the Image property
-                Image = img
+                Image = _srvUtils.CreateImageForButton(assetRelativePath, 12)
             };
 
             // Tighten intrinsic size (prevents extra padding from some themes)
@@ -229,7 +242,7 @@ namespace Clingies.Gtk.Windows
             };
 
             // Persist on close
-            DeleteEvent += (_, __) => service.Update(dto);
+            DeleteEvent += (_, __) => _srvClingy.Update(dto);
         }
 
         // ---------------------------

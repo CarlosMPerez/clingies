@@ -2,6 +2,8 @@ using Gtk;
 
 namespace Clingies.Gtk.Windows
 {
+    //TODO - Refactor so each component has its own CssProvider, or so the provider returns different CSS
+    //for different components
     public class ClingyCssProvider : CssProvider
     {
         public ClingyCssProvider()

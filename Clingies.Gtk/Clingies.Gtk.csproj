@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <LangVersion>9.0</LangVersion>
     <OutputType>Library</OutputType>
   </PropertyGroup>
 
@@ -21,4 +20,7 @@
     <ProjectReference Include="..\Clingies.Infrastructure\Clingies.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Ayatana.AppIndicator3" />
+  </ItemGroup>
 </Project>

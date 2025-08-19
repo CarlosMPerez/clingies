@@ -1,17 +1,17 @@
-﻿using Avalonia;
-using System;
+﻿using System;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Clingies.ApplicationLogic.Services;
 using Clingies.Domain.Interfaces;
-using Clingies.Avalonia.Factories;
 using Clingies.Infrastructure.Data;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.ApplicationLogic.Providers;
 using Clingies.Gtk;
-using Clingies.Avalonia;
-using Clingies.Avalonia.Services;
+using Clingies.Gtk.Utils;
+using Clingies.Gtk.Factories;
+using Clingies.Infrastructure.Migrations;
+using Gtk;
 
 namespace Clingies;
 
@@ -29,18 +29,17 @@ internal sealed class Program
         try
         {
             Log.Information("Application started");
-            var services = ConfigureServices();
-            var mode = (args.Length > 0 ? args[0] : null) ?? "gtk"; // TO BE OBTAINED FROM SETTINGS?
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            var sp = services.BuildServiceProvider();
 
-            IFrontendHost host = mode switch
-            {
-                "gtk" => new GtkFrontendHost(),
-                "avalonia" => new AvaloniaFrontendHost(),
-                _ => new GtkFrontendHost()
-            };
+            RunMigrations(sp);
 
-            host.Run(services, args);
-
+            Application.Init();
+            GtkFrontendHost host = new GtkFrontendHost();
+            host.Run(sp.GetRequiredService<ClingyWindowFactory>(),
+                sp.GetRequiredService<MenuFactory>());
+            Application.Run();
         }
         catch (Exception ex)
         {
@@ -53,11 +52,10 @@ internal sealed class Program
         }
     }
 
-    private static IServiceProvider ConfigureServices()
+    private static void ConfigureServices(ServiceCollection services)
     {
         try
         {
-            var services = new ServiceCollection();
             // TODO: Change this for a configuration file so user can decide where the db is
             var dbPath = Path.Combine(Environment
                     .GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -72,15 +70,13 @@ internal sealed class Program
             services.AddSingleton<IMenuRepository, MenuRepository>();
             services.AddSingleton<IIconPathRepository, IconPathRepository>();
             services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
-            services.AddSingleton<MenuFactory>();
+            //services.AddSingleton<MenuFactory>();
             services.AddSingleton<ClingyWindowFactory>();
             services.AddSingleton<ClingyService>();
-            services.AddSingleton(sp => (ITrayCommandController)Application.Current!);
+            //services.AddSingleton(sp => (ITrayCommandController)Application.Current!);
             services.AddSingleton<Func<IContextCommandController, IContextCommandProvider>>(sp =>
                                     controller => new ContextCommandProvider(controller));
             services.AddSingleton<UtilsService>();
-
-            return services.BuildServiceProvider();
         }
         catch (Exception ex)
         {
@@ -88,5 +84,22 @@ internal sealed class Program
             throw;
         }
     }
+
+    private static void RunMigrations(IServiceProvider sp)
+    {
+        var logger = sp.GetRequiredService<IClingiesLogger>();
+        logger.Info("Running migrations");
+
+        var dbPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "Clingies", "clingies.db");
+
+        Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
+
+        var migrator = new MigrationRunnerService(dbPath);
+        migrator.MigrateUp();
+
+        logger.Info("Migrations done");
+    }    
 }
 
