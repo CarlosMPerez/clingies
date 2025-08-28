@@ -20,7 +20,4 @@
     <ProjectReference Include="..\Clingies.Infrastructure\Clingies.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Ayatana.AppIndicator3" />
-  </ItemGroup>
 </Project>

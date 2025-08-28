@@ -4,7 +4,6 @@ namespace Clingies.ApplicationLogic.Interfaces;
 public interface ITrayCommandController
 {
     void CreateNewClingy();
-    void CreateNewStack();
     void RollUpAllClingies();
     void RollDownAllClingies();
     void PinAllClingies();

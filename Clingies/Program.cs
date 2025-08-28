@@ -36,9 +36,12 @@ internal sealed class Program
             RunMigrations(sp);
 
             Application.Init();
-            GtkFrontendHost host = new GtkFrontendHost();
-            host.Run(sp.GetRequiredService<ClingyWindowFactory>(),
+            GtkFrontendHost host = new GtkFrontendHost(
+                sp.GetRequiredService<IClingiesLogger>(),
+                sp.GetRequiredService<IconPathRepository>(),
+                sp.GetRequiredService<ClingyWindowFactory>(),
                 sp.GetRequiredService<MenuFactory>());
+            host.Run();
             Application.Run();
         }
         catch (Exception ex)
@@ -73,6 +76,7 @@ internal sealed class Program
             //services.AddSingleton<MenuFactory>();
             services.AddSingleton<ClingyWindowFactory>();
             services.AddSingleton<ClingyService>();
+            services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
             //services.AddSingleton(sp => (ITrayCommandController)Application.Current!);
             services.AddSingleton<Func<IContextCommandController, IContextCommandProvider>>(sp =>
                                     controller => new ContextCommandProvider(controller));

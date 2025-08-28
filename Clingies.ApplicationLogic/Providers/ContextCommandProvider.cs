@@ -7,7 +7,6 @@ public class ContextCommandProvider : IContextCommandProvider
 {
     private IContextCommandController _controller;
     public ICommand SleepCommand { get; }
-    public ICommand AttachCommand { get; }
     public ICommand BuildStackMenuCommand { get; }
     public ICommand ShowAlarmWindowCommand { get; }
     public ICommand ShowChangeTitleDialogCommand { get; }
@@ -20,8 +19,6 @@ public class ContextCommandProvider : IContextCommandProvider
     {
         _controller = controller ?? throw new ArgumentNullException(nameof(controller));
         SleepCommand = new RelayCommand(_controller.SleepClingy);
-        AttachCommand = new RelayCommand(_controller.AttachClingy);
-        BuildStackMenuCommand = new RelayCommand(_controller.BuildStackMenu);
         ShowAlarmWindowCommand = new RelayCommand(_controller.ShowAlarmWindow);
         ShowChangeTitleDialogCommand = new RelayCommand(_controller.ShowChangeTitleDialog);
         ShowColorWindowCommand = new RelayCommand(_controller.ShowColorWindow);

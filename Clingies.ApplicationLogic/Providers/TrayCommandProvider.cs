@@ -7,7 +7,6 @@ namespace Clingies.ApplicationLogic.Providers;
 public class TrayCommandProvider : ITrayCommandProvider
 {
     public ICommand NewCommand { get; }
-    public ICommand NewStackCommand { get; }
     public ICommand RolledUpCommand { get; }
     public ICommand RolledDownCommand { get; }
     public ICommand PinnedCommand { get; }
@@ -25,7 +24,6 @@ public class TrayCommandProvider : ITrayCommandProvider
     public TrayCommandProvider(ITrayCommandController controller)
     {
         NewCommand = new RelayCommand(controller.CreateNewClingy);
-        NewStackCommand = new RelayCommand(controller.CreateNewStack);
         RolledUpCommand = new RelayCommand(controller.RollUpAllClingies);
         RolledDownCommand = new RelayCommand(controller.RollDownAllClingies);
         PinnedCommand = new RelayCommand(controller.PinAllClingies);

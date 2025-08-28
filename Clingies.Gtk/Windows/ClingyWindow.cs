@@ -17,7 +17,7 @@ namespace Clingies.Gtk.Windows
     /// - Image-based Close button (from Assets/clingy_close.png)
     /// - Persists geometry and content via injected service
     /// </summary>
-    public sealed class ClingyWindow : Window
+    public sealed class ClingyWindow : Window, IContextCommandController
     {
         // --- Dependencies / state ---
         private readonly ClingyDto dto;
@@ -31,7 +31,7 @@ namespace Clingies.Gtk.Windows
         public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
         public event EventHandler<UpdateWindowSizeRequestedEventArgs>? UpdateWindowSizeRequested;
         public event EventHandler<LockRequestedEventArgs>? LockRequested;
-        public IContextCommandProvider? CommandProvider { get; private set; }        
+        public IContextCommandProvider? CommandProvider { get; private set; }
         private readonly ClingyService _srvClingy;
         private readonly UtilsService _srvUtils;
         // --- UI elements we need to access after build ---
@@ -41,7 +41,7 @@ namespace Clingies.Gtk.Windows
         private Box titleBar = default!;
 
         public ClingyWindow(ClingyDto clingyDto,
-                            ClingyService srvClingy, 
+                            ClingyService srvClingy,
                             UtilsService srvUtils) : base(clingyDto.Title ?? string.Empty)
         {
 
@@ -91,6 +91,11 @@ namespace Clingies.Gtk.Windows
             DefaultWidth = (int)Math.Max(200, dto.Width);
             DefaultHeight = (int)Math.Max(120, dto.Height);
             Move((int)dto.PositionX, (int)dto.PositionY);
+        }
+
+        public void SetContextCommandProvider(IContextCommandProvider provider)
+        {
+            CommandProvider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
         // ---------------------------
@@ -254,6 +259,41 @@ namespace Clingies.Gtk.Windows
         }
 
         private void ToggleLock()
+        {
+            Console.WriteLine("METHOD NOT IMPLEMENTED");
+        }
+
+        public void SleepClingy()
+        {
+            Console.WriteLine("METHOD NOT IMPLEMENTED");
+        }
+
+        public void ShowAlarmWindow()
+        {
+            Console.WriteLine("METHOD NOT IMPLEMENTED");
+        }
+
+        public void ShowChangeTitleDialog()
+        {
+            Console.WriteLine("METHOD NOT IMPLEMENTED");
+        }
+
+        public void ShowColorWindow()
+        {
+            Console.WriteLine("METHOD NOT IMPLEMENTED");
+        }
+
+        public void LockClingy()
+        {
+            Console.WriteLine("METHOD NOT IMPLEMENTED");
+        }
+
+        public void UnlockClingy()
+        {
+            Console.WriteLine("METHOD NOT IMPLEMENTED");
+        }
+
+        public void ShowPropertiesWindow()
         {
             Console.WriteLine("METHOD NOT IMPLEMENTED");
         }

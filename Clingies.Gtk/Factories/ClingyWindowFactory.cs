@@ -7,24 +7,28 @@ using Clingies.ApplicationLogic.Services;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
 using Clingies.Gtk.Windows;
-using Microsoft.Extensions.DependencyInjection;
+using Clingies.Gtk.Utils;
 
 namespace Clingies.Gtk.Factories;
 
-public class ClingyWindowFactory(IServiceProvider services,
+public class ClingyWindowFactory(ClingyService clingyService, 
+                            UtilsService utilsService,
+                            IClingiesLogger loggerService,
                             Func<IContextCommandController, IContextCommandProvider> providerFactory)
 {
     private readonly List<ClingyDto> _activeClingies = new List<ClingyDto>();
     private readonly List<ClingyWindow> _activeWindows = new List<ClingyWindow>();
-    private readonly ClingyService srvClingy = services.GetRequiredService<ClingyService>();
-    private readonly IClingiesLogger srvLogger = services.GetRequiredService<IClingiesLogger>();
-    public void CreateNewWindow(double posX, double posY)
+    private readonly ClingyService _srvClingy = clingyService;
+    private readonly IClingiesLogger _srvLogger = loggerService;
+    private readonly UtilsService _srvUtils = utilsService;
+
+    public void CreateNewWindow()
     {
         try
         {
             var clingy = new ClingyDto();
-            clingy.Id = srvClingy.Create(clingy);
-            var window = new ClingyWindow(clingy, services);
+            clingy.Id = _srvClingy.Create(clingy);
+            var window = new ClingyWindow(clingy, _srvClingy, _srvUtils);
             var provider = providerFactory(window);
             window.SetContextCommandProvider(provider);
             SubscribeWindowToEvents(window);
@@ -34,7 +38,7 @@ public class ClingyWindowFactory(IServiceProvider services,
         }
         catch (Exception ex)
         {
-            srvLogger.Error(ex, "Error creating new Clingy window");
+            _srvLogger.Error(ex, "Error creating new Clingy window");
             throw;
         }
     }
@@ -43,9 +47,9 @@ public class ClingyWindowFactory(IServiceProvider services,
     {
         try
         {
-            foreach (var clingy in srvClingy.GetAllActive())
+            foreach (var clingy in _srvClingy.GetAllActive())
             {
-                var window = new ClingyWindow(clingy, services);
+                var window = new ClingyWindow(clingy, _srvClingy, _srvUtils);
                 var provider = providerFactory(window);
                 window.SetContextCommandProvider(provider);
                 SubscribeWindowToEvents(window);
@@ -56,7 +60,7 @@ public class ClingyWindowFactory(IServiceProvider services,
         }
         catch (Exception ex)
         {
-            srvLogger.Error(ex, "Error loading all active Clingies");
+            _srvLogger.Error(ex, "Error loading all active Clingies");
             throw;
         }
     }
@@ -79,14 +83,14 @@ public class ClingyWindowFactory(IServiceProvider services,
         {
             foreach (var window in _activeWindows)
             {
-                window.Topmost = true;
+                //window.Topmost = true;
                 window.Activate();
-                window.Topmost = false;
+                //window.Topmost = false;
             }
         }
         catch (Exception ex)
         {
-            srvLogger.Error(ex, "Error rendering all active Clingies");
+            _srvLogger.Error(ex, "Error rendering all active Clingies");
             throw;
         }
     }
@@ -101,11 +105,11 @@ public class ClingyWindowFactory(IServiceProvider services,
             _activeWindows.Remove(window);
             _activeClingies.Remove(clingy);
             window.Close();
-            srvClingy.SoftDelete(id);
+            _srvClingy.SoftDelete(id);
         }
         catch (Exception ex)
         {
-            srvLogger.Error(ex, "Error at HandleCloseRequested");
+            _srvLogger.Error(ex, "Error at HandleCloseRequested");
             throw;
         }
     }
@@ -116,13 +120,13 @@ public class ClingyWindowFactory(IServiceProvider services,
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            window.Topmost = args.IsPinned;
+            //window.Topmost = args.IsPinned;
             clingy.IsPinned = args.IsPinned;
-            srvClingy.Update(clingy);
+            _srvClingy.Update(clingy);
         }
         catch (Exception ex)
         {
-            srvLogger.Error(ex, "Error at HandlePinRequested");
+            _srvLogger.Error(ex, "Error at HandlePinRequested");
             throw;
         }
     }
@@ -133,14 +137,14 @@ public class ClingyWindowFactory(IServiceProvider services,
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            window.ClingyTitleBar.IsLocked = args.IsLocked;
-            window.ClingyBody.IsLocked = args.IsLocked;
+            //window.ClingyTitleBar.IsLocked = args.IsLocked;
+            //window.ClingyBody.IsLocked = args.IsLocked;
             clingy.IsLocked = args.IsLocked;
-            srvClingy.Update(clingy);
+            _srvClingy.Update(clingy);
         }
         catch (Exception ex)
         {
-            srvLogger.Error(ex, "Error at HandleLockRequested");
+            _srvLogger.Error(ex, "Error at HandleLockRequested");
             throw;
         }
     }
@@ -152,14 +156,14 @@ public class ClingyWindowFactory(IServiceProvider services,
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            window.Position = new PixelPoint(args.PositionX, args.PositionY);
+            //window.Position = new PixelPoint(args.PositionX, args.PositionY);
             clingy.PositionX = args.PositionX;
             clingy.PositionY = args.PositionY;
-            srvClingy.Update(clingy);
+            _srvClingy.Update(clingy);
         }
         catch (Exception ex)
         {
-            srvLogger.Error(ex, "Error at HandlePositionChangeRequested");
+            _srvLogger.Error(ex, "Error at HandlePositionChangeRequested");
             throw;
         }
     }
@@ -171,11 +175,11 @@ public class ClingyWindowFactory(IServiceProvider services,
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             clingy.Content = string.IsNullOrEmpty(args.Content) ? "" : args.Content;
-            srvClingy.Update(clingy);
+            _srvClingy.Update(clingy);
         }
         catch (Exception ex)
         {
-            srvLogger.Error(ex, "Error at HandleContentChangeRequested");
+            _srvLogger.Error(ex, "Error at HandleContentChangeRequested");
             throw;
         }
     }
@@ -187,11 +191,11 @@ public class ClingyWindowFactory(IServiceProvider services,
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             clingy.Title = args.NewTitle;
-            srvClingy.Update(clingy);
+            _srvClingy.Update(clingy);
         }
         catch (Exception ex)
         {
-            srvLogger.Error(ex, "Error at HandleTitleChangeRequested");
+            _srvLogger.Error(ex, "Error at HandleTitleChangeRequested");
             throw;
         }
     }
@@ -202,15 +206,15 @@ public class ClingyWindowFactory(IServiceProvider services,
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            window.Width = args.Width;
-            window.Height = args.Height;
+            //window.Width = args.Width;
+            //window.Height = args.Height;
             clingy.Width = args.Width;
             clingy.Height = args.Height;
-            srvClingy.Update(clingy);
+            _srvClingy.Update(clingy);
         }
         catch (Exception ex)
         {
-            srvLogger.Error(ex, "Error at HandleUpdateWindowSizeRequested");
+            _srvLogger.Error(ex, "Error at HandleUpdateWindowSizeRequested");
             throw;
         }
     }
@@ -221,13 +225,13 @@ public class ClingyWindowFactory(IServiceProvider services,
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            window.ClingyBody.IsRolled = args.IsRolled;
+            //window.ClingyBody.IsRolled = args.IsRolled;
             clingy.IsRolled = args.IsRolled;
-            srvClingy.Update(clingy);
+            _srvClingy.Update(clingy);
         }
         catch (Exception ex)
         {
-            srvLogger.Error(ex, "Error at HandleRollRequested");
+            _srvLogger.Error(ex, "Error at HandleRollRequested");
             throw;
         }
     }
