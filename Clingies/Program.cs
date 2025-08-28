@@ -38,9 +38,10 @@ internal sealed class Program
             Application.Init();
             GtkFrontendHost host = new GtkFrontendHost(
                 sp.GetRequiredService<IClingiesLogger>(),
-                sp.GetRequiredService<IconPathRepository>(),
+                sp.GetRequiredService<IIconPathRepository>(),
                 sp.GetRequiredService<ClingyWindowFactory>(),
-                sp.GetRequiredService<MenuFactory>());
+                sp.GetRequiredService<MenuFactory>(), 
+                sp.GetRequiredService<UtilsService>());
             host.Run();
             Application.Run();
         }
@@ -73,11 +74,11 @@ internal sealed class Program
             services.AddSingleton<IMenuRepository, MenuRepository>();
             services.AddSingleton<IIconPathRepository, IconPathRepository>();
             services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
-            //services.AddSingleton<MenuFactory>();
+            services.AddSingleton<MenuFactory>();
             services.AddSingleton<ClingyWindowFactory>();
             services.AddSingleton<ClingyService>();
             services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
-            //services.AddSingleton(sp => (ITrayCommandController)Application.Current!);
+            services.AddSingleton<ITrayCommandController, TrayCommandController>();
             services.AddSingleton<Func<IContextCommandController, IContextCommandProvider>>(sp =>
                                     controller => new ContextCommandProvider(controller));
             services.AddSingleton<UtilsService>();
@@ -104,6 +105,6 @@ internal sealed class Program
         migrator.MigrateUp();
 
         logger.Info("Migrations done");
-    }    
+    }
 }
 

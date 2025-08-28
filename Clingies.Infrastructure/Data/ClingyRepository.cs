@@ -16,7 +16,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             List<Clingy> clingies = new List<Clingy>();
             var sql = """
                 SELECT Id, Title, Content, PositionX, PositionY, Width, Height, 
-                    IsPinned, IsRolled, IsLocked, IsStanding, IsDeleted, CreatedAt, ModifiedAt
+                    IsPinned, IsRolled, IsLocked, IsStanding, IsDeleted, CreatedAt
                 FROM Clingies
                 WHERE IsDeleted = 0
             """;
@@ -38,7 +38,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             var parms = new Dictionary<string, object> { { "@Id", id } };
             var sql = """
                 SELECT Id, Title, Content, PositionX, PositionY, Width, Height, 
-                    IsPinned, IsRolled, IsLocked, IsStanding, IsDeleted, CreatedAt, ModifiedAt
+                    IsPinned, IsRolled, IsLocked, IsStanding, IsDeleted, CreatedAt
                 FROM Clingies
                 WHERE Id = @Id
             """;
@@ -60,9 +60,9 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             var sql = """
                 INSERT INTO Clingies (Title, Content, PositionX, PositionY, Width, Height, 
-                    IsPinned, IsRolled, IsLocked, IsStanding, IsDeleted, CreatedAt, ModifiedAt)
+                    IsPinned, IsRolled, IsLocked, IsStanding, IsDeleted, CreatedAt)
                 VALUES (@Title, @Content, @PositionX, @PositionY, @Width, @Height, 
-                    @IsPinned, @IsRolled, @IsLocked, @IsStanding, @IsDeleted, @CreatedAt, @ModifiedAt);
+                    @IsPinned, @IsRolled, @IsLocked, @IsStanding, @IsDeleted, @CreatedAt);
                 SELECT last_insert_rowid();
                 """;
 
@@ -96,8 +96,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     IsLocked = @IsLocked, 
                     IsStanding = @IsStanding, 
                     IsDeleted = @IsDeleted, 
-                    CreatedAt = @CreatedAt, 
-                    ModifiedAt = @ModifiedAt
+                    CreatedAt = @CreatedAt
                 WHERE Id = @Id
                 """;
                 Conn.Execute(sql, clingy);

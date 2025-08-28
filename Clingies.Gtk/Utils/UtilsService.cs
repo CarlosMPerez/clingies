@@ -18,7 +18,7 @@ namespace Clingies.Gtk.Utils
             _iconRepo = iconRepo;
         }
 
-        private string? LoadPathFromDb(string iconId, bool isDarkPath = true)
+        public string? LoadPathFromDb(string iconId, bool isDarkPath = true)
         {
             string? assetPath = isDarkPath ? _iconRepo.GetDarkPath(iconId) : _iconRepo.GetLightPath(iconId);
             if (string.IsNullOrEmpty(assetPath))

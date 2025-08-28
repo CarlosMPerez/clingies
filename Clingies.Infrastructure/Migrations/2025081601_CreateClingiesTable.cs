@@ -22,8 +22,7 @@ public class _2025081601_CreateClingiesTable : Migration
                 .WithColumn("IsLocked").AsBoolean().NotNullable().WithDefaultValue(false)
                 .WithColumn("IsStanding").AsBoolean().NotNullable().WithDefaultValue(false)
                 .WithColumn("IsDeleted").AsBoolean().NotNullable()
-                .WithColumn("CreatedAt").AsDateTime().NotNullable()
-                .WithColumn("ModifiedAt").AsDateTime().Nullable();
+                .WithColumn("CreatedAt").AsDateTime().NotNullable();
         }
     }
 

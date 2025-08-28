@@ -5,6 +5,7 @@ using Clingies.Gtk.Windows;
 using Clingies.Gtk.Factories;
 using Clingies.Domain.Interfaces;
 using Clingies.Gtk.Utils;
+using Clingies.ApplicationLogic.Interfaces;
 
 namespace Clingies.Gtk
 {
@@ -15,13 +16,17 @@ namespace Clingies.Gtk
         private readonly ClingyWindowFactory _windowFactory;
         private readonly MenuFactory _menuFactory;
 
+        private readonly UtilsService _srvUtils;
+
         public GtkFrontendHost(IClingiesLogger logger, IIconPathRepository iconRepo,
-                        ClingyWindowFactory windowFactory, MenuFactory menuFactory)
+                        ClingyWindowFactory windowFactory, MenuFactory menuFactory,
+                        UtilsService utilsService)
         {
             _logger = logger;
             _iconRepo = iconRepo;
             _windowFactory = windowFactory;
             _menuFactory = menuFactory;
+            _srvUtils = utilsService;
         }
 
         public int Run()
@@ -37,7 +42,7 @@ namespace Clingies.Gtk
 
         private void DrawTrayIconAndMenu()
         {
-            var iconPath = _iconRepo.GetLightPath("clingy_icon");
+            var iconPath = _srvUtils.LoadPathFromDb("clingy_icon", false);
             if (string.IsNullOrEmpty(iconPath))
             {
                 _logger.Error(new Exception(), "Could not find main tray icon in DB");
@@ -93,29 +98,6 @@ namespace Clingies.Gtk
         //     var cx = x + (w - defW) / 2;
         //     var cy = y + (h - defH) / 2;
         //     windowFactory.CreateNewWindow(cx, cy);
-        // }
-
-        public void ShowSettings() => Console.WriteLine("SETTINGS NOT IMPLEMENTED");
-        public void ExitApp() => Application.Quit();
-        public void CreateNewStack() => Console.WriteLine("NEW STACK NOT IMPLEMENTED");
-        public void RollUpAllClingies() => Console.WriteLine("ROLL UP ALL NOT IMPLEMENTED");
-        public void RollDownAllClingies() => Console.WriteLine("ROLL DOWN ALL NOT IMPLEMENTED");
-        public void PinAllClingies() => Console.WriteLine("PIN ALL NOT IMPLEMENTED");
-        public void UnpinAllClingies() => Console.WriteLine("UNPIN ALL NOT IMPLEMENTED");
-        public void LockAllClingies() => Console.WriteLine("LOCK ALL NOT IMPLEMENTED");
-        public void UnlockAllClingies() => Console.WriteLine("UNLOCK ALL NOT IMPLEMENTED");
-        public void ShowAllClingies() => Console.WriteLine("SHOW ALL NOT IMPLEMENTED");
-        public void HideAllClingies() => Console.WriteLine("HIDE ALL NOT IMPLEMENTED");
-        public void ShowManageClingiesWindow() => Console.WriteLine("MANAGE CLINGIES NOT IMPLEMENTED");
-        public void ShowHelpWindow() => Console.WriteLine("HELP WINDOW NOT IMPLEMENTED");
-        public void ShowAboutWindow() => Console.WriteLine("ABOUT WINDOW NOT IMPLEMENTED");
-
-        // private static (int X, int Y, int Width, int Height) GetDesktopWorkingArea()
-        // {
-        //     var display = Display.Default;
-        //     var monitor = display?.GetPrimaryMonitor() ?? display?.GetMonitor(0);
-        //     monitor.GetGeometry(out var rect);
-        //     return (rect.X, rect.Y, rect.Width, rect.Height);
         // }
     }
 }
