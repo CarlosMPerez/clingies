@@ -50,6 +50,7 @@ namespace Clingies.Gtk
             }
 
             var trayMenu = _menuFactory.BuildTrayMenu();
+            trayMenu.ShowAll();
 
             try
             {
@@ -67,7 +68,7 @@ namespace Clingies.Gtk
                 // putting a top menu item like “Show All” OR add a global accelerator.
                 // If you want a left-click action specifically, keep a fallback StatusIcon for Cinnamon:
 
-                AttachOptionalStatusIconFallback(iconPath, trayMenu);
+                //AttachOptionalStatusIconFallback(iconPath, trayMenu);
             }
             catch (DllNotFoundException)
             {

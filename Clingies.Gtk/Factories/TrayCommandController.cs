@@ -1,6 +1,7 @@
 using System;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Interfaces;
+using Gtk;
 
 namespace Clingies.Gtk.Factories;
 
@@ -17,7 +18,7 @@ public class TrayCommandController : ITrayCommandController
     }
 
     public void ShowSettings() => Console.WriteLine("SETTINGS NOT IMPLEMENTED");
-    public void ExitApp() => Console.WriteLine("EXIT NOT IMPLEMENTED");
+    public void ExitApp() => Application.Quit();
     public void RollUpAllClingies() => Console.WriteLine("ROLL UP ALL NOT IMPLEMENTED");
     public void RollDownAllClingies() => Console.WriteLine("ROLL DOWN ALL NOT IMPLEMENTED");
     public void PinAllClingies() => Console.WriteLine("PIN ALL NOT IMPLEMENTED");
