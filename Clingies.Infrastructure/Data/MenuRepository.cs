@@ -30,7 +30,7 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
         }
     }
 
-    public List<TrayMenuItem> GetChildrenByParentId(string parentId)
+    public List<TrayMenuItem> GetChildren(string parentId)
     {
         try
         {

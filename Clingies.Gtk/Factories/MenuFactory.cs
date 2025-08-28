@@ -6,14 +6,15 @@ using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
 using Clingies.Gtk.Utils;
+using Clingies.ApplicationLogic.Services;
 
 namespace Clingies.Gtk.Factories;
-// TODO : Implement MenuService and MenuDtos : FRONT END SHOULD NOT TALK TO DB!!!!
-public class MenuFactory(IMenuRepository repo,
-                            IClingiesLogger logger,
-                            ITrayCommandProvider trayCommandProvider,
-                            Func<IContextCommandController, IContextCommandProvider> contextProviderFactory,
-                            UtilsService utils)
+
+public class MenuFactory(MenuService menuService,
+                        IClingiesLogger logger,
+                        ITrayCommandProvider trayCommandProvider,
+                        Func<IContextCommandController, IContextCommandProvider> contextProviderFactory,
+                        UtilsService utils)
 
 {
     private IContextCommandProvider? _contextCommandProvider;
@@ -32,20 +33,20 @@ public class MenuFactory(IMenuRepository repo,
     {
         var menu = new Menu();
 
-        var topLevelItems = repo.GetAllParents("clingy")
+        var topLevelItems = menuService.GetAllParents("clingy")
             .OrderBy(x => x.SortOrder)
             .ToList();
 
         foreach (var item in topLevelItems)
             if (item.Separator) menu.Append(new SeparatorMenuItem());
-            else menu.Append(BuildContextMenuItemRecursive(item, repo));
+            else menu.Append(BuildContextMenuItemRecursive(item));
 
         return menu;
     }
 
-    private MenuItem BuildContextMenuItemRecursive(TrayMenuItem item, IMenuRepository repo)
+    private MenuItem BuildContextMenuItemRecursive(TrayMenuItemDto item)
     {
-        var children = repo.GetChildrenByParentId(item.Id)
+        var children = menuService.GetChildren(item.Id)
                         .OrderBy(c => c.SortOrder)
                         .ToList();
 
@@ -56,7 +57,7 @@ public class MenuFactory(IMenuRepository repo,
 
             var sub = new Menu();
             foreach (var child in children)
-                sub.Append(BuildContextMenuItemRecursive(child, repo));
+                sub.Append(BuildContextMenuItemRecursive(child));
 
             parent.Submenu = sub;
             return parent;
@@ -88,22 +89,22 @@ public class MenuFactory(IMenuRepository repo,
     {
         var menu = new Menu();
 
-        var topLevelItems = repo.GetAllParents("tray")
+        var topLevelItems = menuService.GetAllParents("tray")
             .OrderBy(x => x.SortOrder)
             .ToList();
 
         foreach (var item in topLevelItems)
         {
             if (item.Separator) menu.Append(new SeparatorMenuItem());
-            else menu.Append(BuildGtkTrayMenuItemRecursive(item, repo));
+            else menu.Append(BuildGtkTrayMenuItemRecursive(item));
         }
 
         return menu;
     }
 
-    private MenuItem BuildGtkTrayMenuItemRecursive(TrayMenuItem item, IMenuRepository repo)
+    private MenuItem BuildGtkTrayMenuItemRecursive(TrayMenuItemDto item)
     {
-        var children = repo.GetChildrenByParentId(item.Id)
+        var children = menuService.GetChildren(item.Id)
                         .OrderBy(c => c.SortOrder)
                         .ToList();
 
@@ -114,7 +115,7 @@ public class MenuFactory(IMenuRepository repo,
 
             var sub = new Menu();
             foreach (var child in children)
-                sub.Append(BuildGtkTrayMenuItemRecursive(child, repo));
+                sub.Append(BuildGtkTrayMenuItemRecursive(child));
 
             parent.Submenu = sub;
             return parent;
@@ -172,7 +173,7 @@ public class MenuFactory(IMenuRepository repo,
         "properties" => _contextCommandProvider!.ShowPropertiesWindowCommand,
         _ => null
     };
-    
+
     private static MenuItem NewMenuItemWithOptionalIcon(string text, string id, UtilsService utils)
     {
         // Plain label first (keeps mnemonics/ellipsizing sane)
@@ -189,5 +190,5 @@ public class MenuFactory(IMenuRepository repo,
         hbox.PackStart(label, true, true, 0);
 
         return new MenuItem { Child = hbox };
-    }    
+    }
 }

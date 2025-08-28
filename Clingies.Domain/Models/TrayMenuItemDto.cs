@@ -2,7 +2,7 @@ using System;
 
 namespace Clingies.Domain.Models;
 
-public class TrayMenuItem
+public class TrayMenuItemDto
 {
     public string Id { get; set; } = default!;
     public string? Label { get; set; }
@@ -12,12 +12,9 @@ public class TrayMenuItem
     public bool Separator { get; set; }
     public string? ParentId { get; set; }
     public int SortOrder { get; set; }
-    // Populated later:
-    public List<TrayMenuItem> Children { get; } = new();
-
-    public TrayMenuItemDto ToDto()
+    public TrayMenuItem ToEntity()
     {
-        return new TrayMenuItemDto()
+        return new TrayMenuItem()
         {
             Id = this.Id,
             Label = this.Label,

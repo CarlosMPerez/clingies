@@ -7,7 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Clingies.Gtk.Utils
 {
-    // TODO : Implement MenuService and MenuDtos : FRONT END SHOULD NOT TALK TO DB!!!!
     public class UtilsService
     {
         private readonly IClingiesLogger _logger;
@@ -18,9 +17,10 @@ namespace Clingies.Gtk.Utils
             _iconRepo = iconRepo;
         }
 
-        public string? LoadPathFromDb(string iconId, bool isDarkPath = true)
+        public string? LoadPathFromDb(string iconId, bool isDarkPath = false)
         {
             string? assetPath = isDarkPath ? _iconRepo.GetDarkPath(iconId) : _iconRepo.GetLightPath(iconId);
+            Console.WriteLine(assetPath);
             if (string.IsNullOrEmpty(assetPath))
             {
                 _logger.Warning($"{iconId} not found in database");
@@ -37,7 +37,7 @@ namespace Clingies.Gtk.Utils
             return path;
         }
 
-        public Image? CreateImageForButton(string iconId, int size, bool isDarkPath = true)
+        public Image? CreateImageForButton(string iconId, int size, bool isDarkPath = false)
         {
             string? path = LoadPathFromDb(iconId, isDarkPath);
             if (path.IsNullOrEmpty()) return null;
@@ -46,7 +46,7 @@ namespace Clingies.Gtk.Utils
         }
 
         // Map your menu item id -> pixbuf (file path, resource, or theme icon)
-        public Pixbuf? LoadPixbuf(string iconId, int size, bool isDarkPath = true)
+        public Pixbuf? LoadPixbuf(string iconId, int size, bool isDarkPath = false)
         {
             string? path = LoadPathFromDb(iconId, isDarkPath);
             if (path.IsNullOrEmpty()) return null;

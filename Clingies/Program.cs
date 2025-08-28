@@ -77,6 +77,7 @@ internal sealed class Program
             services.AddSingleton<MenuFactory>();
             services.AddSingleton<ClingyWindowFactory>();
             services.AddSingleton<ClingyService>();
+            services.AddSingleton<MenuService>();
             services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
             services.AddSingleton<ITrayCommandController, TrayCommandController>();
             services.AddSingleton<Func<IContextCommandController, IContextCommandProvider>>(sp =>
