@@ -37,8 +37,10 @@ namespace Clingies.Gtk.Windows
         // --- UI elements we need to access after build ---
         private Label titleEntry = default!;
         private TextView contentView = default!;
-        private ScrolledWindow scroller = default!;
+        private Overlay body = default!;
         private Box titleBar = default!;
+        private EventBox _rightGrip;
+        private EventBox _leftGrip;
 
         public ClingyWindow(ClingyDto clingyDto,
                             ClingyService srvClingy,
@@ -61,10 +63,28 @@ namespace Clingies.Gtk.Windows
 
             // Build and compose
             titleBar = BuildTitleBar();
-            scroller = BuildBody();
+            body = BuildBody();
+            var rightGrip = ConfigureGrip(false);
+            var leftGrip = ConfigureGrip(true);
+            body.AddOverlay(rightGrip);
+            body.AddOverlay(leftGrip);
+
+            titleBar.Events |= Gdk.EventMask.ButtonPressMask;
+            //Wiring drag and drop
+            titleBar.ButtonPressEvent += (o, args) =>
+            {
+                if (args.Event.Button == 1) // left button
+                {
+                    Console.WriteLine("Button pressed");
+                    BeginMoveDrag((int)args.Event.Button,
+                            (int)args.Event.XRoot,
+                            (int)args.Event.YRoot,
+                            args.Event.Time);
+                }
+            };
 
             root.PackStart(titleBar, false, false, 0);
-            root.PackStart(scroller, true, true, 0);
+            root.PackStart(body, true, true, 0);
             root.ShowAll();
             Add(root);
 
@@ -209,8 +229,9 @@ namespace Clingies.Gtk.Windows
         // ---------------------------
         // Body (content area)
         // ---------------------------
-        private ScrolledWindow BuildBody()
+        private Overlay BuildBody()
         {
+            var overlay = new Overlay();
             var scroller = new ScrolledWindow
             {
                 Name = "clingy-content",
@@ -229,7 +250,8 @@ namespace Clingies.Gtk.Windows
             };
 
             scroller.Add(contentView);
-            return scroller;
+            overlay.Add(scroller);
+            return overlay;
         }
 
         // ---------------------------
@@ -249,6 +271,38 @@ namespace Clingies.Gtk.Windows
 
             // Persist on close
             DeleteEvent += (_, __) => _srvClingy.Update(dto);
+        }
+
+        private EventBox ConfigureGrip(bool isLeftGrip)
+        {
+            EventBox grip = new EventBox { VisibleWindow = false, WidthRequest = 6 };
+            grip.VisibleWindow = false;
+            grip.Events |= Gdk.EventMask.ButtonPressMask | Gdk.EventMask.EnterNotifyMask | Gdk.EventMask.LeaveNotifyMask;
+            grip.Halign = isLeftGrip ? Align.Start : Align.End;
+            grip.Valign = Align.Fill;
+
+            grip.ButtonPressEvent += (o, args) =>
+            {
+                if (args.Event.Button == 1)
+                {
+                    BeginResizeDrag(isLeftGrip ? Gdk.WindowEdge.West : Gdk.WindowEdge.East,
+                    (int)args.Event.Button, (int)args.Event.XRoot, (int)args.Event.YRoot, args.Event.Time);
+                }
+            };
+
+            grip.EnterNotifyEvent += (o, args) =>
+            {
+                var display = Display;
+                using (var cursor = new Gdk.Cursor(display, isLeftGrip ? Gdk.CursorType.LeftSide : Gdk.CursorType.RightSide))
+                    grip.Window.Cursor = cursor;
+            };
+
+            grip.LeaveNotifyEvent += (o, args) =>
+            {
+                grip.Window.Cursor = null;
+            };
+
+            return grip;
         }
 
         // ---------------------------

@@ -11,27 +11,27 @@ namespace Clingies.Gtk.Windows
             var css = @"
             /* Window + base */
             #clingy-window {
-            background: #FFFFB4;            /* note body color */
+                background: #FFFFB4;            /* note body color */
             }
 
             /* Header bar */
             #clingy-title {
-            background: #C9D0D4;            /* grey header */
-            padding: 2px 2px;
-            border: none;
-            box-shadow: none;
-            background-position: center;
+                background: #C9D0D4;            /* grey header */
+                padding: 2px 2px;
+                border: none;
+                box-shadow: none;
+                background-position: center;
             }
 
             /* Title text field in header */
             #clingy-title-label {
-            background: transparent;
-            color: black;                    /* black text on grey */
-            border: none;
-            box-shadow: none;
-            font-family: monospace;
-            font-size: 14px;
-            font-weight: bold;
+                background: transparent;
+                color: black;                    /* black text on grey */
+                border: none;
+                box-shadow: none;
+                font-family: monospace;
+                font-size: 14px;
+                font-weight: bold;
             }
 
             /* Scroller + viewport + textview must ALL be painted yellow */
@@ -40,40 +40,45 @@ namespace Clingies.Gtk.Windows
             #clingy-content-view,
             textview#clingy-content-view text,
             textview#clingy-content-view view {
-            background: #FFFFB4;
-            border: none;
-            box-shadow: none;
+                background: #FFFFB4;
+                border: none;
+                box-shadow: none;
+                color: black;                    /* black text on yellow */
+                border: none;
+                box-shadow: none;
+                font-family: monospace;
+                font-size: 12px;
             }
 
             /* Remove any separators/borders between header and body */
             #clingy-title, 
             #clingy-content {
-            border-top-width: 0;
-            border-left-width: 0;
-            border-right-width: 0;
-            border-bottom-width: 0;
-            border-top: none;
-            border-bottom: none;
+                border-top-width: 0;
+                border-left-width: 0;
+                border-right-width: 0;
+                border-bottom-width: 0;
+                border-top: none;
+                border-bottom: none;
             }
 
             /* Optional: slimmer scrollbars to blend in */
             #clingy-content scrollbar,
             #clingy-content scrollbar slider {
-            background: transparent;
-            border: none;
-            box-shadow: none;
+                background: transparent;
+                border: none;
+                box-shadow: none;
             }
 
             /* Icon buttons (pin/lock/close) */
             #btn-pin, #btn-lock, #btn-close {
-            background: transparent;
-            border: none;
-            box-shadow: none;
-            padding: 0;
-            margin: 0; /* margins are set in code for edge-ness */
+                background: transparent;
+                border: none;
+                box-shadow: none;
+                padding: 0;
+                margin: 0; /* margins are set in code for edge-ness */
             }
             #btn-pin:hover, #btn-lock:hover, #btn-close:hover {
-            background: rgba(0,0,0,0.10);
+                background: rgba(0,0,0,0.10);
             }
             ";
 
