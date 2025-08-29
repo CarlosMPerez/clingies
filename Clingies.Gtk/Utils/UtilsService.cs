@@ -20,7 +20,6 @@ namespace Clingies.Gtk.Utils
         public string? LoadPathFromDb(string iconId, bool isDarkPath = false)
         {
             string? assetPath = isDarkPath ? _iconRepo.GetDarkPath(iconId) : _iconRepo.GetLightPath(iconId);
-            Console.WriteLine(assetPath);
             if (string.IsNullOrEmpty(assetPath))
             {
                 _logger.Warning($"{iconId} not found in database");

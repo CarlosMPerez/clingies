@@ -38,7 +38,6 @@ namespace Clingies.Gtk.Windows
             #clingy-content,
             #clingy-content > viewport,
             #clingy-content-view,
-            textview#clingy-content-view text,
             textview#clingy-content-view view {
                 background: #FFFFB4;
                 border: none;
@@ -48,6 +47,19 @@ namespace Clingies.Gtk.Windows
                 box-shadow: none;
                 font-family: monospace;
                 font-size: 12px;
+            }
+
+            textview#clingy-content-view text {
+                background: #FFFFB4;
+                border: none;
+                box-shadow: none;
+                color: black;                    /* black text on yellow */
+                border: none;
+                box-shadow: none;
+                font-family: monospace;
+                font-size: 12px;
+                caret-color: black;
+                -GtkWidget-cursor-color: black;
             }
 
             /* Remove any separators/borders between header and body */
