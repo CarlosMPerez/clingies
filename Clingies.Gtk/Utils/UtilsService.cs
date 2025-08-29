@@ -37,7 +37,14 @@ namespace Clingies.Gtk.Utils
             return path;
         }
 
-        public Image? CreateImageForButton(string iconId, int size, bool isDarkPath = false)
+        public Image? CreateImageFromPath(string fullPath, int size)
+        {
+            if (fullPath.IsNullOrEmpty()) return null;
+            var pixbuf = new Pixbuf(fullPath, size, size, true); // consider caching or scaling if you ship multiple DPI sizes
+            return new Image(pixbuf);
+        }
+
+        public Image? CreateImageFromDb(string iconId, int size, bool isDarkPath = false)
         {
             string? path = LoadPathFromDb(iconId, isDarkPath);
             if (path.IsNullOrEmpty()) return null;

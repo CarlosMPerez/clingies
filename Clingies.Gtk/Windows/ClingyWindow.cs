@@ -65,6 +65,7 @@ namespace Clingies.Gtk.Windows
 
             root.PackStart(titleBar, false, false, 0);
             root.PackStart(scroller, true, true, 0);
+            root.ShowAll();
             Add(root);
 
             WirePersistenceEvents();
@@ -121,7 +122,7 @@ namespace Clingies.Gtk.Windows
             // PIN BUTTON
             var pinBtn = CreateImageButton(
                 name: "btn-pin",
-                assetRelativePath: System.IO.Path.Combine("Assets", "clingy_unpinned.png"),
+                assetName: "clingy_unpinned.png",
                 onClick: (_, __) => TogglePin() //TODO 
             );
             pinBtn.MarginStart = 2;   // near the left edge
@@ -130,7 +131,7 @@ namespace Clingies.Gtk.Windows
             // LOCK BUTTON
             var lockBtn = CreateImageButton(
                 name: "btn-lock",
-                assetRelativePath: System.IO.Path.Combine("Assets", "clingy_locked.png"),
+                assetName: "clingy_locked.png",
                 onClick: (_, __) => ToggleLock() //TODO
             );
             lockBtn.MarginEnd = 4;
@@ -164,7 +165,7 @@ namespace Clingies.Gtk.Windows
 
             var closeBtn = CreateImageButton(
                 name: "btn-close",
-                assetRelativePath: System.IO.Path.Combine("Assets", "clingy_close.png"),
+                assetName: "clingy_close.png",
                 onClick: (_, __) => this.Close()
             );
             closeBtn.MarginEnd = 2;   // near the right edge
@@ -187,16 +188,16 @@ namespace Clingies.Gtk.Windows
         /// Creates a button that shows an image loaded from the given relative asset path.
         /// The image is not scaled here—ship the PNG at the desired size (e.g., 12–14px).
         /// </summary>
-        private Button CreateImageButton(string name, string assetRelativePath, EventHandler onClick)
+        private Button CreateImageButton(string name, string assetName, EventHandler onClick)
         {
-
+            string assetPath = System.IO.Path.Combine(AppContext.BaseDirectory, $"Assets/{assetName}");
             var btn = new Button
             {
                 Name = name,
                 Relief = ReliefStyle.None,
                 CanFocus = false,
                 // In GTK3, Button.Content = img is not a thing; use the Image property
-                Image = _srvUtils.CreateImageForButton(assetRelativePath, 12)
+                Image = _srvUtils.CreateImageFromPath(assetPath, 12)
             };
 
             // Tighten intrinsic size (prevents extra padding from some themes)

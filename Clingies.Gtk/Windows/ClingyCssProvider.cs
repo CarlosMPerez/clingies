@@ -30,7 +30,7 @@ namespace Clingies.Gtk.Windows
             border: none;
             box-shadow: none;
             font-family: monospace;
-            font-size: 14;
+            font-size: 14px;
             font-weight: bold;
             }
 

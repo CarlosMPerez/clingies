@@ -180,7 +180,7 @@ public class MenuFactory(MenuService menuService,
         var label = new Label(text) { Xalign = 0f, UseUnderline = true };
 
         // If you have an icon for this id, compose a row: [img][label]
-        var pixbuf = utils.LoadPixbuf(id, 16, true); // <- implement in your GTK UtilsService (returns Gdk.Pixbuf? or null)
+        var pixbuf = utils.LoadPixbuf(id, 16); // <- implement in your GTK UtilsService (returns Gdk.Pixbuf? or null)
         if (pixbuf is null)
             return new MenuItem { Child = label };
 
