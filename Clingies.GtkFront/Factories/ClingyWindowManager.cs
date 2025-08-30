@@ -6,12 +6,13 @@ using Clingies.ApplicationLogic.Interfaces;
 using Clingies.ApplicationLogic.Services;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
-using Clingies.Gtk.Windows;
-using Clingies.Gtk.Utils;
+using Clingies.GtkFront.Windows;
+using Clingies.GtkFront.Utils;
+using Clingies.GtkFront.Windows.Parts;
 
-namespace Clingies.Gtk.Factories;
+namespace Clingies.GtkFront.Factories;
 
-public class ClingyWindowFactory(ClingyService clingyService, 
+public class ClingyWindowManager(ClingyService clingyService,
                             UtilsService utilsService,
                             IClingiesLogger loggerService,
                             Func<IContextCommandController, IContextCommandProvider> providerFactory)
@@ -28,8 +29,9 @@ public class ClingyWindowFactory(ClingyService clingyService,
         {
             var clingy = new ClingyDto();
             clingy.Id = _srvClingy.Create(clingy);
-            var window = new ClingyWindow(clingy, _srvClingy, _srvUtils);
-            var provider = providerFactory(window);
+            var window = new ClingyWindow(clingy, _srvUtils);
+            var controller = new ClingyContextController(this, clingy.Id);
+            var provider = providerFactory(controller);
             window.SetContextCommandProvider(provider);
             SubscribeWindowToEvents(window);
             _activeWindows.Add(window);
@@ -49,8 +51,9 @@ public class ClingyWindowFactory(ClingyService clingyService,
         {
             foreach (var clingy in _srvClingy.GetAllActive())
             {
-                var window = new ClingyWindow(clingy, _srvClingy, _srvUtils);
-                var provider = providerFactory(window);
+                var window = new ClingyWindow(clingy, _srvUtils);
+                var controller = new ClingyContextController(this, clingy.Id);
+                var provider = providerFactory(controller);
                 window.SetContextCommandProvider(provider);
                 SubscribeWindowToEvents(window);
                 _activeClingies.Add(clingy);

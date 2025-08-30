@@ -3,14 +3,14 @@ using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Interfaces;
 using Gtk;
 
-namespace Clingies.Gtk.Factories;
+namespace Clingies.GtkFront.Factories;
 
 public class TrayCommandController : ITrayCommandController
 {
-    private readonly ClingyWindowFactory _windowFactory;
+    private readonly ClingyWindowManager _windowFactory;
     private readonly IClingiesLogger _logger;
 
-    public TrayCommandController(ClingyWindowFactory windowFactory,
+    public TrayCommandController(ClingyWindowManager windowFactory,
                                  IClingiesLogger logger)
     {
         _windowFactory = windowFactory;

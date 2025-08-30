@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using Gtk;
 
-namespace Clingies.Gtk.Utils;
+namespace Clingies.GtkFront.Utils;
 
 public static class AppIndicatorNative
 {

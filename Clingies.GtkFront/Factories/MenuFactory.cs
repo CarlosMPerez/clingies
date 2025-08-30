@@ -5,10 +5,10 @@ using Gtk;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
-using Clingies.Gtk.Utils;
+using Clingies.GtkFront.Utils;
 using Clingies.ApplicationLogic.Services;
 
-namespace Clingies.Gtk.Factories;
+namespace Clingies.GtkFront.Factories;
 
 public class MenuFactory(MenuService menuService,
                         IClingiesLogger logger,

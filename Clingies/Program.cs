@@ -7,9 +7,9 @@ using Clingies.Domain.Interfaces;
 using Clingies.Infrastructure.Data;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.ApplicationLogic.Providers;
-using Clingies.Gtk;
-using Clingies.Gtk.Utils;
-using Clingies.Gtk.Factories;
+using Clingies.GtkFront;
+using Clingies.GtkFront.Utils;
+using Clingies.GtkFront.Factories;
 using Clingies.Infrastructure.Migrations;
 using Gtk;
 
@@ -39,8 +39,8 @@ internal sealed class Program
             GtkFrontendHost host = new GtkFrontendHost(
                 sp.GetRequiredService<IClingiesLogger>(),
                 sp.GetRequiredService<IIconPathRepository>(),
-                sp.GetRequiredService<ClingyWindowFactory>(),
-                sp.GetRequiredService<MenuFactory>(), 
+                sp.GetRequiredService<ClingyWindowManager>(),
+                sp.GetRequiredService<MenuFactory>(),
                 sp.GetRequiredService<UtilsService>());
             host.Run();
             Application.Run();
@@ -75,7 +75,7 @@ internal sealed class Program
             services.AddSingleton<IIconPathRepository, IconPathRepository>();
             services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
             services.AddSingleton<MenuFactory>();
-            services.AddSingleton<ClingyWindowFactory>();
+            services.AddSingleton<ClingyWindowManager>();
             services.AddSingleton<ClingyService>();
             services.AddSingleton<MenuService>();
             services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();

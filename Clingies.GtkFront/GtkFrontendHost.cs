@@ -1,25 +1,25 @@
 using System;
 using Gdk;
 using Gtk;
-using Clingies.Gtk.Windows;
-using Clingies.Gtk.Factories;
+using Clingies.GtkFront.Windows;
+using Clingies.GtkFront.Factories;
 using Clingies.Domain.Interfaces;
-using Clingies.Gtk.Utils;
+using Clingies.GtkFront.Utils;
 using Clingies.ApplicationLogic.Interfaces;
 
-namespace Clingies.Gtk
+namespace Clingies.GtkFront
 {
     public class GtkFrontendHost
     {
         private readonly IClingiesLogger _logger;
         private readonly IIconPathRepository _iconRepo;
-        private readonly ClingyWindowFactory _windowFactory;
+        private readonly ClingyWindowManager _windowFactory;
         private readonly MenuFactory _menuFactory;
 
         private readonly UtilsService _srvUtils;
 
         public GtkFrontendHost(IClingiesLogger logger, IIconPathRepository iconRepo,
-                        ClingyWindowFactory windowFactory, MenuFactory menuFactory,
+                        ClingyWindowManager windowFactory, MenuFactory menuFactory,
                         UtilsService utilsService)
         {
             _logger = logger;
@@ -79,7 +79,7 @@ namespace Clingies.Gtk
 
         void AttachOptionalStatusIconFallback(string iconPath, Menu trayMenu)
         {
-            #pragma warning disable CS0612
+#pragma warning disable CS0612
             var si = new StatusIcon(new Gdk.Pixbuf(iconPath, 24, 24))
             {
                 Visible = true,
@@ -88,7 +88,7 @@ namespace Clingies.Gtk
             };
             si.Activate += (_, __) => _windowFactory.RenderAllWindows();
             si.PopupMenu += (_, __) => { trayMenu.ShowAll(); trayMenu.Popup(); };
-            #pragma warning restore CS0618
+#pragma warning restore CS0618
         }
 
         // ITrayCommandController methods (direct port from Avalonia App.axaml.cs)

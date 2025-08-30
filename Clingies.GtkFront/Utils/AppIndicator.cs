@@ -1,8 +1,8 @@
 using System;
 using Gtk;
-using appIndiNative = Clingies.Gtk.Utils.AppIndicatorNative;
+using appIndiNative = Clingies.GtkFront.Utils.AppIndicatorNative;
 
-namespace Clingies.Gtk.Utils;
+namespace Clingies.GtkFront.Utils;
 
 public sealed class AppIndicator : IDisposable
 {
