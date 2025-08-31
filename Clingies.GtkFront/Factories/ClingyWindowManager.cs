@@ -56,6 +56,7 @@ public class ClingyWindowManager(ClingyService clingyService,
                 var provider = providerFactory(controller);
                 window.SetContextCommandProvider(provider);
                 SubscribeWindowToEvents(window);
+                window.KeepAbove = clingy.IsPinned;
                 _activeClingies.Add(clingy);
                 _activeWindows.Add(window);
                 window.Show();
@@ -86,9 +87,9 @@ public class ClingyWindowManager(ClingyService clingyService,
         {
             foreach (var window in _activeWindows)
             {
-                //window.Topmost = true;
+                window.KeepAbove = true;
                 window.Activate();
-                //window.Topmost = false;
+                window.KeepAbove = false;
             }
         }
         catch (Exception ex)
@@ -123,7 +124,7 @@ public class ClingyWindowManager(ClingyService clingyService,
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            //window.Topmost = args.IsPinned;
+            window.KeepAbove = args.IsPinned;
             clingy.IsPinned = args.IsPinned;
             _srvClingy.Update(clingy);
         }
@@ -209,8 +210,6 @@ public class ClingyWindowManager(ClingyService clingyService,
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            //window.Width = args.Width;
-            //window.Height = args.Height;
             clingy.Width = args.Width;
             clingy.Height = args.Height;
             _srvClingy.Update(clingy);

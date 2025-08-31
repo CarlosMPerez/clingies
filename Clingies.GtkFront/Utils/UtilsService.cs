@@ -64,5 +64,34 @@ namespace Clingies.GtkFront.Utils
             try { return new Pixbuf(path, w, h); }
             catch { return null; }
         }
+
+        public bool IsX11()
+        {
+            return Display.Default?
+                    .GetType().FullName?
+                    .Contains("X11", StringComparison.OrdinalIgnoreCase) == true;
+        }
+
+        public Button MakeImgButton(string name, string asset, EventHandler? onClick = null)
+        {
+            string path = Path.Combine(AppContext.BaseDirectory, $"Assets/{asset}");
+            var btn = new Button
+            {
+                Name = name,
+                Relief = ReliefStyle.None,
+                CanFocus = false,
+                Image = CreateImageFromPath(path, 12)
+            };
+            btn.SetSizeRequest(16, 16);
+            if (onClick != null) btn.Clicked += onClick;
+            return btn;
+        }
+
+        public void SetButtonIcon(Button btn, string assetName, int size = 12)
+        {
+            string assetPath = Path.Combine(AppContext.BaseDirectory, $"Assets/{assetName}");
+            btn.Image = CreateImageFromPath(assetPath, size);
+            btn.ShowAll();
+        }
     }
 }
