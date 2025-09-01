@@ -75,9 +75,6 @@ namespace Clingies.GtkFront.Windows
 
             AddEvents((int)Gdk.EventMask.StructureMask);
             ConfigureEvent += OnConfigureEvent;
-
-            // Final save on close happens in Manager (listening to CloseRequested)
-            this.DeleteEvent += (_, __) => CloseRequested?.Invoke(this, dto.Id);
         }
 
         [GLib.ConnectBefore]
