@@ -93,5 +93,16 @@ namespace Clingies.GtkFront.Utils
             btn.Image = CreateImageFromPath(assetPath, size);
             btn.ShowAll();
         }
+
+        public Point GetCenterPointDefaultMonitor(int windowWidth, int windowHeight)
+        {
+            // center in primary monitor
+            var monitor = Display.Default.GetMonitor(0);
+            var geom = monitor?.Geometry ?? new Rectangle { X = 0, Y = 0, Width = 800, Height = 600 };
+
+            int centerX = geom.X + (geom.Width - windowWidth) / 2;
+            int centerY = geom.Y + (geom.Height - windowHeight) / 2;
+            return new Point() { X = centerX, Y = centerY };
+        }
     }
 }

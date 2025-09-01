@@ -73,12 +73,13 @@ internal sealed class Program
             services.AddSingleton<IClingyRepository, ClingyRepository>();
             services.AddSingleton<IMenuRepository, MenuRepository>();
             services.AddSingleton<IIconPathRepository, IconPathRepository>();
-            services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
             services.AddSingleton<MenuFactory>();
             services.AddSingleton<ClingyWindowManager>();
             services.AddSingleton<ClingyService>();
             services.AddSingleton<MenuService>();
             services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
+            services.AddSingleton<Func<ITrayCommandProvider>>(sp =>
+                                () => sp.GetRequiredService<ITrayCommandProvider>());            
             services.AddSingleton<ITrayCommandController, TrayCommandController>();
             services.AddSingleton<Func<IContextCommandController, IContextCommandProvider>>(sp =>
                                     controller => new ContextCommandProvider(controller));

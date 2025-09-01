@@ -3,6 +3,7 @@ using System;
 using Clingies.ApplicationLogic.CustomEventArgs;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Models;
+using Clingies.GtkFront.Factories;
 using Clingies.GtkFront.Utils;
 using Clingies.GtkFront.Windows.Parts;
 using Gtk;
@@ -26,13 +27,19 @@ namespace Clingies.GtkFront.Windows
         public IContextCommandProvider? CommandProvider { get; private set; }
 
         private readonly UtilsService _srvUtils;
+        private readonly MenuFactory _menuFactory;
+        private readonly ClingyContextController _contextController;
         private int _lastX = int.MinValue;
         private int _lastY = int.MinValue;
 
-        public ClingyWindow(ClingyDto clingyDto, UtilsService utils) : base(clingyDto.Title ?? string.Empty)
+        public ClingyWindow(ClingyDto clingyDto, UtilsService utils,
+                            MenuFactory menuFactory, ClingyContextController contextController) 
+                            : base(clingyDto.Title ?? string.Empty)
         {
             dto = clingyDto;
             _srvUtils = utils;
+            _menuFactory = menuFactory;
+            _contextController = contextController;
 
             Decorated = false;
             SkipTaskbarHint = true;
@@ -63,8 +70,22 @@ namespace Clingies.GtkFront.Windows
 
             root.PackStart(title, false, false, 0);
             root.PackStart(body, true, true, 0);
-            Add(root);
-            root.ShowAll();
+
+            // Wrap everything in an EventBox so we can catch right-clicks anywhere
+            var clickCatcher = new EventBox { VisibleWindow = false }; // transparent, but receives events
+            clickCatcher.Add(root);
+
+            // Listen for button presses
+            clickCatcher.AddEvents((int)Gdk.EventMask.ButtonPressMask);
+            clickCatcher.ButtonPressEvent += OnAnyRightClick;
+
+            // Optional: keyboard menu (Shift+F10 / Menu key) for accessibility
+            clickCatcher.AddEvents((int)Gdk.EventMask.KeyPressMask);
+            clickCatcher.KeyPressEvent += OnKeyPressForContextMenu;
+
+            Add(clickCatcher);
+
+            clickCatcher.ShowAll();
 
             // Persist *size* continuously in a WM-agnostic way
             this.SizeAllocated += (_, a) =>
@@ -72,6 +93,10 @@ namespace Clingies.GtkFront.Windows
                 UpdateWindowSizeRequested?.Invoke(this,
                     new UpdateWindowSizeRequestedEventArgs(dto.Id, a.Allocation.Width, a.Allocation.Height));
             };
+
+            // Add on focus title bar color change
+            FocusInEvent += (_, __) => title.StyleContext.AddClass("focused");
+            FocusOutEvent += (_, __) => title.StyleContext.RemoveClass("focused");
 
             AddEvents((int)Gdk.EventMask.StructureMask);
             ConfigureEvent += OnConfigureEvent;
@@ -99,6 +124,29 @@ namespace Clingies.GtkFront.Windows
 
             // Don't swallow the event
             e.RetVal = false;
+        }
+
+        private void OnAnyRightClick(object? sender, ButtonPressEventArgs e)
+        {
+            if (e.Event.Button != 3) return; // only right button
+            var menu = _menuFactory.BuildClingyMenu(CommandProvider!);
+            menu.ShowAll();
+            menu.PopupAtPointer(e.Event);
+            e.RetVal = true; // stop further handling
+        }
+
+        private void OnKeyPressForContextMenu(object? sender, KeyPressEventArgs e)
+        {
+            // Show menu on Shift+F10 or the Menu key
+            var isShiftF10 = (e.Event.Key == Gdk.Key.F10) && (e.Event.State & Gdk.ModifierType.ShiftMask) != 0;
+            var isMenuKey  = e.Event.Key == Gdk.Key.Menu;
+
+            if (!isShiftF10 && !isMenuKey) return;
+
+            var menu = _menuFactory.BuildClingyMenu(CommandProvider!);
+            menu.ShowAll();
+            menu.PopupAtWidget(this, Gdk.Gravity.SouthWest, Gdk.Gravity.NorthWest, null);
+            e.RetVal = true;
         }
 
         public void SetContextCommandProvider(IContextCommandProvider provider) =>

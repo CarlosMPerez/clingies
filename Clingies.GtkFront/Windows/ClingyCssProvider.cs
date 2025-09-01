@@ -11,12 +11,20 @@ namespace Clingies.GtkFront.Windows
             var css = @"
             /* Window + base */
             #clingy-window {
-                background: #FFFFB4;            /* note body color */
+                background: #FFFFB8;            /* note body color */
             }
 
             /* Header bar */
             #clingy-title {
-                background: #C9D0D4;            /* grey header */
+                background: #CACECF;            /* grey header */
+                padding: 2px 2px;
+                border: none;
+                box-shadow: none;
+                background-position: center;
+            }
+
+            #clingy-title.focused {
+                background: #6ABFED;            /* blue header */
                 padding: 2px 2px;
                 border: none;
                 box-shadow: none;
@@ -39,7 +47,7 @@ namespace Clingies.GtkFront.Windows
             #clingy-content > viewport,
             #clingy-content-view,
             textview#clingy-content-view view {
-                background: #FFFFB4;
+                background: #FFFFB8;
                 border: none;
                 box-shadow: none;
                 color: black;                    /* black text on yellow */
@@ -50,7 +58,7 @@ namespace Clingies.GtkFront.Windows
             }
 
             textview#clingy-content-view text {
-                background: #FFFFB4;
+                background: #FFFFB8;
                 border: none;
                 box-shadow: none;
                 color: black;                    /* black text on yellow */

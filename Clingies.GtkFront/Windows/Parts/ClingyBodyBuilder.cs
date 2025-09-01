@@ -2,7 +2,6 @@ using System;
 using Clingies.Domain.Models;
 using Clingies.GtkFront.Utils;
 using Gtk;
-using Pango;
 
 namespace Clingies.GtkFront.Windows.Parts;
 
@@ -35,6 +34,7 @@ internal static class ClingyBodyBuilder
         view.Buffer.Text = dto.Content ?? string.Empty;
         view.MapEvent += (_, __) => GLib.Idle.Add(() => { view.GrabFocus(); return false; });
         view.Events |= Gdk.EventMask.ButtonPressMask | Gdk.EventMask.EnterNotifyMask | Gdk.EventMask.LeaveNotifyMask;
+
         view.ButtonPressEvent += (_, e) =>
         {
             view.GrabFocus();
@@ -42,7 +42,9 @@ internal static class ClingyBodyBuilder
             view.WindowToBufferCoords(TextWindowType.Text, (int)e.Event.X, (int)e.Event.Y, out bx, out by);
             view.GetIterAtLocation(out var iter, bx, by);
             view.Buffer.PlaceCursor(iter);
+            if (e.Event.Button == 3) Console.WriteLine("BDR!");
         };
+
         view.EnterNotifyEvent += (_, e) =>
         {
             try
@@ -52,6 +54,7 @@ internal static class ClingyBodyBuilder
                 if (win != null) win.Cursor = cursor;
             } catch { }
         };
+
         view.LeaveNotifyEvent += (_, e) =>
         {
             try { (e.Event.Window ?? view.GetWindow(TextWindowType.Text))!.Cursor = null; } catch { }

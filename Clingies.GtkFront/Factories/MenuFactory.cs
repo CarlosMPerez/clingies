@@ -12,20 +12,20 @@ namespace Clingies.GtkFront.Factories;
 
 public class MenuFactory(MenuService menuService,
                         IClingiesLogger logger,
-                        ITrayCommandProvider trayCommandProvider,
-                        Func<IContextCommandController, IContextCommandProvider> contextProviderFactory,
+                        Func<ITrayCommandProvider> trayCommandProviderFactory,
                         UtilsService utils)
 
 {
     private IContextCommandProvider? _contextCommandProvider;
+    private readonly Func<ITrayCommandProvider> _trayCommandProviderFactory = trayCommandProviderFactory;
     public Menu BuildTrayMenu()
     {
         return BuildGtkTrayMenu();
     }
 
-    public Menu BuildClingyMenu(IContextCommandController controller)
+    public Menu BuildClingyMenu(IContextCommandProvider provider)
     {
-        _contextCommandProvider = contextProviderFactory(controller);
+        _contextCommandProvider = provider;
         return BuildContextMenu();
     }
 
@@ -143,24 +143,28 @@ public class MenuFactory(MenuService menuService,
         }
     }
 
-    private ICommand? ResolveTrayCommand(string itemId) => itemId switch
+    private ICommand? ResolveTrayCommand(string itemId)
     {
-        "new" => trayCommandProvider.NewCommand,
-        "rolled_up" => trayCommandProvider.RolledUpCommand,
-        "rolled_down" => trayCommandProvider.RolledDownCommand,
-        "pinned" => trayCommandProvider.PinnedCommand,
-        "unpinned" => trayCommandProvider.UnpinnedCommand,
-        "locked" => trayCommandProvider.LockedCommand,
-        "unlocked" => trayCommandProvider.UnlockedCommand,
-        "show" => trayCommandProvider.ShowCommand,
-        "hide" => trayCommandProvider.HideCommand,
-        "manage_clingies" => trayCommandProvider.ManageClingiesCommand,
-        "settings" => trayCommandProvider.SettingsCommand,
-        "help" => trayCommandProvider.HelpCommand,
-        "about" => trayCommandProvider.AboutCommand,
-        "exit" => trayCommandProvider.ExitCommand,
-        _ => null
-    };
+        var prov = _trayCommandProviderFactory();
+        return itemId switch
+        {
+            "new" => prov.NewCommand,
+            "rolled_up" => prov.RolledUpCommand,
+            "rolled_down" => prov.RolledDownCommand,
+            "pinned" => prov.PinnedCommand,
+            "unpinned" => prov.UnpinnedCommand,
+            "locked" => prov.LockedCommand,
+            "unlocked" => prov.UnlockedCommand,
+            "show" => prov.ShowCommand,
+            "hide" => prov.HideCommand,
+            "manage_clingies" => prov.ManageClingiesCommand,
+            "settings" => prov.SettingsCommand,
+            "help" => prov.HelpCommand,
+            "about" => prov.AboutCommand,
+            "exit" => prov.ExitCommand,
+            _ => null
+        };
+    }
 
     private ICommand? ResolveContextCommand(string itemId) => itemId switch
     {

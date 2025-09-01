@@ -14,6 +14,7 @@ namespace Clingies.GtkFront.Factories;
 
 public class ClingyWindowManager(ClingyService clingyService,
                             UtilsService utilsService,
+                            MenuFactory menuFactory,
                             IClingiesLogger loggerService,
                             Func<IContextCommandController, IContextCommandProvider> providerFactory)
 {
@@ -22,16 +23,24 @@ public class ClingyWindowManager(ClingyService clingyService,
     private readonly ClingyService _srvClingy = clingyService;
     private readonly IClingiesLogger _srvLogger = loggerService;
     private readonly UtilsService _srvUtils = utilsService;
+    private readonly MenuFactory _menuFactory = menuFactory;
 
     public void CreateNewWindow()
     {
         try
         {
+            var centerPoint = _srvUtils.GetCenterPointDefaultMonitor(300, 100);
             var clingy = new ClingyDto();
+            clingy.PositionX = centerPoint.X;
+            clingy.PositionY = centerPoint.Y;
             clingy.Id = _srvClingy.Create(clingy);
-            var window = new ClingyWindow(clingy, _srvUtils);
+
             var controller = new ClingyContextController(this, clingy.Id);
             var provider = providerFactory(controller);
+            var window = new ClingyWindow(clingy, _srvUtils, _menuFactory, controller);
+
+            window.Move(centerPoint.X, centerPoint.Y);
+
             window.SetContextCommandProvider(provider);
             SubscribeWindowToEvents(window);
             _activeWindows.Add(window);
@@ -51,9 +60,9 @@ public class ClingyWindowManager(ClingyService clingyService,
         {
             foreach (var clingy in _srvClingy.GetAllActive())
             {
-                var window = new ClingyWindow(clingy, _srvUtils);
                 var controller = new ClingyContextController(this, clingy.Id);
                 var provider = providerFactory(controller);
+                var window = new ClingyWindow(clingy, _srvUtils, _menuFactory, controller);
                 window.SetContextCommandProvider(provider);
                 SubscribeWindowToEvents(window);
                 window.KeepAbove = clingy.IsPinned;
