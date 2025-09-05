@@ -5,10 +5,10 @@ using Gtk;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
-using Clingies.GtkFront.Utils;
 using Clingies.ApplicationLogic.Services;
+using Clingies.GtkFront.Utils;
 
-namespace Clingies.GtkFront.Factories;
+namespace Clingies.GtkFront.Services;
 
 public class MenuFactory(MenuService menuService,
                         IClingiesLogger logger,
@@ -33,7 +33,7 @@ public class MenuFactory(MenuService menuService,
     {
         var menu = new Menu();
 
-        var topLevelItems = menuService.GetAllParents("clingy")
+        var topLevelItems = menuService.GetAllParents(AppConstants.MenuOptions.ClingyMenuType)
             .OrderBy(x => x.SortOrder)
             .ToList();
 
@@ -89,7 +89,7 @@ public class MenuFactory(MenuService menuService,
     {
         var menu = new Menu();
 
-        var topLevelItems = menuService.GetAllParents("tray")
+        var topLevelItems = menuService.GetAllParents(AppConstants.MenuOptions.TrayMenuType)
             .OrderBy(x => x.SortOrder)
             .ToList();
 
@@ -148,43 +148,41 @@ public class MenuFactory(MenuService menuService,
         var prov = _trayCommandProviderFactory();
         return itemId switch
         {
-            "new" => prov.NewCommand,
-            "rolled_up" => prov.RolledUpCommand,
-            "rolled_down" => prov.RolledDownCommand,
-            "pinned" => prov.PinnedCommand,
-            "unpinned" => prov.UnpinnedCommand,
-            "locked" => prov.LockedCommand,
-            "unlocked" => prov.UnlockedCommand,
-            "show" => prov.ShowCommand,
-            "hide" => prov.HideCommand,
-            "manage_clingies" => prov.ManageClingiesCommand,
-            "settings" => prov.SettingsCommand,
-            "help" => prov.HelpCommand,
-            "about" => prov.AboutCommand,
-            "exit" => prov.ExitCommand,
+            AppConstants.TrayMenuCommands.New => prov.NewCommand,
+            AppConstants.TrayMenuCommands.RollUp => prov.RolledUpCommand,
+            AppConstants.TrayMenuCommands.RollDown => prov.RolledDownCommand,
+            AppConstants.TrayMenuCommands.Pin => prov.PinnedCommand,
+            AppConstants.TrayMenuCommands.UnPin => prov.UnpinnedCommand,
+            AppConstants.TrayMenuCommands.Lock => prov.LockedCommand,
+            AppConstants.TrayMenuCommands.Unlock => prov.UnlockedCommand,
+            AppConstants.TrayMenuCommands.Show => prov.ShowCommand,
+            AppConstants.TrayMenuCommands.Hide => prov.HideCommand,
+            AppConstants.TrayMenuCommands.ManageClingies => prov.ManageClingiesCommand,
+            AppConstants.TrayMenuCommands.Settings => prov.SettingsCommand,
+            AppConstants.TrayMenuCommands.Help => prov.HelpCommand,
+            AppConstants.TrayMenuCommands.About => prov.AboutCommand,
+            AppConstants.TrayMenuCommands.Exit => prov.ExitCommand,
             _ => null
         };
     }
 
     private ICommand? ResolveContextCommand(string itemId) => itemId switch
     {
-        "sleep" => _contextCommandProvider!.SleepCommand,
-        "alarm" => _contextCommandProvider!.ShowAlarmWindowCommand,
-        "title" => _contextCommandProvider!.ShowChangeTitleDialogCommand,
-        "color" => _contextCommandProvider!.ShowColorWindowCommand,
-        "lock" => _contextCommandProvider!.LockCommand,
-        "unlock" => _contextCommandProvider!.UnlockCommand,
-        "properties" => _contextCommandProvider!.ShowPropertiesWindowCommand,
+        AppConstants.ContextMenuCommands.Sleep => _contextCommandProvider!.SleepCommand,
+        AppConstants.ContextMenuCommands.Alarm => _contextCommandProvider!.ShowAlarmWindowCommand,
+        AppConstants.ContextMenuCommands.Title => _contextCommandProvider!.ShowChangeTitleDialogCommand,
+        AppConstants.ContextMenuCommands.Color => _contextCommandProvider!.ShowColorWindowCommand,
+        AppConstants.ContextMenuCommands.Lock => _contextCommandProvider!.LockCommand,
+        AppConstants.ContextMenuCommands.Unlock => _contextCommandProvider!.UnlockCommand,
+        AppConstants.ContextMenuCommands.Properties => _contextCommandProvider!.ShowPropertiesWindowCommand,
         _ => null
     };
 
     private static MenuItem NewMenuItemWithOptionalIcon(string text, string id, UtilsService utils)
     {
-        // Plain label first (keeps mnemonics/ellipsizing sane)
         var label = new Label(text) { Xalign = 0f, UseUnderline = true };
 
-        // If you have an icon for this id, compose a row: [img][label]
-        var pixbuf = utils.LoadPixbuf(id, 16); // <- implement in your GTK UtilsService (returns Gdk.Pixbuf? or null)
+        var pixbuf = utils.LoadPixbuf(id, 16); 
         if (pixbuf is null)
             return new MenuItem { Child = label };
 

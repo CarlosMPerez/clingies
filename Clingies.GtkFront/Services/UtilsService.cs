@@ -5,7 +5,7 @@ using Gdk;
 using Gtk;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Clingies.GtkFront.Utils
+namespace Clingies.GtkFront.Services
 {
     public class UtilsService
     {

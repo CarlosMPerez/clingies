@@ -2,10 +2,9 @@ using System;
 using Gdk;
 using Gtk;
 using Clingies.GtkFront.Windows;
-using Clingies.GtkFront.Factories;
+using Clingies.GtkFront.Services;
 using Clingies.Domain.Interfaces;
 using Clingies.GtkFront.Utils;
-using Clingies.ApplicationLogic.Interfaces;
 
 namespace Clingies.GtkFront
 {
@@ -42,7 +41,7 @@ namespace Clingies.GtkFront
 
         private void DrawTrayIconAndMenu()
         {
-            var iconPath = _srvUtils.LoadPathFromDb("clingy_icon", false);
+            var iconPath = _srvUtils.LoadPathFromDb(AppConstants.IconNames.Application, false);
             if (string.IsNullOrEmpty(iconPath))
             {
                 _logger.Error(new Exception(), "Could not find main tray icon in DB");

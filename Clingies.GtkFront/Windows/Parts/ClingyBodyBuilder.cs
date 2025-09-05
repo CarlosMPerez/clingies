@@ -1,5 +1,6 @@
 using System;
 using Clingies.Domain.Models;
+using Clingies.GtkFront.Services;
 using Clingies.GtkFront.Utils;
 using Gtk;
 
@@ -13,7 +14,7 @@ internal static class ClingyBodyBuilder
 
         var scroller = new ScrolledWindow
         {
-            Name = "clingy-content",
+            Name = AppConstants.CssSections.ClingyContent,
             ShadowType = ShadowType.None,
             HscrollbarPolicy = PolicyType.Never,
             VscrollbarPolicy = PolicyType.Automatic
@@ -21,7 +22,7 @@ internal static class ClingyBodyBuilder
 
         var view = new TextView
         {
-            Name = "clingy-content-view",
+            Name = AppConstants.CssSections.ClingyContentView,
             CursorVisible = true,
             Editable = true,
             CanFocus = true,
@@ -33,18 +34,6 @@ internal static class ClingyBodyBuilder
         // init + caret behavior
         view.Buffer.Text = dto.Content ?? string.Empty;
         view.MapEvent += (_, __) => GLib.Idle.Add(() => { view.GrabFocus(); return false; });
-        view.Events |= Gdk.EventMask.ButtonPressMask | Gdk.EventMask.EnterNotifyMask | Gdk.EventMask.LeaveNotifyMask;
-
-        view.ButtonPressEvent += (_, e) =>
-        {
-            view.GrabFocus();
-            int bx, by;
-            view.WindowToBufferCoords(TextWindowType.Text, (int)e.Event.X, (int)e.Event.Y, out bx, out by);
-            view.GetIterAtLocation(out var iter, bx, by);
-            view.Buffer.PlaceCursor(iter);
-            if (e.Event.Button == 3) Console.WriteLine("BDR!");
-        };
-
         view.EnterNotifyEvent += (_, e) =>
         {
             try
@@ -91,8 +80,17 @@ internal static class ClingyBodyBuilder
 
     private static Widget MakeGrip(Window owner, ClingyWindowCallbacks cb, bool isLeft)
     {
-        var grip = new EventBox { VisibleWindow = false, WidthRequest = 6, Halign = isLeft ? Align.Start : Align.End, Valign = Align.Fill };
-        grip.Events |= Gdk.EventMask.ButtonPressMask | Gdk.EventMask.ButtonReleaseMask | Gdk.EventMask.EnterNotifyMask | Gdk.EventMask.LeaveNotifyMask;
+        var grip = new EventBox
+        {
+            VisibleWindow = false,
+            WidthRequest = 6,
+            Halign = isLeft ? Align.Start : Align.End,
+            Valign = Align.Fill
+        };
+        grip.Events |= Gdk.EventMask.ButtonPressMask |
+                        Gdk.EventMask.ButtonReleaseMask |
+                        Gdk.EventMask.EnterNotifyMask |
+                        Gdk.EventMask.LeaveNotifyMask;
 
         grip.ButtonPressEvent += (_, e) =>
         {

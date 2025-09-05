@@ -7,23 +7,33 @@ using Clingies.ApplicationLogic.Services;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
 using Clingies.GtkFront.Windows;
-using Clingies.GtkFront.Utils;
-using Clingies.GtkFront.Windows.Parts;
 
-namespace Clingies.GtkFront.Factories;
+namespace Clingies.GtkFront.Services;
 
 public class ClingyWindowManager(ClingyService clingyService,
                             UtilsService utilsService,
                             MenuFactory menuFactory,
                             IClingiesLogger loggerService,
+                            ITitleDialogService titleDialogService,
                             Func<IContextCommandController, IContextCommandProvider> providerFactory)
 {
     private readonly List<ClingyDto> _activeClingies = new List<ClingyDto>();
     private readonly List<ClingyWindow> _activeWindows = new List<ClingyWindow>();
     private readonly ClingyService _srvClingy = clingyService;
     private readonly IClingiesLogger _srvLogger = loggerService;
+    private readonly ITitleDialogService _titleDialogService = titleDialogService;
     private readonly UtilsService _srvUtils = utilsService;
     private readonly MenuFactory _menuFactory = menuFactory;
+
+    public List<ClingyDto> ActiveClingies
+    {
+        get { return _activeClingies; }
+    }
+
+    public List<ClingyWindow> ActiveWindows
+    {
+        get { return _activeWindows; }
+    }
 
     public void CreateNewWindow()
     {
@@ -35,7 +45,7 @@ public class ClingyWindowManager(ClingyService clingyService,
             clingy.PositionY = centerPoint.Y;
             clingy.Id = _srvClingy.Create(clingy);
 
-            var controller = new ClingyContextController(this, clingy.Id);
+            var controller = new ClingyContextController(this, _titleDialogService, clingy.Id);
             var provider = providerFactory(controller);
             var window = new ClingyWindow(clingy, _srvUtils, _menuFactory, controller);
 
@@ -60,7 +70,7 @@ public class ClingyWindowManager(ClingyService clingyService,
         {
             foreach (var clingy in _srvClingy.GetAllActive())
             {
-                var controller = new ClingyContextController(this, clingy.Id);
+                var controller = new ClingyContextController(this, _titleDialogService, clingy.Id);
                 var provider = providerFactory(controller);
                 var window = new ClingyWindow(clingy, _srvUtils, _menuFactory, controller);
                 window.SetContextCommandProvider(provider);

@@ -3,7 +3,7 @@ using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Interfaces;
 using Gtk;
 
-namespace Clingies.GtkFront.Factories;
+namespace Clingies.GtkFront.Services;
 
 public class TrayCommandController : ITrayCommandController
 {

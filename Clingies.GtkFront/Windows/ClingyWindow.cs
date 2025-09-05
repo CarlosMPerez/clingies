@@ -1,9 +1,8 @@
-// src/Clingies.Gtk/Windows/ClingyWindow.cs  (edited)
 using System;
 using Clingies.ApplicationLogic.CustomEventArgs;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Models;
-using Clingies.GtkFront.Factories;
+using Clingies.GtkFront.Services;
 using Clingies.GtkFront.Utils;
 using Clingies.GtkFront.Windows.Parts;
 using Gtk;
@@ -33,7 +32,7 @@ namespace Clingies.GtkFront.Windows
         private int _lastY = int.MinValue;
 
         public ClingyWindow(ClingyDto clingyDto, UtilsService utils,
-                            MenuFactory menuFactory, ClingyContextController contextController) 
+                            MenuFactory menuFactory, ClingyContextController contextController)
                             : base(clingyDto.Title ?? string.Empty)
         {
             dto = clingyDto;
@@ -64,7 +63,11 @@ namespace Clingies.GtkFront.Windows
             );
 
             // Compose UI
-            var root = new Box(Orientation.Vertical, 0) { Name = "clingy-window", BorderWidth = 0 };
+            var root = new Box(Orientation.Vertical, 0)
+            {
+                Name = AppConstants.CssSections.ClingyWindow,
+                BorderWidth = 0
+            };
             var title = ClingyTitleBarBuilder.Build(dto, this, _srvUtils, cb);
             var body = ClingyBodyBuilder.Build(dto, this, _srvUtils, cb);
 
@@ -95,8 +98,8 @@ namespace Clingies.GtkFront.Windows
             };
 
             // Add on focus title bar color change
-            FocusInEvent += (_, __) => title.StyleContext.AddClass("focused");
-            FocusOutEvent += (_, __) => title.StyleContext.RemoveClass("focused");
+            FocusInEvent += (_, __) => title.StyleContext.AddClass(AppConstants.CssSections.Focused);
+            FocusOutEvent += (_, __) => title.StyleContext.RemoveClass(AppConstants.CssSections.Focused);
 
             AddEvents((int)Gdk.EventMask.StructureMask);
             ConfigureEvent += OnConfigureEvent;
@@ -138,14 +141,27 @@ namespace Clingies.GtkFront.Windows
         private void OnKeyPressForContextMenu(object? sender, KeyPressEventArgs e)
         {
             // Show menu on Shift+F10 or the Menu key
-            var isShiftF10 = (e.Event.Key == Gdk.Key.F10) && (e.Event.State & Gdk.ModifierType.ShiftMask) != 0;
-            var isMenuKey  = e.Event.Key == Gdk.Key.Menu;
+            var isShiftF10 = (e.Event.Key == Gdk.Key.F10) && ((e.Event.State & Gdk.ModifierType.ShiftMask) != 0);
+            // Show title dialog on Shft+Ctrl+T
+            var isShiftCtrlT = (e.Event.Key == Gdk.Key.T) &&
+                                ((e.Event.State & Gdk.ModifierType.ShiftMask) != 0) &&
+                                ((e.Event.State & Gdk.ModifierType.ControlMask) != 0);
+            var isMenuKey = e.Event.Key == Gdk.Key.Menu;
 
-            if (!isShiftF10 && !isMenuKey) return;
+            if (!isShiftF10 && !isMenuKey && !isShiftCtrlT) return;
 
-            var menu = _menuFactory.BuildClingyMenu(CommandProvider!);
-            menu.ShowAll();
-            menu.PopupAtWidget(this, Gdk.Gravity.SouthWest, Gdk.Gravity.NorthWest, null);
+            if (isShiftF10 || isMenuKey)
+            {
+                var menu = _menuFactory.BuildClingyMenu(CommandProvider!);
+                menu.ShowAll();
+                menu.PopupAtWidget(this, Gdk.Gravity.SouthWest, Gdk.Gravity.NorthWest, null);
+            }
+
+            if (isShiftCtrlT)
+            {
+                _contextController.ShowChangeTitleDialog();
+            }
+
             e.RetVal = true;
         }
 

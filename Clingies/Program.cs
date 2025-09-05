@@ -8,10 +8,9 @@ using Clingies.Infrastructure.Data;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.ApplicationLogic.Providers;
 using Clingies.GtkFront;
-using Clingies.GtkFront.Utils;
-using Clingies.GtkFront.Factories;
 using Clingies.Infrastructure.Migrations;
 using Gtk;
+using Clingies.GtkFront.Services;
 
 namespace Clingies;
 
@@ -83,6 +82,7 @@ internal sealed class Program
             services.AddSingleton<ITrayCommandController, TrayCommandController>();
             services.AddSingleton<Func<IContextCommandController, IContextCommandProvider>>(sp =>
                                     controller => new ContextCommandProvider(controller));
+            services.AddSingleton<ITitleDialogService, TitleDialogService>();
             services.AddSingleton<UtilsService>();
         }
         catch (Exception ex)
