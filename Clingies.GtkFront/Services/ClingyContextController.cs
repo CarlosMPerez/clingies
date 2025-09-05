@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Clingies.ApplicationLogic.CustomEventArgs;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.GtkFront.Windows;
 
@@ -24,12 +25,11 @@ public class ClingyContextController : IContextCommandController
 
     public void ShowChangeTitleDialog()
     {
-        var prevTitle = _manager.ActiveClingies.Where(x => x.Id == _clingyId).First().Title;
-        var owner = _manager.ActiveWindows.Where(x => x.ClingyId == _clingyId).First();
+        var prevTitle = _manager.GetClingyDtoById(_clingyId)?.Title;
+        var owner = _manager.GetClingyWindowById(_clingyId);
         var newTitle = _titleDialog.ShowChangeTitleDialog(owner, prevTitle);
         if (newTitle == null) return;
-        // APPLY AND PERSIST
-        Console.WriteLine($"NEW TITLE: {newTitle}");
+        _manager.RequestTitleChange(_clingyId, newTitle);
     }
 
     public void ShowColorWindow() => Console.WriteLine("TO BE IMPLEMENTED BY WINDOW CONTEXT MENU");

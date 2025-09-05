@@ -25,16 +25,6 @@ public class ClingyWindowManager(ClingyService clingyService,
     private readonly UtilsService _srvUtils = utilsService;
     private readonly MenuFactory _menuFactory = menuFactory;
 
-    public List<ClingyDto> ActiveClingies
-    {
-        get { return _activeClingies; }
-    }
-
-    public List<ClingyWindow> ActiveWindows
-    {
-        get { return _activeWindows; }
-    }
-
     public void CreateNewWindow()
     {
         try
@@ -116,6 +106,16 @@ public class ClingyWindowManager(ClingyService clingyService,
             _srvLogger.Error(ex, "Error rendering all active Clingies");
             throw;
         }
+    }
+
+    public ClingyDto? GetClingyDtoById(int clingyId)
+    {
+        return _activeClingies.Where(x => x.Id == clingyId).FirstOrDefault();
+    }
+
+    public ClingyWindow? GetClingyWindowById(int clingyId)
+    {
+        return _activeWindows.Where(x => x.ClingyId == clingyId).FirstOrDefault();
     }
 
     #region EventHandlers
@@ -207,6 +207,13 @@ public class ClingyWindowManager(ClingyService clingyService,
         }
     }
 
+    // Exposing a façade for the private event so we can call it from ContextController or elsewhere,
+    //  do the same for others
+    public void RequestTitleChange(int clingyId, string newTitle)
+    {
+        HandleTitleChangeRequested(sender: this, args: new TitleChangeRequestedEventArgs(clingyId, newTitle));
+    }
+
     private void HandleTitleChangeRequested(object? sender, TitleChangeRequestedEventArgs args)
     {
         try
@@ -214,6 +221,7 @@ public class ClingyWindowManager(ClingyService clingyService,
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             clingy.Title = args.NewTitle;
+            window.Title = args.NewTitle;
             _srvClingy.Update(clingy);
         }
         catch (Exception ex)

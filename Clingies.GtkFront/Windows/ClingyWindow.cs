@@ -167,5 +167,6 @@ namespace Clingies.GtkFront.Windows
 
         public void SetContextCommandProvider(IContextCommandProvider provider) =>
             CommandProvider = provider ?? throw new ArgumentNullException(nameof(provider));
+
     }
 }
