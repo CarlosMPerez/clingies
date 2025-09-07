@@ -6,11 +6,15 @@ using Gtk;
 
 namespace Clingies.GtkFront.Windows.Parts;
 
-internal static class ClingyBodyBuilder
+public sealed class ClingyBody : Overlay
 {
-    public static Overlay Build(ClingyDto dto, Window owner, UtilsService utils, ClingyWindowCallbacks cb)
+    private ClingyBody() : base()
     {
-        var overlay = new Overlay();
+    }
+
+    public static ClingyBody Build(ClingyDto dto, Window owner, UtilsService utils, ClingyWindowCallbacks cb)
+    {
+        var overlay = new ClingyBody();
 
         var scroller = new ScrolledWindow
         {
@@ -41,7 +45,8 @@ internal static class ClingyBodyBuilder
                 var win = e.Event.Window ?? view.GetWindow(TextWindowType.Text);
                 using var cursor = new Gdk.Cursor(owner.Display, Gdk.CursorType.Xterm);
                 if (win != null) win.Cursor = cursor;
-            } catch { }
+            }
+            catch { }
         };
 
         view.LeaveNotifyEvent += (_, e) =>

@@ -30,6 +30,7 @@ namespace Clingies.GtkFront.Windows
         private readonly ClingyContextController _contextController;
         private int _lastX = int.MinValue;
         private int _lastY = int.MinValue;
+        private ClingyTitleBar _titleBar;
 
         public ClingyWindow(ClingyDto clingyDto, UtilsService utils,
                             MenuFactory menuFactory, ClingyContextController contextController)
@@ -68,10 +69,10 @@ namespace Clingies.GtkFront.Windows
                 Name = AppConstants.CssSections.ClingyWindow,
                 BorderWidth = 0
             };
-            var title = ClingyTitleBarBuilder.Build(dto, this, _srvUtils, cb);
-            var body = ClingyBodyBuilder.Build(dto, this, _srvUtils, cb);
+            _titleBar = ClingyTitleBar.Build(dto, this, _srvUtils, cb);
+            var body = ClingyBody.Build(dto, this, _srvUtils, cb);
 
-            root.PackStart(title, false, false, 0);
+            root.PackStart(_titleBar, false, false, 0);
             root.PackStart(body, true, true, 0);
 
             // Wrap everything in an EventBox so we can catch right-clicks anywhere
@@ -80,7 +81,7 @@ namespace Clingies.GtkFront.Windows
 
             // Listen for button presses
             clickCatcher.AddEvents((int)Gdk.EventMask.ButtonPressMask);
-            clickCatcher.ButtonPressEvent += OnAnyRightClick;
+            clickCatcher.ButtonPressEvent += OnRightClick;
 
             // Optional: keyboard menu (Shift+F10 / Menu key) for accessibility
             clickCatcher.AddEvents((int)Gdk.EventMask.KeyPressMask);
@@ -98,8 +99,8 @@ namespace Clingies.GtkFront.Windows
             };
 
             // Add on focus title bar color change
-            FocusInEvent += (_, __) => title.StyleContext.AddClass(AppConstants.CssSections.Focused);
-            FocusOutEvent += (_, __) => title.StyleContext.RemoveClass(AppConstants.CssSections.Focused);
+            FocusInEvent += (_, __) => _titleBar.StyleContext.AddClass(AppConstants.CssSections.Focused);
+            FocusOutEvent += (_, __) => _titleBar.StyleContext.RemoveClass(AppConstants.CssSections.Focused);
 
             AddEvents((int)Gdk.EventMask.StructureMask);
             ConfigureEvent += OnConfigureEvent;
@@ -129,7 +130,7 @@ namespace Clingies.GtkFront.Windows
             e.RetVal = false;
         }
 
-        private void OnAnyRightClick(object? sender, ButtonPressEventArgs e)
+        private void OnRightClick(object? sender, ButtonPressEventArgs e)
         {
             if (e.Event.Button != 3) return; // only right button
             var menu = _menuFactory.BuildClingyMenu(CommandProvider!);
@@ -165,8 +166,9 @@ namespace Clingies.GtkFront.Windows
             e.RetVal = true;
         }
 
+        public void ChangeTitleBarText(string newTitle) => _titleBar.ChangeTitle(newTitle);
+
         public void SetContextCommandProvider(IContextCommandProvider provider) =>
             CommandProvider = provider ?? throw new ArgumentNullException(nameof(provider));
-
     }
 }

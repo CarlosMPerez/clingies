@@ -2,7 +2,7 @@ using System;
 
 namespace Clingies.GtkFront.Windows.Parts;
 
-internal sealed class ClingyWindowCallbacks
+public sealed class ClingyWindowCallbacks
 {
     public int ClingyId { get; }
 

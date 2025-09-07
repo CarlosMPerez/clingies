@@ -1,6 +1,7 @@
 using System;
 using Gtk;
 using Gdk;
+using Clingies.GtkFront.Services;
 
 namespace Clingies.GtkFront.Windows
 {
@@ -22,31 +23,31 @@ namespace Clingies.GtkFront.Windows
             SkipTaskbarHint = true;               // do not show in taskbar
             KeepAbove = true;                     // ensure on top when opened
             Resizable = false;                    // fixed size
-            SetDefaultSize(380, 140);
+            SetDefaultSize(380, 120);
             SetPosition(parent is not null ? WindowPosition.CenterOnParent : WindowPosition.Center);
 
             // Content area
             var content = (Box)ContentArea;
             content.BorderWidth = 12;
-            content.Spacing = 8;
+            content.Spacing = 4;
 
             var row = new Box(Orientation.Horizontal, 8);
 
-            var label = new Label("Set Clingy title:")
-            {
-                Xalign = 0f,
-                Yalign = 0.5f
-            };
+            var label = new Label("Set Clingy title:");
 
             _entry = new Entry
             {
-                WidthChars = 36,
                 Text = initialTitle ?? string.Empty,
                 ActivatesDefault = true, // Pressing Enter triggers default button (OK)
-                InputPurpose = InputPurpose.FreeForm
+                //InputPurpose = InputPurpose.FreeForm
             };
-            _entry.SetSizeRequest(-1, 24);
-            
+            GtkTweaks.MakeEntryCompact(_entry, pxHeight: 26, fontPt: 10);
+            // optional: keep it visually tidy
+            _entry.HasFrame = true;             // default, but good to be explicit
+            _entry.Hexpand = true;
+            _entry.Valign = Align.Center;
+            _entry.ActivatesDefault = true;
+
             row.PackStart(label, false, false, 0);
             row.PackStart(_entry, true, true, 0);
 

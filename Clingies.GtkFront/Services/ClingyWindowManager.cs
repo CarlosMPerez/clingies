@@ -7,6 +7,7 @@ using Clingies.ApplicationLogic.Services;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
 using Clingies.GtkFront.Windows;
+using Clingies.GtkFront.Windows.Parts;
 
 namespace Clingies.GtkFront.Services;
 
@@ -221,7 +222,7 @@ public class ClingyWindowManager(ClingyService clingyService,
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             clingy.Title = args.NewTitle;
-            window.Title = args.NewTitle;
+            window.ChangeTitleBarText(args.NewTitle);
             _srvClingy.Update(clingy);
         }
         catch (Exception ex)
