@@ -1,6 +1,6 @@
-using System;
+using Clingies.Domain.Models;
 
-namespace Clingies.Domain.Models;
+namespace Clingies.Domain.DTOs;
 
 public class TrayMenuItemDto
 {

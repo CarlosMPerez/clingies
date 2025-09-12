@@ -1,5 +1,5 @@
 using Clingies.Domain.Interfaces;
-using Clingies.Domain.Models;
+using Clingies.Domain.DTOs;
 
 namespace Clingies.ApplicationLogic.Services;
 

@@ -13,7 +13,7 @@ public class IconPathRepository(IConnectionFactory connectionFactory, IClingiesL
         {
             var parms = new Dictionary<string, object> { { "@id", id } };
             var sql = """
-                SELECT dark_path FROM system_icon_path 
+                SELECT dark_path FROM app_icon_paths 
                 WHERE id = @id
             """;
             return Conn.ExecuteScalar<string>(sql, parms);
@@ -31,7 +31,7 @@ public class IconPathRepository(IConnectionFactory connectionFactory, IClingiesL
         {
             var parms = new Dictionary<string, object> { { "@id", id } };
             var sql = """
-                SELECT light_path FROM system_icon_path 
+                SELECT light_path FROM app_icon_paths 
                 WHERE id = @id
             """;
             return Conn.ExecuteScalar<string>(sql, parms);

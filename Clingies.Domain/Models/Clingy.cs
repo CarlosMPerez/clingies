@@ -1,18 +1,15 @@
+using Clingies.Domain.DTOs;
+
 namespace Clingies.Domain.Models;
 
-public class Clingy
+public sealed class Clingy
 {
     public int Id { get; set; }
     public string? Title { get; set; }
-    public string Content { get; set; }
-    public double PositionX { get; set; }
-    public double PositionY { get; set; }
-    public double Width { get; set; }
-    public double Height { get; set; }
-    public bool IsPinned { get; set; }
-    public bool IsRolled { get; set; }
-    public bool IsLocked { get; set; }
-    public bool IsStanding { get; set; }
+    public ClingyProperties Properties { get; set; }
+    public ClingyContent Content { get; set; }
+    public ClingyType Type { get; set; }
+
     public bool IsDeleted { get; set; }
 
     [IgnoreComparisonFieldAttribute]
@@ -27,15 +24,18 @@ public class Clingy
         {
             Id = Id,
             Title = Title,
-            Content = Content,
-            PositionX = PositionX,
-            PositionY = PositionY,
-            Width = Width,
-            Height = Height,
-            IsPinned = IsPinned,
-            IsLocked = IsLocked,
-            IsRolled = IsRolled,
-            IsStanding = IsStanding,
+            Type = Type,
+            CreatedAt = CreatedAt,
+            Text = Content.Text,
+            PngBytes = Content.Png,
+            PositionX = Properties.PositionX,
+            PositionY = Properties.PositionY,
+            Width = Properties.Width,
+            Height = Properties.Height,
+            IsPinned = Properties.IsPinned,
+            IsLocked = Properties.IsLocked,
+            IsRolled = Properties.IsRolled,
+            IsStanding = Properties.IsStanding,
             IsDeleted = IsDeleted
         };
     }

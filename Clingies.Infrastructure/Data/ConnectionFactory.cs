@@ -12,7 +12,7 @@ public class ConnectionFactory : IConnectionFactory, IDisposable
 
     public ConnectionFactory(string dbPath, IClingiesLogger logger)
     {
-        _connectionString = $"Data Source={dbPath}";
+        _connectionString = $"PRAGMA foreign_keys=ON;Data Source={dbPath}";
         _logger = logger;
         _logger.Info("Registering connection for db at {0}", dbPath);
     }

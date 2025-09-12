@@ -4,7 +4,7 @@ using System.Windows.Input;
 using Gtk;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Interfaces;
-using Clingies.Domain.Models;
+using Clingies.Domain.DTOs;
 using Clingies.ApplicationLogic.Services;
 using Clingies.GtkFront.Utils;
 

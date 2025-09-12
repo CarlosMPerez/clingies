@@ -2,10 +2,9 @@ using FluentMigrator;
 
 namespace Clingies.Infrastructure.Migrations;
 
-[Migration(2025081603)]
-public class _2025081603_SeedClingyMenu : Migration
+[Migration(2025091204)]
+public class _20250912_04_SeedClingyMenu : Migration
 {
-    // COMMENTED ROWS FOR A FUTURE SEED
     public override void Up()
     {
         // SLEEP

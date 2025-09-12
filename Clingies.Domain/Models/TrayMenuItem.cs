@@ -1,4 +1,4 @@
-using System;
+using Clingies.Domain.DTOs;
 
 namespace Clingies.Domain.Models;
 

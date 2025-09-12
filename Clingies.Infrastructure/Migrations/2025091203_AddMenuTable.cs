@@ -2,8 +2,8 @@ using FluentMigrator;
 
 namespace Clingies.Infrastructure.Migrations;
 
-[Migration(2025081602)]
-public class _2025081602_AddMenuTable : Migration
+[Migration(2025091203)]
+public class _20250912_03_AddMenuTable : Migration
 {
     public override void Up()
     {
@@ -20,9 +20,9 @@ public class _2025081602_AddMenuTable : Migration
                 .WithColumn("sort_order").AsInt32().WithDefaultValue(0);
         }
 
-        if (!Schema.Table("system_icon_path").Exists())
+        if (!Schema.Table("app_icon_paths").Exists())
         {
-            Create.Table("system_icon_path")
+            Create.Table("app_icon_paths")
                 .WithColumn("id").AsString().PrimaryKey()
                 .WithColumn("light_path").AsString().NotNullable()
                 .WithColumn("dark_path").AsString().NotNullable();
@@ -35,9 +35,9 @@ public class _2025081602_AddMenuTable : Migration
         {
             Delete.Table("system_menu");
         }
-        if (Schema.Table("system_icon_path").Exists())
+        if (Schema.Table("app_icon_paths").Exists())
         {
-            Delete.Table("system_icon_path");
+            Delete.Table("app_icon_paths");
         }
     }
 }

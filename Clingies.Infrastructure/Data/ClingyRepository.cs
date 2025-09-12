@@ -2,6 +2,7 @@ using System.Data;
 using System.Reflection;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
+using Clingies.Domain.DTOs;
 using Dapper;
 
 namespace Clingies.Infrastructure.Data;
@@ -15,10 +16,14 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             List<Clingy> clingies = new List<Clingy>();
             var sql = """
-                SELECT Id, Title, Content, PositionX, PositionY, Width, Height, 
-                    IsPinned, IsRolled, IsLocked, IsStanding, IsDeleted, CreatedAt
-                FROM Clingies
-                WHERE IsDeleted = 0
+
+                SELECT c.id, c.title, c.type_id, c.created_at, c.is_deleted,
+                p.position_x, p.position_y, p.width, p.height, p.is_pinned, p.is_rolled, 
+                p.is_locked, p.is_standing, cc.text, cc.png
+                FROM clingies AS c
+                JOIN clincy_properties as p ON p.id = c.id
+                JOIN clingy_content as cc on cc.id = c.id
+                WHERE c.is_deleted = 0 AND c.type_id = 1
             """;
             var dtos = Conn.Query<ClingyDto>(sql).ToList();
             clingies = dtos.Select(dto => dto.ToEntity()).ToList();
@@ -37,12 +42,15 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             var parms = new Dictionary<string, object> { { "@Id", id } };
             var sql = """
-                SELECT Id, Title, Content, PositionX, PositionY, Width, Height, 
-                    IsPinned, IsRolled, IsLocked, IsStanding, IsDeleted, CreatedAt
-                FROM Clingies
-                WHERE Id = @Id
+                SELECT c.id, c.title, c.type_id, c.created_at, c.is_deleted,
+                p.position_x, p.position_y, p.width, p.height, p.is_pinned, p.is_rolled, 
+                p.is_locked, p.is_standing, cc.text, cc.png
+                FROM clingies AS c
+                JOIN clincy_properties as p ON p.id = c.id
+                JOIN clingy_content as cc on cc.id = c.id
+                WHERE c.id = @Id
             """;
-            var dtos = Conn.Query<ClingyDto>(sql, parms);
+            var result = Conn.Query<ClingyDto>(sql, parms);
             var clingy = dtos.Select(dto => dto.ToEntity()).FirstOrDefault();
 
             return clingy;
@@ -56,8 +64,11 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
 
     public int Create(Clingy clingy)
     {
+        Conn.BeginTransaction();
         try
         {
+
+
             var sql = """
                 INSERT INTO Clingies (Title, Content, PositionX, PositionY, Width, Height, 
                     IsPinned, IsRolled, IsLocked, IsStanding, IsDeleted, CreatedAt)

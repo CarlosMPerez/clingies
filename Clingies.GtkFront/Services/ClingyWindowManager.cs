@@ -5,9 +5,8 @@ using Clingies.ApplicationLogic.CustomEventArgs;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.ApplicationLogic.Services;
 using Clingies.Domain.Interfaces;
-using Clingies.Domain.Models;
+using Clingies.Domain.DTOs;
 using Clingies.GtkFront.Windows;
-using Clingies.GtkFront.Windows.Parts;
 
 namespace Clingies.GtkFront.Services;
 
@@ -128,7 +127,7 @@ public class ClingyWindowManager(ClingyService clingyService,
             var clingy = _activeClingies.Single(x => x.Id == id);
             _activeWindows.Remove(window);
             _activeClingies.Remove(clingy);
-            window.Close();
+            window.Close();Models
             _srvClingy.SoftDelete(id);
         }
         catch (Exception ex)

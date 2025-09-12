@@ -1,5 +1,5 @@
 using System;
-using Clingies.Domain.Models;
+using Clingies.Domain.DTOs;
 using Clingies.GtkFront.Services;
 using Clingies.GtkFront.Utils;
 using Gtk;

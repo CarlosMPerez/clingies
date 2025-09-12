@@ -21,7 +21,7 @@ namespace Clingies.Infrastructure.Migrations
                 .ConfigureRunner(rb => rb
                     .AddSQLite()
                     .WithGlobalConnectionString(connectionString)
-                    .ScanIn(typeof(_2025081601_CreateClingiesTable).Assembly).For.Migrations())
+                    .ScanIn(typeof(_20250912_01_Init_Clingies_Schema).Assembly).For.Migrations())
                 .AddLogging(lb => lb.AddFluentMigratorConsole())
                 .BuildServiceProvider(false);
         }
