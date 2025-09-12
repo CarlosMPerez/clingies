@@ -1,0 +1,54 @@
+Table clingies {
+  id integer [pk, identity]                    // auto-id
+  type_id int [not null, ref: > clingy_types.id]
+  title varchar [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table clingy_properties {
+  id integer [pk, ref: > clingies.id]          // shared-PK, no identity
+  position_x integer [not null]                // consider CHECK >= 0
+  position_y integer [not null]
+  width integer [not null]                     // consider CHECK > 0
+  height integer [not null]
+  is_pinned boolean [not null, default: 0]
+  is_rolled boolean [not null, default: 0]
+  is_locked boolean [not null, default: 0]
+  is_standing boolean [not null, default: 0]
+}
+
+Table clingy_content {
+  id integer [pk, ref: > clingies.id]          // shared-PK
+  text text
+  png blob
+}
+
+Table clingy_types {
+  id integer [pk, identity]
+  name varchar [not null, unique]
+}
+
+Table system_icon_path {
+  id integer [pk, identity]                    // or make this a key/value table
+  light_path varchar
+  dark_path varchar
+}
+
+Table system_menu {
+  id integer [pk, identity]
+  menu_type varchar [not null]                 // consider lookup or CHECK
+  parent_id integer [ref: > system_menu.id]    // self-FK, cascade delete in FM
+  label varchar [not null]
+  tooltip varchar
+  enabled boolean [not null, default: 1]
+  separator boolean [not null, default: 0]
+  sort_order integer [not null]
+  indexes {
+    (parent_id, sort_order) [unique]
+  }
+}
+
+// already covered via column annotation:
+Ref: clingy_types.id < clingies.type_id
+
