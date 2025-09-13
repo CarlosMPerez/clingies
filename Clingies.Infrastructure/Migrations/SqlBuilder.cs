@@ -35,7 +35,7 @@ public static class SqlBuilder
             INSERT INTO clingy_types (id, name)
             SELECT {0}, {1}
             WHERE NOT EXISTS (SELECT 1 FROM clingy_types WHERE id = {0})
-        ", id, name);
+        ", id, AddApostrophes(name));
     }
 
     private static string AddApostrophes(string val)

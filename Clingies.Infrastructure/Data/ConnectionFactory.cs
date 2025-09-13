@@ -12,7 +12,14 @@ public class ConnectionFactory : IConnectionFactory, IDisposable
 
     public ConnectionFactory(string dbPath, IClingiesLogger logger)
     {
-        _connectionString = $"PRAGMA foreign_keys=ON;Data Source={dbPath}";
+        var csb = new SqliteConnectionStringBuilder
+        {
+            DataSource = dbPath,
+            ForeignKeys = true,
+            Mode = SqliteOpenMode.ReadWriteCreate,
+            Cache = SqliteCacheMode.Default
+        };
+        _connectionString = csb.ToString();
         _logger = logger;
         _logger.Info("Registering connection for db at {0}", dbPath);
     }

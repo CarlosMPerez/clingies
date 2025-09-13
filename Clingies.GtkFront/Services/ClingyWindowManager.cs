@@ -7,6 +7,7 @@ using Clingies.ApplicationLogic.Services;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.DTOs;
 using Clingies.GtkFront.Windows;
+using Clingies.Domain.Models;
 
 namespace Clingies.GtkFront.Services;
 
@@ -31,8 +32,10 @@ public class ClingyWindowManager(ClingyService clingyService,
         {
             var centerPoint = _srvUtils.GetCenterPointDefaultMonitor(300, 100);
             var clingy = new ClingyDto();
+            // default values
             clingy.PositionX = centerPoint.X;
             clingy.PositionY = centerPoint.Y;
+            clingy.Type = ClingyType.Desktop;
             clingy.Id = _srvClingy.Create(clingy);
 
             var controller = new ClingyContextController(this, _titleDialogService, clingy.Id);
@@ -127,7 +130,7 @@ public class ClingyWindowManager(ClingyService clingyService,
             var clingy = _activeClingies.Single(x => x.Id == id);
             _activeWindows.Remove(window);
             _activeClingies.Remove(clingy);
-            window.Close();Models
+            window.Close();
             _srvClingy.SoftDelete(id);
         }
         catch (Exception ex)
@@ -195,9 +198,10 @@ public class ClingyWindowManager(ClingyService clingyService,
     {
         try
         {
+            // TODO - HANDLE IMGS
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            clingy.Content = string.IsNullOrEmpty(args.Content) ? "" : args.Content;
+            clingy.Text = string.IsNullOrEmpty(args.Content) ? "" : args.Content;
             _srvClingy.Update(clingy);
         }
         catch (Exception ex)

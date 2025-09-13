@@ -24,6 +24,8 @@ namespace Clingies.Infrastructure.Migrations
             Create.Table("clingies")
                 .WithColumn("id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("type_id").AsInt32().NotNullable()
+                    .ForeignKey("fk_clingies_type", "clingy_types", "id")
+                    .OnDelete(Rule.None).OnUpdate(Rule.None)
                 .WithColumn("title").AsString().NotNullable()
                 .WithColumn("created_at").AsDateTime().NotNullable()
                 .WithColumn("is_deleted").AsBoolean().NotNullable().WithDefaultValue(false);
@@ -32,15 +34,11 @@ namespace Clingies.Infrastructure.Migrations
                 .OnTable("clingies")
                 .OnColumn("type_id").Ascending();
 
-            // FK: clingies.type_id -> clingy_types.id (RESTRICT/NONE on delete)
-            Create.ForeignKey("fk_clingies_type")
-                .FromTable("clingies").ForeignColumn("type_id")
-                .ToTable("clingy_types").PrimaryColumn("id")
-                .OnDelete(Rule.None).OnUpdate(Rule.None);
-
             // --- 1:1 child: clingy_properties (shared PK, cascade on clingy delete)
             Create.Table("clingy_properties")
                 .WithColumn("id").AsInt32().PrimaryKey() // shared-PK; no Identity
+                    .ForeignKey("fk_props_clingy", "clingies", "id")
+                    .OnDelete(Rule.Cascade).OnUpdate(Rule.Cascade)
                 .WithColumn("position_x").AsInt32().NotNullable().WithDefaultValue(0)
                 .WithColumn("position_y").AsInt32().NotNullable().WithDefaultValue(0)
                 .WithColumn("width").AsInt32().NotNullable().WithDefaultValue(240)
@@ -50,43 +48,32 @@ namespace Clingies.Infrastructure.Migrations
                 .WithColumn("is_locked").AsBoolean().NotNullable().WithDefaultValue(false)
                 .WithColumn("is_standing").AsBoolean().NotNullable().WithDefaultValue(false);
 
-            Create.ForeignKey("fk_props_clingy")
-                .FromTable("clingy_properties").ForeignColumn("id")
-                .ToTable("clingies").PrimaryColumn("id")
-                .OnDeleteOrUpdate(Rule.Cascade);
-
             // --- 1:1 child: clingy_content (shared PK, cascade on clingy delete)
             Create.Table("clingy_content")
                 .WithColumn("id").AsInt32().PrimaryKey() // shared-PK; no Identity
+                    .ForeignKey("fk_content_clingy", "clingies", "id")
+                    .OnDelete(Rule.Cascade).OnUpdate(Rule.Cascade)
                 .WithColumn("text").AsString(int.MaxValue).Nullable() // app ensures XOR with png
                 .WithColumn("png").AsBinary().Nullable();
 
-            Create.ForeignKey("fk_content_clingy")
-                .FromTable("clingy_content").ForeignColumn("id")
-                .ToTable("clingies").PrimaryColumn("id")
-                .OnDeleteOrUpdate(Rule.Cascade);
-
             // --- Non-menu icons (app-wide)
             Create.Table("app_icon_paths")
-                .WithColumn("id").AsInt32().PrimaryKey().Identity()
+                .WithColumn("id").AsString().PrimaryKey()
                 .WithColumn("light_path").AsString().Nullable()
                 .WithColumn("dark_path").AsString().Nullable();
 
             // --- System menu (self-referencing tree; cascade delete subtrees)
             Create.Table("system_menu")
-                .WithColumn("id").AsInt32().PrimaryKey().Identity()
+                .WithColumn("id").AsString().PrimaryKey()
                 .WithColumn("menu_type").AsString().NotNullable()
                 .WithColumn("parent_id").AsInt32().Nullable()
-                .WithColumn("label").AsString().NotNullable()
+                    .ForeignKey("fk_system_menu_parent", "system_menu", "id")
+                    .OnDelete(Rule.Cascade).OnUpdate(Rule.Cascade)
+                .WithColumn("label").AsString().Nullable()
                 .WithColumn("tooltip").AsString().Nullable()
                 .WithColumn("enabled").AsBoolean().NotNullable().WithDefaultValue(true)
                 .WithColumn("separator").AsBoolean().NotNullable().WithDefaultValue(false)
                 .WithColumn("sort_order").AsInt32().NotNullable().WithDefaultValue(0);
-
-            Create.ForeignKey("fk_system_menu_parent")
-                .FromTable("system_menu").ForeignColumn("parent_id")
-                .ToTable("system_menu").PrimaryColumn("id")
-                .OnDeleteOrUpdate(Rule.Cascade);
 
             Create.Index("ux_system_menu_parent_sort")
                 .OnTable("system_menu")
@@ -100,18 +87,14 @@ namespace Clingies.Infrastructure.Migrations
             // Drop in reverse dependency order
 
             Delete.Index("ux_system_menu_parent_sort").OnTable("system_menu");
-            Delete.ForeignKey("fk_system_menu_parent").OnTable("system_menu");
             Delete.Table("system_menu");
 
             Delete.Table("app_icon_paths");
 
-            Delete.ForeignKey("fk_content_clingy").OnTable("clingy_content");
             Delete.Table("clingy_content");
 
-            Delete.ForeignKey("fk_props_clingy").OnTable("clingy_properties");
             Delete.Table("clingy_properties");
 
-            Delete.ForeignKey("fk_clingies_type").OnTable("clingies");
             Delete.Index("ix_clingies_type_id").OnTable("clingies");
             Delete.Table("clingies");
 

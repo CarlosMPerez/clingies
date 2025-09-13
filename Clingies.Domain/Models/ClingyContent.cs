@@ -3,7 +3,7 @@ namespace Clingies.Domain.Models;
 
 public sealed class ClingyContent
 {
-    public int Id { get; init; }
+    public int Id { get; set; }
     public string? Text { get; set; }
     public byte[]? Png { get; set; }
 

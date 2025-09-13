@@ -36,7 +36,7 @@ public sealed class ClingyBody : Overlay
         };
 
         // init + caret behavior
-        view.Buffer.Text = dto.Content ?? string.Empty;
+        view.Buffer.Text = dto.Text ?? string.Empty;
         view.MapEvent += (_, __) => GLib.Idle.Add(() => { view.GrabFocus(); return false; });
         view.EnterNotifyEvent += (_, e) =>
         {

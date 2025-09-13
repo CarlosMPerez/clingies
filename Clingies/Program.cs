@@ -33,6 +33,8 @@ internal sealed class Program
             var sp = services.BuildServiceProvider();
 
             RunMigrations(sp);
+            // turns position_x to PositionX (other cases use ALIAS in the query)
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             Application.Init();
             GtkFrontendHost host = new GtkFrontendHost(

@@ -3,7 +3,7 @@ namespace Clingies.Domain.Models;
 
 public sealed class ClingyProperties
 {
-    public int Id { get; init; }
+    public int Id { get; set; }
     public double PositionX { get; set; }
     public double PositionY { get; set; }
     public double Width { get; set; }
