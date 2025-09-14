@@ -9,33 +9,17 @@ public static class AppIndicatorNative
     // The shared object from libayatana-appindicator3-1
     private const string Lib = "ayatana-appindicator3";
 
-    public enum AppIndicatorCategory
-    {
-        ApplicationStatus = 0,
-        Communications = 1,
-        SystemServices = 2,
-        Hardware = 3,
-        Other = 4
-    }
-
-    public enum AppIndicatorStatus
-    {
-        Passive = 0,
-        Active = 1,
-        Attention = 2
-    }
-
     // typedef struct _AppIndicator AppIndicator;
     // AppIndicator* app_indicator_new(const gchar* id, const gchar* icon_name, AppIndicatorCategory category);
     [DllImport(Lib)]
     public static extern IntPtr app_indicator_new(
         [MarshalAs(UnmanagedType.LPStr)] string id,
         [MarshalAs(UnmanagedType.LPStr)] string icon_name,
-        AppIndicatorCategory category);
+        Enums.AppIndicatorCategory category);
 
     // void app_indicator_set_status(AppIndicator* self, AppIndicatorStatus status);
     [DllImport(Lib)]
-    public static extern void app_indicator_set_status(IntPtr self, AppIndicatorStatus status);
+    public static extern void app_indicator_set_status(IntPtr self, Enums.AppIndicatorStatus status);
 
     // void app_indicator_set_menu(AppIndicator* self, GtkMenu* menu);
     [DllImport(Lib)]

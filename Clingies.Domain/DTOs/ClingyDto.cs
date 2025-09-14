@@ -6,7 +6,7 @@ public class ClingyDto
 {
     // base and meta
     public int Id { get; set; }
-    public ClingyType Type { get; set; }
+    public Enums.ClingyType Type { get; set; }
     public string Title { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public bool IsDeleted { get; set; }
@@ -31,8 +31,8 @@ public class ClingyDto
         // default values
         Id = 0;
         Title = "";
-        Height = 100;
-        Width = 300;
+        Height = AppConstants.Dimensions.DefaultClingyHeight;
+        Width = AppConstants.Dimensions.DefaultClingyWidth;
         CreatedAt = DateTime.UtcNow;
     }
 
@@ -41,10 +41,13 @@ public class ClingyDto
         return new Clingy()
         {
             Id = Id,
-            Title = Title,
             Type = Type,
+            Title = Title,
+            CreatedAt = CreatedAt,
+            IsDeleted = IsDeleted,
             Content = new ClingyContent
             {
+                Id = Id,
                 Text = Text,
                 Png = PngBytes
             },
@@ -59,8 +62,7 @@ public class ClingyDto
                 IsLocked = IsLocked,
                 IsRolled = IsRolled,
                 IsStanding = IsStanding,
-            },
-            IsDeleted = IsDeleted
+            }
         };
     }
 }

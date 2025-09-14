@@ -30,12 +30,12 @@ public class ClingyWindowManager(ClingyService clingyService,
     {
         try
         {
-            var centerPoint = _srvUtils.GetCenterPointDefaultMonitor(300, 100);
+            var centerPoint = _srvUtils.GetCenterPointDefaultMonitor(AppConstants.Dimensions.DefaultClingyWidth, AppConstants.Dimensions.DefaultClingyHeight);
             var clingy = new ClingyDto();
             // default values
             clingy.PositionX = centerPoint.X;
             clingy.PositionY = centerPoint.Y;
-            clingy.Type = ClingyType.Desktop;
+            clingy.Type = Enums.ClingyType.Desktop;
             clingy.Id = _srvClingy.Create(clingy);
 
             var controller = new ClingyContextController(this, _titleDialogService, clingy.Id);

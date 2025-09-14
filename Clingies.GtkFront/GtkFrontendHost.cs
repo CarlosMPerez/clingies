@@ -56,12 +56,12 @@ namespace Clingies.GtkFront
                 // If you provide a *file path*, some shells expect a theme name; set a simple icon name first,
                 // then immediately set the full path:
                 using var ind = new AppIndicator("clingies", iconPath,
-                    AppIndicatorNative.AppIndicatorCategory.ApplicationStatus);
+                    Enums.AppIndicatorCategory.ApplicationStatus);
 
                 ind.SetIcon(iconPath);
                 ind.SetTitle("Clingies");
                 ind.SetMenu(trayMenu);
-                ind.SetStatus(AppIndicatorNative.AppIndicatorStatus.Active);
+                ind.SetStatus(Enums.AppIndicatorStatus.Active);
 
                 // AppIndicator doesn’t raise a “clicked” event; mimic Avalonia’s behavior by
                 // putting a top menu item like “Show All” OR add a global accelerator.
@@ -87,17 +87,7 @@ namespace Clingies.GtkFront
             };
             si.Activate += (_, __) => _windowFactory.RenderAllWindows();
             si.PopupMenu += (_, __) => { trayMenu.ShowAll(); trayMenu.Popup(); };
-#pragma warning restore CS0618
         }
 
-        // ITrayCommandController methods (direct port from Avalonia App.axaml.cs)
-        // public void CreateNewClingy()
-        // {
-        //     var defW = 300; var defH = 100;
-        //     var (x, y, w, h) = GetDesktopWorkingArea();
-        //     var cx = x + (w - defW) / 2;
-        //     var cy = y + (h - defH) / 2;
-        //     windowFactory.CreateNewWindow(cx, cy);
-        // }
     }
 }

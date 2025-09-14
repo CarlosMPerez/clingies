@@ -136,9 +136,9 @@ public sealed class ClingyBody : Overlay
         layout.Width = (int)(w * Pango.Scale.PangoScale);
         layout.GetPixelSize(out _, out int textH);
 
-        const int MinH = 100, MaxH = 1500, Pad = 16;
+        const int MinH = AppConstants.Dimensions.DefaultClingyHeight, MaxH = 1500, Pad = 16;
         int targetH = Math.Max(MinH, Math.Min(MaxH, textH + Pad));
-        int currentW = owner.Allocation.Width > 0 ? owner.Allocation.Width : 300;
+        int currentW = owner.Allocation.Width > 0 ? owner.Allocation.Width : AppConstants.Dimensions.DefaultClingyWidth;
         owner.Resize(currentW, targetH);
     }
 }

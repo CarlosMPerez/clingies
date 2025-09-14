@@ -1,4 +1,4 @@
-namespace Clingies.Domain.Models;
+namespace Clingies.Utils;
 
 public sealed class IgnoreComparisonFieldAttribute : Attribute
 {

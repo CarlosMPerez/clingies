@@ -18,5 +18,6 @@
     <ItemGroup>
       <ProjectReference Include="../Clingies.GtkFront/Clingies.GtkFront.csproj" />
       <ProjectReference Include="..\Clingies.ApplicationLogic\Clingies.ApplicationLogic.csproj" />
+      <ProjectReference Include="..\Clingies.Utils\Clingies.Utils.csproj" />
     </ItemGroup>
 </Project>

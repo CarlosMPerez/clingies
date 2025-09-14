@@ -5,26 +5,27 @@ namespace Clingies.Domain.Models;
 public sealed class Clingy
 {
     public int Id { get; set; }
+    public Enums.ClingyType Type { get; set; }
     public string? Title { get; set; }
-    public ClingyProperties Properties { get; set; }
-    public ClingyContent Content { get; set; }
-    public ClingyType Type { get; set; }
-
     public bool IsDeleted { get; set; }
 
-    [IgnoreComparisonFieldAttribute]
+    [IgnoreComparisonField]
     public DateTime CreatedAt { get; set; }
+    [IgnoreComparisonField]
+    public ClingyProperties Properties { get; set; }
+    [IgnoreComparisonField]
+    public ClingyContent Content { get; set; }
 
     public Clingy() { }
-
 
     public ClingyDto ToDto()
     {
         return new ClingyDto()
         {
             Id = Id,
-            Title = Title,
             Type = Type,
+            Title = Title,
+            IsDeleted = IsDeleted,
             CreatedAt = CreatedAt,
             Text = Content.Text,
             PngBytes = Content.Png,
@@ -35,8 +36,7 @@ public sealed class Clingy
             IsPinned = Properties.IsPinned,
             IsLocked = Properties.IsLocked,
             IsRolled = Properties.IsRolled,
-            IsStanding = Properties.IsStanding,
-            IsDeleted = IsDeleted
+            IsStanding = Properties.IsStanding
         };
     }
 }

@@ -23,7 +23,7 @@ namespace Clingies.GtkFront.Windows
             SkipTaskbarHint = true;               // do not show in taskbar
             KeepAbove = true;                     // ensure on top when opened
             Resizable = false;                    // fixed size
-            SetDefaultSize(380, 120);
+            SetDefaultSize(AppConstants.Dimensions.DefaultDialogWidth, AppConstants.Dimensions.DefaultDialogHeight);
             SetPosition(parent is not null ? WindowPosition.CenterOnParent : WindowPosition.Center);
 
             // Content area

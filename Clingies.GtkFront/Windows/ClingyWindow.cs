@@ -45,8 +45,8 @@ namespace Clingies.GtkFront.Windows
             SkipTaskbarHint = true;
             SkipPagerHint = true;
 
-            DefaultWidth = Math.Max(200, (int)dto.Width);
-            DefaultHeight = Math.Max(120, (int)dto.Height);
+            DefaultWidth = Math.Max(AppConstants.Dimensions.DefaultClingyWidth, (int)dto.Width);
+            DefaultHeight = Math.Max(AppConstants.Dimensions.DefaultClingyHeight, (int)dto.Height);
             Move((int)dto.PositionX, (int)dto.PositionY);
             _lastX = (int)dto.PositionX;
             _lastY = (int)dto.PositionY;

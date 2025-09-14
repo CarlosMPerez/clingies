@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\Clingies.Domain\Clingies.Domain.csproj" />
+    <ProjectReference Include="..\Clingies.Utils\Clingies.Utils.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.66" />

@@ -1,5 +1,5 @@
 
-namespace Clingies.GtkFront.Utils;
+namespace Clingies.Utils;
 
 /// <summary>
 /// Application-wide constants to avoid magic numbers and strings.
@@ -72,7 +72,10 @@ public static class AppConstants
 
     public static class Dimensions
     {
-        public const int DefaultClingyWidth  = 240;
-        public const int DefaultClingyHeight = 200;
+        public const int DefaultClingyWidth = 380;
+        public const int DefaultClingyHeight = 120;
+
+        public const int DefaultDialogWidth = 380;
+        public const int DefaultDialogHeight = 100;
     }
 }

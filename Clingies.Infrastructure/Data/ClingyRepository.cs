@@ -2,7 +2,6 @@ using System.Data;
 using System.Reflection;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.Models;
-using Clingies.Domain.DTOs;
 using Dapper;
 
 namespace Clingies.Infrastructure.Data;
@@ -15,16 +14,18 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         try
         {
             List<Clingy> clingies = new List<Clingy>();
-            var sql = """
-                SELECT c.id, c.title, c.type_id AS Type, c.created_at, c.is_deleted,
-                p.Id as PropsId, p.position_x, p.position_y, p.width, p.height, p.is_pinned, p.is_rolled, 
-                p.is_locked, p.is_standing, 
-                cc.Id as ContentId, cc.text, cc.png
-                FROM clingies AS c
-                JOIN clingy_properties as p ON p.id = c.id
-                JOIN clingy_content as cc on cc.id = c.id
-                WHERE c.is_deleted = 0 AND c.type_id = @TypeId;
-            """;
+            var sql =
+                """
+                    SELECT c.id, c.title, c.type_id AS Type, c.created_at, c.is_deleted,
+                    p.Id as PropsId, p.position_x, p.position_y, 
+                    p.width, p.height, p.is_pinned, p.is_rolled, 
+                    p.is_locked, p.is_standing, 
+                    cc.Id as ContentId, cc.text, cc.png
+                    FROM clingies AS c
+                    JOIN clingy_properties as p ON p.id = c.id
+                    JOIN clingy_content as cc on cc.id = c.id
+                    WHERE c.is_deleted = 0 AND c.type_id = @TypeId;
+                """;
             var data = Conn.Query<Clingy, ClingyProperties, ClingyContent, Clingy>(
                 sql,
                 (c, p, ct) =>
@@ -35,7 +36,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     c.Content = ct;
                     return c;
                 },
-                new { TypeId = (int)ClingyType.Desktop },
+                new { TypeId = (int)Enums.ClingyType.Desktop },
                 splitOn: "PropsId, ContentId"
             ).ToList();
 
@@ -51,29 +52,28 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
     {
         try
         {
-            var parms = new Dictionary<string, object> { { "@Id", id } };
-            var sql = """
-                SELECT c.id, c.title, c.type_id AS Type, c.created_at, c.is_deleted,
-                p.Id as PropsId, p.position_x, p.position_y, p.width, p.height, p.is_pinned, p.is_rolled, 
-                p.is_locked, p.is_standing, 
-                cc.Id as ContentId, cc.text, cc.png
-                FROM clingies AS c
-                JOIN clingy_properties as p ON p.id = c.id
-                JOIN clingy_content as cc on cc.id = c.id
-                WHERE c.id = @Id
-            """;
+            var sql =
+                """
+                    SELECT c.id, c.type_id AS Type, c.title, c.created_at, c.is_deleted,
+                    p.Id as Id, p.position_x, p.position_y, p.width, 
+                    p.height, p.is_pinned, p.is_rolled, 
+                    p.is_locked, p.is_standing, 
+                    c.Id as Id, cc.text, cc.png
+                    FROM clingies AS c
+                    JOIN clingy_properties AS p ON p.id = c.id
+                    JOIN clingy_content AS cc ON cc.id = c.id
+                    WHERE c.id = @Id;
+                """;
             return Conn.Query<Clingy, ClingyProperties, ClingyContent, Clingy>(
                 sql,
                 (c, p, ct) =>
                 {
-                    p.Id = c.Id;
-                    c.Id = p.Id;
                     c.Properties = p;
                     c.Content = ct;
                     return c;
                 },
-                new { TypeId = (int)ClingyType.Desktop },
-                splitOn: "PropsId, ContentId"
+                new { Id = id },
+                splitOn: "Id, Id"
             ).SingleOrDefault();
         }
         catch (Exception ex)
@@ -104,18 +104,22 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
 
             clingy.Properties.Id = clingy.Id;
             Conn.Execute(
-                @"INSERT INTO clingy_properties
+                """
+                    INSERT INTO clingy_properties
                     (id, position_x, position_y, width, height, is_pinned, is_rolled, is_locked, is_standing)
-                  VALUES
-                    (@Id, @PositionX, @PositionY, @Width, @Height, @IsPinned, @IsRolled, @IsLocked, @IsStanding);",
+                    VALUES
+                    (@Id, @PositionX, @PositionY, @Width, @Height, @IsPinned, @IsRolled, @IsLocked, @IsStanding);
+                """,
                 clingy.Properties, tx
             );
 
             // NEW clingies are ALWAYS created with content as null, either TEXT or PNG
             clingy.Content.Id = clingy.Id;
             Conn.Execute(
-                @"INSERT INTO clingy_content (id, text, png)
-                  VALUES (@Id, null, null);",
+                """
+                    INSERT INTO clingy_content (id, text, png)
+                    VALUES (@Id, null, null);
+                """,
                 clingy.Content, tx
             );
 
@@ -146,6 +150,11 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             var propsDirty = !IsEqual(current.Properties!, incoming.Properties!);
             var contDirty = !IsEqual(current.Content!, incoming.Content!);
 
+            Console.WriteLine($"Clingy {incoming.Id} is mainDirty: {mainDirty}");
+            Console.WriteLine($"Clingy {incoming.Id} is propsDirty: {propsDirty}");
+            Console.WriteLine($"Clingy {incoming.Id} is contDirty: {contDirty}");
+            Console.WriteLine("--------------------");
+
             if (mainDirty || propsDirty || contDirty)
             {
                 // Normalize “empties”
@@ -154,7 +163,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
 
                 // Enforce XOR ONLY on update
                 var hasText = incoming.Content?.Text is { Length: > 0 };
-                var hasImg  = incoming.Content?.Png  is { Length: > 0 };
+                var hasImg = incoming.Content?.Png is { Length: > 0 };
                 if (hasText && hasImg) // if both are true, error
                     throw new InvalidOperationException("On update, content must be either Text or Png (exclusively).");
 
@@ -282,37 +291,34 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
     {
         if (affected == 0)
             throw new KeyNotFoundException($"No row in '{table}' with id={id}.");
-    }    
+    }
 
     private Clingy? LoadAggregateForUpdate(int id, IDbTransaction tx)
     {
-        const string sql = @"
-                    SELECT
-                        c.id,
-                        c.type_id AS Type,
-                        c.title,
-                        c.created_at,
-                        c.is_deleted,
-                        p.position_x, p.position_y, p.width, p.height,
-                        p.is_pinned, p.is_rolled, p.is_locked, p.is_standing,
-                        ct.text, ct.png
-                    FROM clingies c
-                    JOIN clingy_properties p ON p.id = c.id
-                    JOIN clingy_content    ct ON ct.id = c.id
-                    WHERE c.id = @Id;";
-
-        return Conn.Query<Clingy, ClingyProperties, ClingyContent, Clingy>(
+        const string sql =
+            """
+                SELECT c.id, c.type_id AS Type, c.title, c.created_at, c.is_deleted,
+                p.Id as Id, p.position_x, p.position_y, p.width, 
+                p.height, p.is_pinned, p.is_rolled, 
+                p.is_locked, p.is_standing, 
+                cc.Id as Id, cc.text, cc.png
+                FROM clingies AS c
+                JOIN clingy_properties AS p ON p.id = c.id
+                JOIN clingy_content AS cc ON cc.id = c.id
+                WHERE c.id = @Id;
+            """;
+        var x = Conn.Query<Clingy, ClingyProperties, ClingyContent, Clingy>(
             sql,
             (c, p, ct) =>
             {
-                p.Id = c.Id; ct.Id = c.Id;
                 c.Properties = p;
                 c.Content = ct;
                 return c;
             },
             new { Id = id }, tx,
-            splitOn: "position_x, text"
+            splitOn: "Id, Id"
         ).SingleOrDefault();
+        return x;
     }
 
     private bool IsEqual<T>(T obj1, T obj2)
