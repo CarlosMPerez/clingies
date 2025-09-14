@@ -13,6 +13,8 @@ public class ContextCommandProvider : IContextCommandProvider
     public ICommand ShowColorWindowCommand { get; }
     public ICommand LockCommand { get; }
     public ICommand UnlockCommand { get; }
+    public ICommand RollUpCommand { get; }
+    public ICommand RollDownCommand { get; }
     public ICommand ShowPropertiesWindowCommand { get; }
 
     public ContextCommandProvider(IContextCommandController controller)
@@ -24,6 +26,8 @@ public class ContextCommandProvider : IContextCommandProvider
         ShowColorWindowCommand = new RelayCommand(_controller.ShowColorWindow);
         LockCommand = new RelayCommand(_controller.LockClingy);
         UnlockCommand = new RelayCommand(_controller.UnlockClingy);
+        RollUpCommand = new RelayCommand(_controller.RollUpClingy);
+        RollDownCommand = new RelayCommand(_controller.RollDownClingy);
         ShowPropertiesWindowCommand = new RelayCommand(_controller.ShowPropertiesWindow);
     }
 }

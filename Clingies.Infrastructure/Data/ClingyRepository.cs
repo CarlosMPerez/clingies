@@ -150,11 +150,6 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             var propsDirty = !IsEqual(current.Properties!, incoming.Properties!);
             var contDirty = !IsEqual(current.Content!, incoming.Content!);
 
-            Console.WriteLine($"Clingy {incoming.Id} is mainDirty: {mainDirty}");
-            Console.WriteLine($"Clingy {incoming.Id} is propsDirty: {propsDirty}");
-            Console.WriteLine($"Clingy {incoming.Id} is contDirty: {contDirty}");
-            Console.WriteLine("--------------------");
-
             if (mainDirty || propsDirty || contDirty)
             {
                 // Normalize “empties”
@@ -237,7 +232,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             """,
             new { Id = main.Id, TypeId = (int)main.Type, Title = main.Title }, tx);
         EnsureFound(rows, main.Id, "clingies");
-    }    
+    }
 
     private void UpdateProps(Clingy main, IDbTransaction tx)
     {
@@ -254,8 +249,14 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             new
             {
                 Id = main.Id,
-                props.PositionX, props.PositionY, props.Width, props.Height,
-                props.IsPinned, props.IsRolled, props.IsLocked, props.IsStanding
+                props.PositionX,
+                props.PositionY,
+                props.Width,
+                props.Height,
+                props.IsPinned,
+                props.IsRolled,
+                props.IsLocked,
+                props.IsStanding
             }, tx);
         EnsureFound(rows, main.Id, "clingy_properties");
     }
@@ -379,7 +380,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             }
 
             // Fallback to Equals (covers primitives, enums, bools, etc.)
-            if (!Equals(val1, val2)) return false;            
+            if (!Equals(val1, val2)) return false;
         }
 
         return true;

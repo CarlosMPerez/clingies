@@ -48,6 +48,8 @@ public static class AppConstants
         public const string Color = "color";
         public const string Lock = "lock";
         public const string Unlock = "unlock";
+        public const string RollUp = "rollup";
+        public const string RollDown = "rolldown";
         public const string Properties = "properties";
     }
 

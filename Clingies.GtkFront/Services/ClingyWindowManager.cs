@@ -7,12 +7,11 @@ using Clingies.ApplicationLogic.Services;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.DTOs;
 using Clingies.GtkFront.Windows;
-using Clingies.Domain.Models;
 
 namespace Clingies.GtkFront.Services;
 
 public class ClingyWindowManager(ClingyService clingyService,
-                            UtilsService utilsService,
+                            GtkUtilsService utilsService,
                             MenuFactory menuFactory,
                             IClingiesLogger loggerService,
                             ITitleDialogService titleDialogService,
@@ -23,7 +22,7 @@ public class ClingyWindowManager(ClingyService clingyService,
     private readonly ClingyService _srvClingy = clingyService;
     private readonly IClingiesLogger _srvLogger = loggerService;
     private readonly ITitleDialogService _titleDialogService = titleDialogService;
-    private readonly UtilsService _srvUtils = utilsService;
+    private readonly GtkUtilsService _srvUtils = utilsService;
     private readonly MenuFactory _menuFactory = menuFactory;
 
     public void CreateNewWindow()
@@ -128,6 +127,7 @@ public class ClingyWindowManager(ClingyService clingyService,
         {
             var window = _activeWindows.Single(x => x.ClingyId == id);
             var clingy = _activeClingies.Single(x => x.Id == id);
+            if (clingy.IsLocked) return;
             _activeWindows.Remove(window);
             _activeClingies.Remove(clingy);
             window.Close();
@@ -146,8 +146,10 @@ public class ClingyWindowManager(ClingyService clingyService,
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
+            if (clingy.IsLocked) return;
             window.KeepAbove = args.IsPinned;
             clingy.IsPinned = args.IsPinned;
+            window.SetPinIcon(clingy.IsPinned);
             _srvClingy.Update(clingy);
         }
         catch (Exception ex)
@@ -157,15 +159,24 @@ public class ClingyWindowManager(ClingyService clingyService,
         }
     }
 
+    public void RequestLock(int clingyId)
+    {
+        HandleLockRequested(sender: this, args: new LockRequestedEventArgs(clingyId, true));
+    }
+
+    public void RequestUnlock(int clingyId)
+    {
+        HandleLockRequested(sender: this, args: new LockRequestedEventArgs(clingyId, false));
+    }
+
     private void HandleLockRequested(object? sender, LockRequestedEventArgs args)
     {
         try
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            //window.ClingyTitleBar.IsLocked = args.IsLocked;
-            //window.ClingyBody.IsLocked = args.IsLocked;
             clingy.IsLocked = args.IsLocked;
+            window.SetLockIcon(clingy.IsLocked);
             _srvClingy.Update(clingy);
         }
         catch (Exception ex)
@@ -182,7 +193,7 @@ public class ClingyWindowManager(ClingyService clingyService,
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            //window.Position = new PixelPoint(args.PositionX, args.PositionY);
+            if (clingy.IsLocked) return;
             clingy.PositionX = args.PositionX;
             clingy.PositionY = args.PositionY;
             _srvClingy.Update(clingy);
@@ -201,6 +212,7 @@ public class ClingyWindowManager(ClingyService clingyService,
             // TODO - HANDLE IMGS
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
+            if (clingy.IsLocked) return;
             clingy.Text = string.IsNullOrEmpty(args.Content) ? "" : args.Content;
             _srvClingy.Update(clingy);
         }
@@ -241,6 +253,7 @@ public class ClingyWindowManager(ClingyService clingyService,
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
+            if (clingy.IsLocked) return;
             clingy.Width = args.Width;
             clingy.Height = args.Height;
             _srvClingy.Update(clingy);
@@ -258,7 +271,7 @@ public class ClingyWindowManager(ClingyService clingyService,
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
-            //window.ClingyBody.IsRolled = args.IsRolled;
+            if (clingy.IsLocked) return;
             clingy.IsRolled = args.IsRolled;
             _srvClingy.Update(clingy);
         }

@@ -42,7 +42,7 @@ internal sealed class Program
                 sp.GetRequiredService<IIconPathRepository>(),
                 sp.GetRequiredService<ClingyWindowManager>(),
                 sp.GetRequiredService<MenuFactory>(),
-                sp.GetRequiredService<UtilsService>());
+                sp.GetRequiredService<GtkUtilsService>());
             host.Run();
             Application.Run();
         }
@@ -80,12 +80,12 @@ internal sealed class Program
             services.AddSingleton<MenuService>();
             services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
             services.AddSingleton<Func<ITrayCommandProvider>>(sp =>
-                                () => sp.GetRequiredService<ITrayCommandProvider>());            
+                                () => sp.GetRequiredService<ITrayCommandProvider>());
             services.AddSingleton<ITrayCommandController, TrayCommandController>();
             services.AddSingleton<Func<IContextCommandController, IContextCommandProvider>>(sp =>
                                     controller => new ContextCommandProvider(controller));
             services.AddSingleton<ITitleDialogService, TitleDialogService>();
-            services.AddSingleton<UtilsService>();
+            services.AddSingleton<GtkUtilsService>();
         }
         catch (Exception ex)
         {

@@ -19,9 +19,7 @@ public class ClingyContextController : IContextCommandController
         _clingyId = clingyId;
     }
 
-    public void LockClingy() => Console.WriteLine("TO BE IMPLEMENTED BY WINDOW CONTEXT MENU");
-
-    public void ShowAlarmWindow() => Console.WriteLine("TO BE IMPLEMENTED BY WINDOW CONTEXT MENU");
+    public void ShowAlarmWindow() => Console.WriteLine("ALARM TO BE IMPLEMENTED");
 
     public void ShowChangeTitleDialog()
     {
@@ -32,11 +30,23 @@ public class ClingyContextController : IContextCommandController
         _manager.RequestTitleChange(_clingyId, newTitle);
     }
 
-    public void ShowColorWindow() => Console.WriteLine("TO BE IMPLEMENTED BY WINDOW CONTEXT MENU");
+    public void ShowColorWindow() => Console.WriteLine("COLOR TO BE IMPLEMENTED");
 
-    public void ShowPropertiesWindow() => Console.WriteLine("TO BE IMPLEMENTED BY WINDOW CONTEXT MENU");
+    public void ShowPropertiesWindow() => Console.WriteLine("PROPERTIES TO BE IMPLEMENTED");
 
-    public void SleepClingy() => Console.WriteLine("TO BE IMPLEMENTED BY WINDOW CONTEXT MENU");
+    public void SleepClingy() => Console.WriteLine("SLEEP TO BE IMPLEMENTED");
 
-    public void UnlockClingy() => Console.WriteLine("TO BE IMPLEMENTED BY WINDOW CONTEXT MENU");
+    public void LockClingy()
+    {
+        _manager.RequestLock(_clingyId);
+    }
+
+    public void UnlockClingy()
+    {
+        _manager.RequestUnlock(_clingyId);
+    }
+
+    public void RollUpClingy() => Console.WriteLine("ROLLUP TO BE IMPLEMENTED");
+
+    public void RollDownClingy() => Console.WriteLine("ROLLDOWN TO BE IMPLEMENTED");
 }

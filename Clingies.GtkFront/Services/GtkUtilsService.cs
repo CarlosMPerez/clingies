@@ -7,11 +7,11 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Clingies.GtkFront.Services
 {
-    public class UtilsService
+    public class GtkUtilsService
     {
         private readonly IClingiesLogger _logger;
         private readonly IIconPathRepository _iconRepo;
-        public UtilsService(IClingiesLogger logger, IIconPathRepository iconRepo)
+        public GtkUtilsService(IClingiesLogger logger, IIconPathRepository iconRepo)
         {
             _logger = logger;
             _iconRepo = iconRepo;

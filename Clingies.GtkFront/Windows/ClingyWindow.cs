@@ -3,7 +3,6 @@ using Clingies.ApplicationLogic.CustomEventArgs;
 using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.DTOs;
 using Clingies.GtkFront.Services;
-using Clingies.GtkFront.Utils;
 using Clingies.GtkFront.Windows.Parts;
 using Gtk;
 
@@ -25,14 +24,15 @@ namespace Clingies.GtkFront.Windows
 
         public IContextCommandProvider? CommandProvider { get; private set; }
 
-        private readonly UtilsService _srvUtils;
+        private readonly GtkUtilsService _srvUtils;
         private readonly MenuFactory _menuFactory;
         private readonly ClingyContextController _contextController;
         private int _lastX = int.MinValue;
         private int _lastY = int.MinValue;
         private ClingyTitleBar _titleBar;
+        private ClingyBody _body;
 
-        public ClingyWindow(ClingyDto clingyDto, UtilsService utils,
+        public ClingyWindow(ClingyDto clingyDto, GtkUtilsService utils,
                             MenuFactory menuFactory, ClingyContextController contextController)
                             : base(clingyDto.Title ?? string.Empty)
         {
@@ -59,8 +59,7 @@ namespace Clingies.GtkFront.Windows
                 sizeChanged: (w, h) => UpdateWindowSizeRequested?.Invoke(this, new UpdateWindowSizeRequestedEventArgs(dto.Id, w, h)),
                 contentChanged: text => ContentChangeRequested?.Invoke(this, new ContentChangeRequestedEventArgs(dto.Id, text)),
                 titleChanged: title => TitleChangeRequested?.Invoke(this, new TitleChangeRequestedEventArgs(dto.Id, title)),
-                pinChanged: isPinned => PinRequested?.Invoke(this, new PinRequestedEventArgs(dto.Id, isPinned)),
-                lockChanged: isLocked => LockRequested?.Invoke(this, new LockRequestedEventArgs(dto.Id, isLocked))
+                pinChanged: isPinned => PinRequested?.Invoke(this, new PinRequestedEventArgs(dto.Id, isPinned))
             );
 
             // Compose UI
@@ -70,10 +69,10 @@ namespace Clingies.GtkFront.Windows
                 BorderWidth = 0
             };
             _titleBar = ClingyTitleBar.Build(dto, this, _srvUtils, cb);
-            var body = ClingyBody.Build(dto, this, _srvUtils, cb);
+            _body = ClingyBody.Build(dto, this, _srvUtils, cb);
 
             root.PackStart(_titleBar, false, false, 0);
-            root.PackStart(body, true, true, 0);
+            root.PackStart(_body, true, true, 0);
 
             // Wrap everything in an EventBox so we can catch right-clicks anywhere
             var clickCatcher = new EventBox { VisibleWindow = false }; // transparent, but receives events
@@ -170,5 +169,12 @@ namespace Clingies.GtkFront.Windows
 
         public void SetContextCommandProvider(IContextCommandProvider provider) =>
             CommandProvider = provider ?? throw new ArgumentNullException(nameof(provider));
+
+        public void SetLockIcon(bool locked)
+        {
+            _titleBar.SetLockIcon(locked);
+            _body.SetLocked(locked);
+        }
+        public void SetPinIcon(bool pinned) => _titleBar.SetPinIcon(pinned);
     }
 }

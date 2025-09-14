@@ -8,5 +8,7 @@ public interface IContextCommandController
     void ShowColorWindow();
     void LockClingy();
     void UnlockClingy();
+    void RollUpClingy();
+    void RollDownClingy();
     void ShowPropertiesWindow();
 }

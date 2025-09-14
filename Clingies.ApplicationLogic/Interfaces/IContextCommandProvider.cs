@@ -10,5 +10,7 @@ public interface IContextCommandProvider
     ICommand ShowColorWindowCommand { get; }
     ICommand LockCommand { get; }
     ICommand UnlockCommand { get; }
+    ICommand RollUpCommand { get; }
+    ICommand RollDownCommand { get; }
     ICommand ShowPropertiesWindowCommand { get; }
 }

@@ -15,11 +15,11 @@ namespace Clingies.GtkFront
         private readonly ClingyWindowManager _windowFactory;
         private readonly MenuFactory _menuFactory;
 
-        private readonly UtilsService _srvUtils;
+        private readonly GtkUtilsService _srvUtils;
 
         public GtkFrontendHost(IClingiesLogger logger, IIconPathRepository iconRepo,
                         ClingyWindowManager windowFactory, MenuFactory menuFactory,
-                        UtilsService utilsService)
+                        GtkUtilsService utilsService)
         {
             _logger = logger;
             _iconRepo = iconRepo;

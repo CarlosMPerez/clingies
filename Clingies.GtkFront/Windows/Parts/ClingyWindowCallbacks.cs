@@ -12,16 +12,24 @@ public sealed class ClingyWindowCallbacks
     public Action<string> ContentChanged { get; }
     public Action<string> TitleChanged { get; }
     public Action<bool> PinChanged { get; }
-    public Action<bool> LockChanged { get; }
 
+    /// <summary>
+    /// Class for calling WindowManager events from insiode the window, or title or content
+    /// </summary>
+    /// <param name="clingyId"></param>
+    /// <param name="closeRequested"></param>
+    /// <param name="positionChanged"></param>
+    /// <param name="sizeChanged"></param>
+    /// <param name="titleChanged"></param>
+    /// <param name="contentChanged"></param>
+    /// <param name="pinChanged"></param>
     public ClingyWindowCallbacks(int clingyId,
                                 Action closeRequested,
                                 Action<int, int> positionChanged,
                                 Action<int, int> sizeChanged,
                                 Action<string> titleChanged,
                                 Action<string> contentChanged,
-                                Action<bool> pinChanged,
-                                Action<bool> lockChanged)
+                                Action<bool> pinChanged)
     {
         ClingyId = clingyId;
         CloseRequested = closeRequested;
@@ -30,6 +38,5 @@ public sealed class ClingyWindowCallbacks
         TitleChanged = titleChanged;
         ContentChanged = contentChanged;
         PinChanged = pinChanged;
-        LockChanged = lockChanged;
     }
 }

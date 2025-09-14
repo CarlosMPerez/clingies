@@ -13,7 +13,7 @@ namespace Clingies.GtkFront.Services;
 public class MenuFactory(MenuService menuService,
                         IClingiesLogger logger,
                         Func<ITrayCommandProvider> trayCommandProviderFactory,
-                        UtilsService utils)
+                        GtkUtilsService utils)
 
 {
     private IContextCommandProvider? _contextCommandProvider;
@@ -174,15 +174,17 @@ public class MenuFactory(MenuService menuService,
         AppConstants.ContextMenuCommands.Color => _contextCommandProvider!.ShowColorWindowCommand,
         AppConstants.ContextMenuCommands.Lock => _contextCommandProvider!.LockCommand,
         AppConstants.ContextMenuCommands.Unlock => _contextCommandProvider!.UnlockCommand,
+        AppConstants.ContextMenuCommands.RollUp => _contextCommandProvider!.RollUpCommand,
+        AppConstants.ContextMenuCommands.RollDown => _contextCommandProvider!.RollDownCommand,
         AppConstants.ContextMenuCommands.Properties => _contextCommandProvider!.ShowPropertiesWindowCommand,
         _ => null
     };
 
-    private static MenuItem NewMenuItemWithOptionalIcon(string text, string id, UtilsService utils)
+    private static MenuItem NewMenuItemWithOptionalIcon(string text, string id, GtkUtilsService utils)
     {
         var label = new Label(text) { Xalign = 0f, UseUnderline = true };
 
-        var pixbuf = utils.LoadPixbuf(id, 16); 
+        var pixbuf = utils.LoadPixbuf(id, 16);
         if (pixbuf is null)
             return new MenuItem { Child = label };
 

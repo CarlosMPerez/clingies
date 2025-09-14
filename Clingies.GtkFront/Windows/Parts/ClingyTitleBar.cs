@@ -1,6 +1,5 @@
 using Clingies.Domain.DTOs;
 using Clingies.GtkFront.Services;
-using Clingies.GtkFront.Utils;
 using Gtk;
 using Pango;
 
@@ -13,6 +12,10 @@ public sealed class ClingyTitleBar : Box
     private readonly Box _leftSide;
     private readonly Box _rightSide;
 
+    private Button _pinButton;
+    private Button _lockButton;
+    private Button _closeButton;
+
     private bool _isPinned;
     private bool _isLocked;
 
@@ -22,26 +25,28 @@ public sealed class ClingyTitleBar : Box
         Name = AppConstants.CssSections.ClingyTitle;
         HeightRequest = 22;
 
-        _leftSide  = new Box(Orientation.Horizontal, 0) { Halign = Align.Start, Valign = Align.Center };
-        _dragArea  = new EventBox { VisibleWindow = false, AboveChild = false };
-        _rightSide = new Box(Orientation.Horizontal, 0) { Halign = Align.End,   Valign = Align.Center };
+        _leftSide = new Box(Orientation.Horizontal, 0) { Halign = Align.Start, Valign = Align.Center };
+        _dragArea = new EventBox { VisibleWindow = false, AboveChild = false };
+        _rightSide = new Box(Orientation.Horizontal, 0) { Halign = Align.End, Valign = Align.Center };
 
         _titleLabel = new Label
         {
             Name = AppConstants.CssSections.ClingyTitleLabel,
-            Xalign = 0.5f, Yalign = 0.5f,
-            Halign = Align.Fill, Valign = Align.Center,
+            Xalign = 0.5f,
+            Yalign = 0.5f,
+            Halign = Align.Fill,
+            Valign = Align.Center,
             Ellipsize = EllipsizeMode.End
         };
         _dragArea.Add(_titleLabel);
 
-        PackStart(_leftSide,  false, false, 0);
-        PackStart(_dragArea,  true,  true,  0);
-        PackEnd  (_rightSide, false, false, 0);
+        PackStart(_leftSide, false, false, 0);
+        PackStart(_dragArea, true, true, 0);
+        PackEnd(_rightSide, false, false, 0);
     }
 
     public static ClingyTitleBar Build(ClingyDto dto, Window owner,
-        UtilsService utils, ClingyWindowCallbacks callbacks)
+        GtkUtilsService utils, ClingyWindowCallbacks callbacks)
     {
         var bar = new ClingyTitleBar();
 
@@ -51,23 +56,24 @@ public sealed class ClingyTitleBar : Box
         bar._titleLabel.Text = dto.Title ?? string.Empty;
 
         // left: pin, lock ----------------------------------------------------
-        var pinBtn = utils.MakeImgButton(
+        bar._pinButton = new Button();
+        bar._pinButton = utils.MakeImgButton(
             AppConstants.CssSections.ButtonPin,
             bar._isPinned ? AppConstants.IconNames.ClingyPinned : AppConstants.IconNames.ClingyUnpinned
         );
-        pinBtn.MarginStart = 2; pinBtn.MarginEnd = 4;
-        pinBtn.Clicked += (_, __) => bar.TogglePin(pinBtn, callbacks, utils);
-        bar._leftSide.PackStart(pinBtn, false, false, 0);
+        bar._pinButton.MarginStart = 2; bar._pinButton.MarginEnd = 4;
+        bar._pinButton.Clicked += (_, __) => bar.InternalTogglePin(callbacks, utils);
+        bar._leftSide.PackStart(bar._pinButton, false, false, 0);
 
-        var lockBtn = utils.MakeImgButton(
+        bar._lockButton = utils.MakeImgButton(
             AppConstants.CssSections.ButtonLock,
             AppConstants.IconNames.ClingyLocked,
-            (_, __) => { bar._isLocked = !bar._isLocked; callbacks.LockChanged(bar._isLocked); }
+            (_, __) => { bar._isLocked = !bar._isLocked; }
         );
-        lockBtn.MarginEnd = 4;
-        lockBtn.NoShowAll = true;
-        lockBtn.Visible = bar._isLocked;
-        bar._leftSide.PackStart(lockBtn, false, false, 0);
+        bar._lockButton.MarginEnd = 4;
+        bar._lockButton.NoShowAll = true;
+        bar._lockButton.Visible = bar._isLocked;
+        bar._leftSide.PackStart(bar._lockButton, false, false, 0);
 
         // drag area events ---------------------------------------------------
         bar._dragArea.Events |= Gdk.EventMask.ButtonPressMask | Gdk.EventMask.ButtonReleaseMask;
@@ -83,25 +89,50 @@ public sealed class ClingyTitleBar : Box
         };
 
         // right: close -------------------------------------------------------
-        var closeBtn = utils.MakeImgButton(
+        bar._closeButton = utils.MakeImgButton(
             AppConstants.CssSections.ButtonClose,
             AppConstants.IconNames.ClingyClose,
             (_, __) => callbacks.CloseRequested()
         );
-        closeBtn.MarginStart = 4; closeBtn.MarginEnd = 2;
-        bar._rightSide.PackEnd(closeBtn, false, false, 0);
+        bar._closeButton.MarginStart = 4; bar._closeButton.MarginEnd = 2;
+        bar._rightSide.PackEnd(bar._closeButton, false, false, 0);
 
         bar.ShowAll();
         return bar;
     }
 
-    private void TogglePin(Button pinBtn, ClingyWindowCallbacks callbacks, UtilsService utils)
+    // Internal Pin/Unpin command (by button clicking)
+    // can ONLY be called by command OnClick
+    private void InternalTogglePin(ClingyWindowCallbacks callbacks, GtkUtilsService utils)
     {
+        if (_isLocked) return;
         _isPinned = !_isPinned;
         var assetName = _isPinned ? AppConstants.IconNames.ClingyPinned : AppConstants.IconNames.ClingyUnpinned;
-        utils.SetButtonIcon(pinBtn, assetName);
+        utils.SetButtonIcon(_pinButton, assetName);
+        // notify the window manager that pin has changed
         callbacks.PinChanged(_isPinned);
     }
 
+    private void TogglePin(bool isPinned)
+    {
+        _isPinned = isPinned;
+        var assetName = _isPinned ? AppConstants.IconNames.ClingyPinned : AppConstants.IconNames.ClingyUnpinned;
+        //_utils.SetButtonIcon(_pinButton, assetName);
+        _pinButton.Show();
+    }
+
+    private void ToggleLock(bool isLocked)
+    {
+        _isLocked = isLocked;
+        _lockButton.Visible = _isLocked;
+        if (isLocked) _lockButton.Show();
+        else _lockButton.Hide();
+    }
+
+    // This calls come from WindowsManager and CANNOT return to it
     public void ChangeTitle(string newTitle) => _titleLabel.Text = newTitle ?? string.Empty;
+
+    public void SetPinIcon(bool isPinned) => TogglePin(isPinned);
+
+    public void SetLockIcon(bool isLocked) => ToggleLock(isLocked);
 }
