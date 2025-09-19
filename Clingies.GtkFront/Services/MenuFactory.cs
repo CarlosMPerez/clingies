@@ -6,7 +6,6 @@ using Clingies.ApplicationLogic.Interfaces;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.DTOs;
 using Clingies.ApplicationLogic.Services;
-using Clingies.GtkFront.Utils;
 
 namespace Clingies.GtkFront.Services;
 
@@ -18,18 +17,19 @@ public class MenuFactory(MenuService menuService,
 {
     private IContextCommandProvider? _contextCommandProvider;
     private readonly Func<ITrayCommandProvider> _trayCommandProviderFactory = trayCommandProviderFactory;
+
     public Menu BuildTrayMenu()
     {
         return BuildGtkTrayMenu();
     }
 
-    public Menu BuildClingyMenu(IContextCommandProvider provider)
+    public Menu BuildClingyMenu(IContextCommandProvider provider, bool isLocked)
     {
         _contextCommandProvider = provider;
-        return BuildContextMenu();
+        return BuildContextMenu(isLocked);
     }
 
-    private Menu BuildContextMenu()
+    private Menu BuildContextMenu(bool isLocked)
     {
         var menu = new Menu();
 
@@ -38,13 +38,16 @@ public class MenuFactory(MenuService menuService,
             .ToList();
 
         foreach (var item in topLevelItems)
+        {
+            if(item.Id != AppConstants.ContextMenuCommands.Unlock) item.Enabled = !isLocked;
             if (item.Separator) menu.Append(new SeparatorMenuItem());
             else menu.Append(BuildContextMenuItemRecursive(item));
+        }
 
         return menu;
     }
 
-    private MenuItem BuildContextMenuItemRecursive(TrayMenuItemDto item)
+    private MenuItem BuildContextMenuItemRecursive(MenuItemDto item)
     {
         var children = menuService.GetChildren(item.Id)
                         .OrderBy(c => c.SortOrder)
@@ -102,7 +105,7 @@ public class MenuFactory(MenuService menuService,
         return menu;
     }
 
-    private MenuItem BuildGtkTrayMenuItemRecursive(TrayMenuItemDto item)
+    private MenuItem BuildGtkTrayMenuItemRecursive(MenuItemDto item)
     {
         var children = menuService.GetChildren(item.Id)
                         .OrderBy(c => c.SortOrder)

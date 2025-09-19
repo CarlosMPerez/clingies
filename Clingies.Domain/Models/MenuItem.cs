@@ -2,7 +2,7 @@ using Clingies.Domain.DTOs;
 
 namespace Clingies.Domain.Models;
 
-public class TrayMenuItem
+public class MenuItem
 {
     public string Id { get; set; } = default!;
     public string? Label { get; set; }
@@ -13,11 +13,11 @@ public class TrayMenuItem
     public string? ParentId { get; set; }
     public int SortOrder { get; set; }
     // Populated later:
-    public List<TrayMenuItem> Children { get; } = new();
+    public List<MenuItem> Children { get; } = new();
 
-    public TrayMenuItemDto ToDto()
+    public MenuItemDto ToDto()
     {
-        return new TrayMenuItemDto()
+        return new MenuItemDto()
         {
             Id = this.Id,
             Label = this.Label,

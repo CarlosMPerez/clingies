@@ -4,6 +4,6 @@ namespace Clingies.Domain.Interfaces;
 
 public interface IMenuRepository
 {
-    public List<TrayMenuItem> GetAllParents(string menuType);
-    public List<TrayMenuItem> GetChildren(string parentId);
+    public List<MenuItem> GetAllParents(string menuType);
+    public List<MenuItem> GetChildren(string parentId);
 }

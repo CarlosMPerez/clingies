@@ -80,17 +80,17 @@ public class ClingyWindowManager(ClingyService clingyService,
         }
     }
 
-    private void SubscribeWindowToEvents(ClingyWindow window)
-    {
-        window.CloseRequested += HandleCloseRequested;
-        window.PinRequested += HandlePinRequested;
-        window.PositionChangeRequested += HandlePositionChangeRequested;
-        window.ContentChangeRequested += HandleContentChangeRequested;
-        window.TitleChangeRequested += HandleTitleChangeRequested;
-        window.UpdateWindowSizeRequested += HandleUpdateWindowSizeRequested;
-        window.RollRequested += HandleRollRequested;
-        window.LockRequested += HandleLockRequested;
-    }
+    public void RequestLock(int clingyId) =>
+        HandleLockRequested(sender: this, args: new LockRequestedEventArgs(clingyId, true));
+
+    public void RequestUnlock(int clingyId) =>
+        HandleLockRequested(sender: this, args: new LockRequestedEventArgs(clingyId, false));
+
+    public void RequestRollUp(int clingyId) =>
+        HandleRollRequested(sender: this, args: new RollRequestedEventArgs(clingyId, true));
+
+    public void RequestRollDown(int clingyId) =>
+        HandleRollRequested(sender: this, args: new RollRequestedEventArgs(clingyId, false));
 
     public void RenderAllWindows()
     {
@@ -110,17 +110,28 @@ public class ClingyWindowManager(ClingyService clingyService,
         }
     }
 
-    public ClingyDto? GetClingyDtoById(int clingyId)
+    public ClingyDto? GetClingyDtoById(int clingyId) =>
+        _activeClingies.Where(x => x.Id == clingyId).FirstOrDefault();
+
+    public ClingyWindow? GetClingyWindowById(int clingyId) =>
+        _activeWindows.Where(x => x.ClingyId == clingyId).FirstOrDefault();
+
+    public void RequestTitleChange(int clingyId, string newTitle) =>
+        HandleTitleChangeRequested(sender: this,
+            args: new TitleChangeRequestedEventArgs(clingyId, newTitle));
+
+    private void SubscribeWindowToEvents(ClingyWindow window)
     {
-        return _activeClingies.Where(x => x.Id == clingyId).FirstOrDefault();
+        window.CloseRequested += HandleCloseRequested;
+        window.PinRequested += HandlePinRequested;
+        window.PositionChangeRequested += HandlePositionChangeRequested;
+        window.ContentChangeRequested += HandleContentChangeRequested;
+        window.TitleChangeRequested += HandleTitleChangeRequested;
+        window.UpdateWindowSizeRequested += HandleUpdateWindowSizeRequested;
+        window.RollRequested += HandleRollRequested;
+        window.LockRequested += HandleLockRequested;
     }
 
-    public ClingyWindow? GetClingyWindowById(int clingyId)
-    {
-        return _activeWindows.Where(x => x.ClingyId == clingyId).FirstOrDefault();
-    }
-
-    #region EventHandlers
     private void HandleCloseRequested(object? sender, int id)
     {
         try
@@ -157,16 +168,6 @@ public class ClingyWindowManager(ClingyService clingyService,
             _srvLogger.Error(ex, "Error at HandlePinRequested");
             throw;
         }
-    }
-
-    public void RequestLock(int clingyId)
-    {
-        HandleLockRequested(sender: this, args: new LockRequestedEventArgs(clingyId, true));
-    }
-
-    public void RequestUnlock(int clingyId)
-    {
-        HandleLockRequested(sender: this, args: new LockRequestedEventArgs(clingyId, false));
     }
 
     private void HandleLockRequested(object? sender, LockRequestedEventArgs args)
@@ -223,19 +224,13 @@ public class ClingyWindowManager(ClingyService clingyService,
         }
     }
 
-    // Exposing a façade for the private event so we can call it from ContextController or elsewhere,
-    //  do the same for others
-    public void RequestTitleChange(int clingyId, string newTitle)
-    {
-        HandleTitleChangeRequested(sender: this, args: new TitleChangeRequestedEventArgs(clingyId, newTitle));
-    }
-
     private void HandleTitleChangeRequested(object? sender, TitleChangeRequestedEventArgs args)
     {
         try
         {
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
+            if (clingy.IsLocked) return;
             clingy.Title = args.NewTitle;
             window.ChangeTitleBarText(args.NewTitle);
             _srvClingy.Update(clingy);
@@ -273,6 +268,7 @@ public class ClingyWindowManager(ClingyService clingyService,
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             if (clingy.IsLocked) return;
             clingy.IsRolled = args.IsRolled;
+            window.SetRolled(args.IsRolled);
             _srvClingy.Update(clingy);
         }
         catch (Exception ex)
@@ -281,6 +277,4 @@ public class ClingyWindowManager(ClingyService clingyService,
             throw;
         }
     }
-
-    #endregion    
 }

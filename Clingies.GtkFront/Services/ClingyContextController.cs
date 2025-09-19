@@ -36,17 +36,11 @@ public class ClingyContextController : IContextCommandController
 
     public void SleepClingy() => Console.WriteLine("SLEEP TO BE IMPLEMENTED");
 
-    public void LockClingy()
-    {
-        _manager.RequestLock(_clingyId);
-    }
+    public void LockClingy() => _manager.RequestLock(_clingyId);
 
-    public void UnlockClingy()
-    {
-        _manager.RequestUnlock(_clingyId);
-    }
+    public void UnlockClingy() => _manager.RequestUnlock(_clingyId);
 
-    public void RollUpClingy() => Console.WriteLine("ROLLUP TO BE IMPLEMENTED");
+    public void RollUpClingy() => _manager.RequestRollUp(_clingyId);
 
-    public void RollDownClingy() => Console.WriteLine("ROLLDOWN TO BE IMPLEMENTED");
+    public void RollDownClingy() => _manager.RequestRollDown(_clingyId);
 }

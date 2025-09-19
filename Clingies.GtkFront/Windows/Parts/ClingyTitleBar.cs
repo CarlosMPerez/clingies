@@ -79,7 +79,7 @@ public sealed class ClingyTitleBar : Box
         bar._dragArea.Events |= Gdk.EventMask.ButtonPressMask | Gdk.EventMask.ButtonReleaseMask;
         bar._dragArea.ButtonPressEvent += (_, e) =>
         {
-            if (e.Event.Button == 1)
+            if (e.Event.Button == 1 && !dto.IsLocked)
                 owner.BeginMoveDrag((int)e.Event.Button, (int)e.Event.XRoot, (int)e.Event.YRoot, e.Event.Time);
         };
         bar._dragArea.ButtonReleaseEvent += (_, __) =>

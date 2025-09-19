@@ -9,7 +9,7 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
 {
     private IDbConnection Conn => connectionFactory.GetConnection();
 
-    public List<TrayMenuItem> GetAllParents(string menuType)
+    public List<MenuItem> GetAllParents(string menuType)
     {
         try
         {
@@ -20,7 +20,7 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
                 AND parent_id IS NULL
                 ORDER BY sort_order
             """;
-            var items = Conn.Query<TrayMenuItem>(sql, parms).ToList();
+            var items = Conn.Query<MenuItem>(sql, parms).ToList();
             return items;
         }
         catch (Exception ex)
@@ -30,7 +30,7 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
         }
     }
 
-    public List<TrayMenuItem> GetChildren(string parentId)
+    public List<MenuItem> GetChildren(string parentId)
     {
         try
         {
@@ -41,7 +41,7 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
                 WHERE parent_id = @parentId
                 ORDER BY sort_order
             """;
-            var items = Conn.Query<TrayMenuItem>(sql, parms).ToList();
+            var items = Conn.Query<MenuItem>(sql, parms).ToList();
             return items;
         }
         catch (Exception ex)

@@ -6,7 +6,7 @@ namespace Clingies.ApplicationLogic.Services;
 
 public class MenuService(IMenuRepository repo, IClingiesLogger logger)
 {
-    public List<TrayMenuItemDto> GetAllParents(string menuType)
+    public List<MenuItemDto> GetAllParents(string menuType)
     {
         try
         {
@@ -19,7 +19,7 @@ public class MenuService(IMenuRepository repo, IClingiesLogger logger)
         }
     }
 
-    public List<TrayMenuItemDto> GetChildren(string parentId)
+    public List<MenuItemDto> GetChildren(string parentId)
     {
         try
         {
