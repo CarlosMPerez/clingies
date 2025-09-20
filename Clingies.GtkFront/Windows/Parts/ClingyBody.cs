@@ -11,11 +11,15 @@ public sealed class ClingyBody : Overlay
     private EventBox _rightGrip;
     private bool _isLocked;
 
+    private bool _autoSizeEnabled = true;
+
     private ClingyBody() : base()
     {
     }
 
-    public static ClingyBody Build(ClingyDto dto, Window owner, ClingyWindowCallbacks cb)
+    public static ClingyBody Build(ClingyDto dto,
+                                    Window owner,
+                                    ClingyWindowCallbacks cb)
     {
         var overlay = new ClingyBody();
         var scroller = new ScrolledWindow
@@ -69,6 +73,8 @@ public sealed class ClingyBody : Overlay
 
         void DebounceAutosize()
         {
+            if (!overlay._autoSizeEnabled) return;
+
             if (autosizeId != 0) GLib.Source.Remove(autosizeId);
             autosizeId = GLib.Timeout.Add(16, () =>
             {
@@ -132,6 +138,8 @@ public sealed class ClingyBody : Overlay
             _rightGrip.Window?.SetDeviceCursor(owner.Display.DefaultSeat.Pointer, null);
         }
     }
+
+    public void SetAutoSizeEnabled(bool enabled) => _autoSizeEnabled = enabled;
 
     private static EventBox MakeGrip(Window owner, ClingyWindowCallbacks cb, bool isLeft, Func<bool> isLocked)
     {

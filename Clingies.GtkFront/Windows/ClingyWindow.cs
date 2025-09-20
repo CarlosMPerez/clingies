@@ -17,10 +17,9 @@ namespace Clingies.GtkFront.Windows
         public event EventHandler<PinRequestedEventArgs>? PinRequested;
         public event EventHandler<TitleChangeRequestedEventArgs>? TitleChangeRequested;
         public event EventHandler<PositionChangeRequestedEventArgs>? PositionChangeRequested;
-        public event EventHandler<RollRequestedEventArgs>? RollRequested;
         public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
         public event EventHandler<UpdateWindowSizeRequestedEventArgs>? UpdateWindowSizeRequested;
-        public event EventHandler<LockRequestedEventArgs>? LockRequested;
+        public event EventHandler<RollRequestedEventArgs>? RollRequested;
 
         public IContextCommandProvider? CommandProvider { get; private set; }
 
@@ -31,9 +30,7 @@ namespace Clingies.GtkFront.Windows
         private int _lastY = int.MinValue;
         private ClingyTitleBar _titleBar;
         private ClingyBody _body;
-        private Revealer _bodyRevealer;
-        private bool _isRolled;
-
+        private Box _root;
 
         public ClingyWindow(ClingyDto clingyDto, GtkUtilsService utils,
                             MenuFactory menuFactory, ClingyContextController contextController)
@@ -62,11 +59,12 @@ namespace Clingies.GtkFront.Windows
                 sizeChanged: (w, h) => UpdateWindowSizeRequested?.Invoke(this, new UpdateWindowSizeRequestedEventArgs(dto.Id, w, h)),
                 contentChanged: text => ContentChangeRequested?.Invoke(this, new ContentChangeRequestedEventArgs(dto.Id, text)),
                 titleChanged: title => TitleChangeRequested?.Invoke(this, new TitleChangeRequestedEventArgs(dto.Id, title)),
-                pinChanged: isPinned => PinRequested?.Invoke(this, new PinRequestedEventArgs(dto.Id, isPinned))
+                pinChanged: isPinned => PinRequested?.Invoke(this, new PinRequestedEventArgs(dto.Id, isPinned)),
+                rollChanged: isRolled => RollRequested?.Invoke(this, new RollRequestedEventArgs(dto.Id, isRolled))
             );
 
             // Compose UI
-            var root = new Box(Orientation.Vertical, 0)
+            _root = new Box(Orientation.Vertical, 0)
             {
                 Name = AppConstants.CssSections.ClingyWindow,
                 BorderWidth = 0
@@ -74,23 +72,12 @@ namespace Clingies.GtkFront.Windows
             _titleBar = ClingyTitleBar.Build(dto, this, _srvUtils, cb);
             _body = ClingyBody.Build(dto, this, cb);
 
-            _bodyRevealer = new Revealer
-            {
-                RevealChild = !dto.IsRolled,
-                TransitionType = dto.IsRolled ?
-                        RevealerTransitionType.SlideDown :
-                        RevealerTransitionType.SlideDown,
-                TransitionDuration = 150
-            };
-
-            _bodyRevealer.Add(_body);
-
-            root.PackStart(_titleBar, false, false, 0);
-            root.PackStart(_bodyRevealer, true, true, 0);
+            _root.PackStart(_titleBar, false, false, 0);
+            _root.PackStart(_body, true, true, 0);
 
             // Wrap everything in an EventBox so we can catch right-clicks anywhere
             var clickCatcher = new EventBox { VisibleWindow = false }; // transparent, but receives events
-            clickCatcher.Add(root);
+            clickCatcher.Add(_root);
 
             // Listen for button presses
             clickCatcher.AddEvents((int)Gdk.EventMask.ButtonPressMask);
@@ -117,6 +104,7 @@ namespace Clingies.GtkFront.Windows
 
             AddEvents((int)Gdk.EventMask.StructureMask);
             ConfigureEvent += OnConfigureEvent;
+            ApplyRollState(dto.IsRolled);
             ApplyContentLock(dto.IsLocked);
         }
 
@@ -192,47 +180,52 @@ namespace Clingies.GtkFront.Windows
             ApplyContentLock(locked);
         }
 
-        public void SetRolled(bool isRolled)
+        public void ApplyRollState(bool isRolled)
         {
-            _isRolled = isRolled;
-            _bodyRevealer.TransitionType = isRolled ?
-                     RevealerTransitionType.SlideUp :
-                     RevealerTransitionType.SlideDown;
-            _bodyRevealer.RevealChild = !isRolled;
-
-            ApplyRollGeometry(isRolled);
-            GLib.Idle.Add(() => { ApplyRollGeometry(_isRolled); return false; });            
-        }
-
-        private void ApplyRollGeometry(bool isRolled)
-        {
-            // Measure title bar height
-            _titleBar.GetPreferredHeight(out int minH, out int natH);
-            int titleH = Math.Max(minH, natH);
-
-            var geom = new Gdk.Geometry();
-
             if (isRolled)
             {
-                // Fix height to title bar only
-                geom.MinHeight = titleH;
-                geom.MaxHeight = titleH;
-                // keep width flexible
-                this.SetGeometryHints(this, geom,
-                    Gdk.WindowHints.MinSize | Gdk.WindowHints.MaxSize);
+                _body.SetAutoSizeEnabled(false);
+                _body.Hide();
+                _root.SetChildPacking(_body, expand: false, fill: false, padding: 0, PackType.Start);
+                //_root.Remove(_body);
+                ClampToTitleBarHeight();
             }
             else
             {
-                // Remove the tight clamp: allow normal growth again
-                geom.MinHeight = titleH;          // still can’t be smaller than title
-                geom.MaxHeight = int.MaxValue;    // effectively “no cap”
-                this.SetGeometryHints(this, geom,
-                    Gdk.WindowHints.MinSize | Gdk.WindowHints.MaxSize);
+                _body.SetAutoSizeEnabled(true);
+                _root.SetChildPacking(_body, expand: true, fill: true, padding: 0, PackType.Start);
+                //_root.PackStart(_body, expand: true, fill: true, padding: 0);
+                _body.ShowAll();
+                UnclampHeight();
             }
 
-            // Optional: nudge size so WM applies constraints immediately
-            this.QueueResize();
+            _root.QueueResize();
         }
+
+        private void ClampToTitleBarHeight()
+        {
+            var geom = new Gdk.Geometry
+            {
+                MinHeight = AppConstants.Dimensions.TitleHeight,
+                MaxHeight = AppConstants.Dimensions.TitleHeight,
+                MinWidth = (int)dto.Width,
+                MaxWidth = (int)dto.Width
+            };
+            this.SetGeometryHints(this, geom, Gdk.WindowHints.MinSize | Gdk.WindowHints.MaxSize);
+        }
+
+        private void UnclampHeight()
+        {
+            var geom = new Gdk.Geometry
+            {
+                MinHeight = AppConstants.Dimensions.TitleHeight,
+                MaxHeight = int.MaxValue,
+                MinWidth = (int)dto.Width,
+                MaxWidth = int.MaxValue
+            };
+            this.SetGeometryHints(this, geom, Gdk.WindowHints.MinSize | Gdk.WindowHints.MaxSize);
+        }
+
         private void ApplyContentLock(bool isLocked) => _body.ApplyLock(isLocked, this);
     }
 }

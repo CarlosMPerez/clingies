@@ -23,7 +23,7 @@ public sealed class ClingyTitleBar : Box
     private ClingyTitleBar() : base(Orientation.Horizontal, 4)
     {
         Name = AppConstants.CssSections.ClingyTitle;
-        HeightRequest = 22;
+        HeightRequest = AppConstants.Dimensions.TitleHeight;
 
         _leftSide = new Box(Orientation.Horizontal, 0) { Halign = Align.Start, Valign = Align.Center };
         _dragArea = new EventBox { VisibleWindow = false, AboveChild = false };
@@ -76,10 +76,17 @@ public sealed class ClingyTitleBar : Box
         bar._leftSide.PackStart(bar._lockButton, false, false, 0);
 
         // drag area events ---------------------------------------------------
-        bar._dragArea.Events |= Gdk.EventMask.ButtonPressMask | Gdk.EventMask.ButtonReleaseMask;
+        bar._dragArea.Events |= Gdk.EventMask.ButtonPressMask |
+                                Gdk.EventMask.ButtonReleaseMask |
+                                Gdk.EventMask.PointerMotionMask;
         bar._dragArea.ButtonPressEvent += (_, e) =>
         {
-            if (e.Event.Button == 1 && !dto.IsLocked)
+            // do NOT check for islocked for all actions of mouse or right click menu will be blocked
+            // ask individually
+            if (e.Event.Button == 1 && !dto.IsLocked && e.Event.Type == Gdk.EventType.TwoButtonPress)
+                callbacks.RollChanged(!dto.IsRolled);
+
+            if (e.Event.Button == 1 && !dto.IsLocked && e.Event.Type == Gdk.EventType.ButtonPress)
                 owner.BeginMoveDrag((int)e.Event.Button, (int)e.Event.XRoot, (int)e.Event.YRoot, e.Event.Time);
         };
         bar._dragArea.ButtonReleaseEvent += (_, __) =>
@@ -113,10 +120,15 @@ public sealed class ClingyTitleBar : Box
         callbacks.PinChanged(_isPinned);
     }
 
+    /// <summary>
+    /// for when pin ios called EXTERNALLY, from menu for example
+    /// </summary>
+    /// <param name="isPinned"></param>
     private void TogglePin(bool isPinned)
     {
         _isPinned = isPinned;
-        var assetName = _isPinned ? AppConstants.IconNames.ClingyPinned : AppConstants.IconNames.ClingyUnpinned;
+        // SOLVE THIS
+        //var assetName = _isPinned ? AppConstants.IconNames.ClingyPinned : AppConstants.IconNames.ClingyUnpinned;
         //_utils.SetButtonIcon(_pinButton, assetName);
         _pinButton.Show();
     }

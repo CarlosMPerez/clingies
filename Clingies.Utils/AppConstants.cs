@@ -79,5 +79,7 @@ public static class AppConstants
 
         public const int DefaultDialogWidth = 380;
         public const int DefaultDialogHeight = 100;
+
+        public const int TitleHeight = 20;
     }
 }

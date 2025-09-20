@@ -129,7 +129,6 @@ public class ClingyWindowManager(ClingyService clingyService,
         window.TitleChangeRequested += HandleTitleChangeRequested;
         window.UpdateWindowSizeRequested += HandleUpdateWindowSizeRequested;
         window.RollRequested += HandleRollRequested;
-        window.LockRequested += HandleLockRequested;
     }
 
     private void HandleCloseRequested(object? sender, int id)
@@ -268,7 +267,7 @@ public class ClingyWindowManager(ClingyService clingyService,
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             if (clingy.IsLocked) return;
             clingy.IsRolled = args.IsRolled;
-            window.SetRolled(args.IsRolled);
+            window.ApplyRollState(args.IsRolled);
             _srvClingy.Update(clingy);
         }
         catch (Exception ex)
