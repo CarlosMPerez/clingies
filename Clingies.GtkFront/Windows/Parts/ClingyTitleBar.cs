@@ -29,6 +29,10 @@ public sealed class ClingyTitleBar : Box
         _dragArea = new EventBox { VisibleWindow = false, AboveChild = false };
         _rightSide = new Box(Orientation.Horizontal, 0) { Halign = Align.End, Valign = Align.Center };
 
+        _pinButton = new Button();
+        _lockButton = new Button();
+        _closeButton = new Button();
+
         _titleLabel = new Label
         {
             Name = AppConstants.CssSections.ClingyTitleLabel,
@@ -56,7 +60,6 @@ public sealed class ClingyTitleBar : Box
         bar._titleLabel.Text = dto.Title ?? string.Empty;
 
         // left: pin, lock ----------------------------------------------------
-        bar._pinButton = new Button();
         bar._pinButton = utils.MakeImgButton(
             AppConstants.CssSections.ButtonPin,
             bar._isPinned ? AppConstants.IconNames.ClingyPinned : AppConstants.IconNames.ClingyUnpinned

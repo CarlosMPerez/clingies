@@ -17,6 +17,14 @@ public class _20250912_02_InitialSeedMenuData : Migration
             "Assets/menu_light/menu_new.png",
             "Assets/menu_dark/menu_new.png");
         Execute.Sql(sql);
+        // SHOW ALL
+        sql = SqlBuilder.BuildInsertSystemTrayMenuItem("show", "tray", null, "Show all",
+            "Show all Clingies", true, false, 20);
+        Execute.Sql(sql);
+        sql = SqlBuilder.BuildInsertSystemTrayIcon("show",
+            "Assets/menu_light/menu_show.png",
+            "Assets/menu_dark/menu_show.png");
+        Execute.Sql(sql);
         // SEPARATOR
         sql = SqlBuilder.BuildInsertSystemTrayMenuItem("sep001", "tray", null, null, null, true, true, 30);
         Execute.Sql(sql);
@@ -71,22 +79,6 @@ public class _20250912_02_InitialSeedMenuData : Migration
         sql = SqlBuilder.BuildInsertSystemTrayIcon("unlocked",
             "Assets/menu_light/menu_unlocked.png",
             "Assets/menu_dark/menu_unlocked.png");
-        Execute.Sql(sql);
-        // SET ALL _> VISIBLE
-        sql = SqlBuilder.BuildInsertSystemTrayMenuItem("show", "tray", "set_all", "Show all",
-            "Show all Clingies", true, false, 70);
-        Execute.Sql(sql);
-        sql = SqlBuilder.BuildInsertSystemTrayIcon("show",
-            "Assets/menu_light/menu_show.png",
-            "Assets/menu_dark/menu_show.png");
-        Execute.Sql(sql);
-        // SET ALL _> INVISIBLE
-        sql = SqlBuilder.BuildInsertSystemTrayMenuItem("hide", "tray", "set_all", "Hide",
-            "Hide all Clingies", true, false, 80);
-        Execute.Sql(sql);
-        sql = SqlBuilder.BuildInsertSystemTrayIcon("hide",
-            "Assets/menu_light/menu_hide.png",
-            "Assets/menu_dark/menu_hide.png");
         Execute.Sql(sql);
         // SEPARATOR
         sql = SqlBuilder.BuildInsertSystemTrayMenuItem("sep002", "tray", null, null, null, true, true, 50);

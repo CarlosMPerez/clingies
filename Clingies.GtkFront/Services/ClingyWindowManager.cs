@@ -176,7 +176,7 @@ public class ClingyWindowManager(ClingyService clingyService,
             var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
             var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
             clingy.IsLocked = args.IsLocked;
-            window.SetLockIcon(clingy.IsLocked);
+            window.ApplyLockState(clingy.IsLocked);
             _srvClingy.Update(clingy);
         }
         catch (Exception ex)

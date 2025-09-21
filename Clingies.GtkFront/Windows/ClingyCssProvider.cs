@@ -67,7 +67,6 @@ namespace Clingies.GtkFront.Windows
                 font-family: monospace;
                 font-size: 12px;
                 caret-color: black;
-                -GtkWidget-cursor-color: black;
             }
 
             /* Remove any separators/borders between header and body */

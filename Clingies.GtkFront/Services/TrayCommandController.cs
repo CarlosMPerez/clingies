@@ -25,7 +25,7 @@ public class TrayCommandController : ITrayCommandController
     public void UnpinAllClingies() => Console.WriteLine("UNPIN ALL NOT IMPLEMENTED");
     public void LockAllClingies() => Console.WriteLine("LOCK ALL NOT IMPLEMENTED");
     public void UnlockAllClingies() => Console.WriteLine("UNLOCK ALL NOT IMPLEMENTED");
-    public void ShowAllClingies() => Console.WriteLine("SHOW ALL NOT IMPLEMENTED");
+    public void ShowAllClingies() => _windowFactory.RenderAllWindows();
     public void HideAllClingies() => Console.WriteLine("HIDE ALL NOT IMPLEMENTED");
     public void ShowManageClingiesWindow() => Console.WriteLine("MANAGE CLINGIES NOT IMPLEMENTED");
     public void ShowHelpWindow() => Console.WriteLine("HELP WINDOW NOT IMPLEMENTED");

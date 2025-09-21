@@ -23,13 +23,13 @@ public class MenuFactory(MenuService menuService,
         return BuildGtkTrayMenu();
     }
 
-    public Menu BuildClingyMenu(IContextCommandProvider provider, bool isLocked)
+    public Menu BuildClingyMenu(IContextCommandProvider provider, bool isLocked, bool isRolled)
     {
         _contextCommandProvider = provider;
-        return BuildContextMenu(isLocked);
+        return BuildContextMenu(isLocked, isRolled);
     }
 
-    private Menu BuildContextMenu(bool isLocked)
+    private Menu BuildContextMenu(bool isLocked, bool isRolled)
     {
         var menu = new Menu();
 
@@ -39,7 +39,15 @@ public class MenuFactory(MenuService menuService,
 
         foreach (var item in topLevelItems)
         {
-            if(item.Id != AppConstants.ContextMenuCommands.Unlock) item.Enabled = !isLocked;
+            item.Enabled = item.Id switch
+            {
+                AppConstants.ContextMenuCommands.Lock => !isLocked && !isRolled,
+                AppConstants.ContextMenuCommands.Unlock => isLocked && !isRolled,
+                AppConstants.ContextMenuCommands.RollUp => !isLocked && !isRolled,
+                AppConstants.ContextMenuCommands.RollDown => isRolled,
+                _ => !isLocked
+            };
+            
             if (item.Separator) menu.Append(new SeparatorMenuItem());
             else menu.Append(BuildContextMenuItemRecursive(item));
         }

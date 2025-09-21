@@ -7,7 +7,7 @@ public class ContextCommandProvider : IContextCommandProvider
 {
     private IContextCommandController _controller;
     public ICommand SleepCommand { get; }
-    public ICommand BuildStackMenuCommand { get; }
+    //public ICommand BuildStackMenuCommand { get; }
     public ICommand ShowAlarmWindowCommand { get; }
     public ICommand ShowChangeTitleDialogCommand { get; }
     public ICommand ShowColorWindowCommand { get; }

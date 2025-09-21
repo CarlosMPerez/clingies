@@ -16,7 +16,11 @@ public sealed class Clingy
     [IgnoreComparisonField]
     public ClingyContent Content { get; set; }
 
-    public Clingy() { }
+    public Clingy()
+    {
+        Properties = new ClingyProperties();
+        Content = new ClingyContent();    
+    }
 
     public ClingyDto ToDto()
     {
@@ -24,7 +28,7 @@ public sealed class Clingy
         {
             Id = Id,
             Type = Type,
-            Title = Title,
+            Title = Title ?? string.Empty,
             IsDeleted = IsDeleted,
             CreatedAt = CreatedAt,
             Text = Content.Text,

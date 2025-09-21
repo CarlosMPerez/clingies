@@ -75,10 +75,10 @@ public static class AppConstants
     public static class Dimensions
     {
         public const int DefaultClingyWidth = 380;
-        public const int DefaultClingyHeight = 120;
+        public const int DefaultClingyHeight = 80;
 
         public const int DefaultDialogWidth = 380;
-        public const int DefaultDialogHeight = 100;
+        public const int DefaultDialogHeight = 60;
 
         public const int TitleHeight = 20;
     }

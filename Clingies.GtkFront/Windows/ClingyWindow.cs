@@ -104,8 +104,8 @@ namespace Clingies.GtkFront.Windows
 
             AddEvents((int)Gdk.EventMask.StructureMask);
             ConfigureEvent += OnConfigureEvent;
+            ApplyLockState(dto.IsLocked);
             ApplyRollState(dto.IsRolled);
-            ApplyContentLock(dto.IsLocked);
         }
 
         [GLib.ConnectBefore]
@@ -135,7 +135,7 @@ namespace Clingies.GtkFront.Windows
         private void OnRightClick(object? sender, ButtonPressEventArgs e)
         {
             if (e.Event.Button != 3) return; // only right button
-            var menu = _menuFactory.BuildClingyMenu(CommandProvider!, dto.IsLocked);
+            var menu = _menuFactory.BuildClingyMenu(CommandProvider!, dto.IsLocked, dto.IsRolled);
             menu.ShowAll();
             menu.PopupAtPointer(e.Event);
             e.RetVal = true; // stop further handling
@@ -155,7 +155,7 @@ namespace Clingies.GtkFront.Windows
 
             if (isShiftF10 || isMenuKey)
             {
-                var menu = _menuFactory.BuildClingyMenu(CommandProvider!, dto.IsLocked);
+                var menu = _menuFactory.BuildClingyMenu(CommandProvider!, dto.IsLocked, dto.IsRolled);
                 menu.ShowAll();
                 menu.PopupAtWidget(this, Gdk.Gravity.SouthWest, Gdk.Gravity.NorthWest, null);
             }
@@ -174,58 +174,14 @@ namespace Clingies.GtkFront.Windows
         public void SetContextCommandProvider(IContextCommandProvider provider) =>
             CommandProvider = provider ?? throw new ArgumentNullException(nameof(provider));
 
-        public void SetLockIcon(bool locked)
+        public void ApplyLockState(bool isLocked)
         {
-            _titleBar.SetLockIcon(locked);
-            ApplyContentLock(locked);
+            _titleBar.SetLockIcon(isLocked);
+            _body.ApplyLock(isLocked, this);
         }
 
-        public void ApplyRollState(bool isRolled)
-        {
-            if (isRolled)
-            {
-                _body.SetAutoSizeEnabled(false);
-                _body.Hide();
-                _root.SetChildPacking(_body, expand: false, fill: false, padding: 0, PackType.Start);
-                //_root.Remove(_body);
-                ClampToTitleBarHeight();
-            }
-            else
-            {
-                _body.SetAutoSizeEnabled(true);
-                _root.SetChildPacking(_body, expand: true, fill: true, padding: 0, PackType.Start);
-                //_root.PackStart(_body, expand: true, fill: true, padding: 0);
-                _body.ShowAll();
-                UnclampHeight();
-            }
-
-            _root.QueueResize();
-        }
-
-        private void ClampToTitleBarHeight()
-        {
-            var geom = new Gdk.Geometry
-            {
-                MinHeight = AppConstants.Dimensions.TitleHeight,
-                MaxHeight = AppConstants.Dimensions.TitleHeight,
-                MinWidth = (int)dto.Width,
-                MaxWidth = (int)dto.Width
-            };
-            this.SetGeometryHints(this, geom, Gdk.WindowHints.MinSize | Gdk.WindowHints.MaxSize);
-        }
-
-        private void UnclampHeight()
-        {
-            var geom = new Gdk.Geometry
-            {
-                MinHeight = AppConstants.Dimensions.TitleHeight,
-                MaxHeight = int.MaxValue,
-                MinWidth = (int)dto.Width,
-                MaxWidth = int.MaxValue
-            };
-            this.SetGeometryHints(this, geom, Gdk.WindowHints.MinSize | Gdk.WindowHints.MaxSize);
-        }
-
-        private void ApplyContentLock(bool isLocked) => _body.ApplyLock(isLocked, this);
+        // public accessor for window manager (only knows isRolled)
+        public void ApplyRollState(bool isRolled) =>
+            _body.ApplyRollState(this, _root, isRolled, (int)dto.Width);
     }
 }

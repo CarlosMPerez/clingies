@@ -15,10 +15,23 @@ public sealed class ClingyBody : Overlay
 
     private ClingyBody() : base()
     {
+        _content = new TextView
+        {
+            Name = AppConstants.CssSections.ClingyContentView,
+            CursorVisible = true,
+            Editable = true,
+            CanFocus = true,
+            WrapMode = Gtk.WrapMode.WordChar,
+            LeftMargin = 6,
+            RightMargin = 6
+        };
+
+        _leftGrip = new EventBox();
+        _rightGrip = new EventBox();
     }
 
     public static ClingyBody Build(ClingyDto dto,
-                                    Window owner,
+                                    Gtk.Window owner,
                                     ClingyWindowCallbacks cb)
     {
         var overlay = new ClingyBody();
@@ -30,16 +43,6 @@ public sealed class ClingyBody : Overlay
             VscrollbarPolicy = PolicyType.Automatic
         };
 
-        overlay._content = new TextView
-        {
-            Name = AppConstants.CssSections.ClingyContentView,
-            CursorVisible = true,
-            Editable = true,
-            CanFocus = true,
-            WrapMode = Gtk.WrapMode.WordChar,
-            LeftMargin = 6,
-            RightMargin = 6
-        };
 
         // init + caret behavior
         overlay._content.Buffer.Text = dto.Text ?? string.Empty;
@@ -96,7 +99,7 @@ public sealed class ClingyBody : Overlay
         return overlay;
     }
 
-    public void ApplyLock(bool isLocked, Window owner)
+    public void ApplyLock(bool isLocked, Gtk.Window owner)
     {
         _isLocked = isLocked;
 
@@ -130,7 +133,6 @@ public sealed class ClingyBody : Overlay
             _content.Buffer.DeleteRange -= BlockDelete;
         }
 
-
         // Optional: neutral cursor when locked
         if (isLocked)
         {
@@ -139,9 +141,29 @@ public sealed class ClingyBody : Overlay
         }
     }
 
+    public void ApplyRollState(Gtk.Window owner, Box parent, bool isRolled, int width)
+    {
+        if (isRolled)
+        {
+            SetAutoSizeEnabled(false);
+            Hide();
+            parent.SetChildPacking(this, expand: false, fill: false, padding: 0, PackType.Start);
+            ClampToTitleBarHeight(owner, width);
+        }
+        else
+        {
+            SetAutoSizeEnabled(true);
+            parent.SetChildPacking(this, expand: true, fill: true, padding: 0, PackType.Start);
+            ShowAll();
+            UnclampHeight(owner, width);
+        }
+
+        parent.QueueResize();
+    }
+
     public void SetAutoSizeEnabled(bool enabled) => _autoSizeEnabled = enabled;
 
-    private static EventBox MakeGrip(Window owner, ClingyWindowCallbacks cb, bool isLeft, Func<bool> isLocked)
+    private static EventBox MakeGrip(Gtk.Window owner, ClingyWindowCallbacks cb, bool isLeft, Func<bool> isLocked)
     {
         var grip = new EventBox
         {
@@ -188,7 +210,7 @@ public sealed class ClingyBody : Overlay
         return grip;
     }
 
-    private static void AutoHeightToContent(Window owner, TextView tv)
+    private static void AutoHeightToContent(Gtk.Window owner, TextView tv)
     {
         int w = tv.Allocation.Width;
         if (w <= 0) return;
@@ -201,7 +223,33 @@ public sealed class ClingyBody : Overlay
         const int MinH = AppConstants.Dimensions.DefaultClingyHeight, MaxH = 1500, Pad = 16;
         int targetH = Math.Max(MinH, Math.Min(MaxH, textH + Pad));
         int currentW = owner.Allocation.Width > 0 ? owner.Allocation.Width : AppConstants.Dimensions.DefaultClingyWidth;
+        //Console.WriteLine($"W:{currentW} - H:{targetH}");
         owner.Resize(currentW, targetH);
+    }
+
+    private void ClampToTitleBarHeight(Gtk.Window owner, int width)
+    {
+        var geom = new Gdk.Geometry
+        {
+            MinHeight = AppConstants.Dimensions.TitleHeight,
+            MaxHeight = AppConstants.Dimensions.TitleHeight,
+            MinWidth = width,
+            MaxWidth = width
+        };
+        owner.SetGeometryHints(this, geom, Gdk.WindowHints.MinSize | Gdk.WindowHints.MaxSize);
+    }
+
+    private void UnclampHeight(Gtk.Window owner, int width)
+    {
+        var geom = new Gdk.Geometry
+        {
+            MinHeight = AppConstants.Dimensions.TitleHeight,
+            MaxHeight = int.MaxValue,
+            MinWidth = width,
+            MaxWidth = int.MaxValue
+        };
+
+        owner.SetGeometryHints(this, geom, Gdk.WindowHints.MinSize | Gdk.WindowHints.MaxSize);
     }
 
     private void BlockKey(object? o, Gtk.KeyPressEventArgs ev) => ev.RetVal = true;

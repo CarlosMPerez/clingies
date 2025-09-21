@@ -26,7 +26,7 @@ public static class GtkTweaks
 
         // 1) cut font size a bit (optional but effective)
         var fd = Pango.FontDescription.FromString($"Sans {fontPt}");
-        entry.OverrideFont(fd);
+        //entry.OverrideFont(fd);
 
         // 2) mark it with our compact class so the CSS applies
         entry.StyleContext.AddClass("compact-entry");

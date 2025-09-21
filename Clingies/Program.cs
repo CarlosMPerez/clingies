@@ -39,7 +39,6 @@ internal sealed class Program
             Application.Init();
             GtkFrontendHost host = new GtkFrontendHost(
                 sp.GetRequiredService<IClingiesLogger>(),
-                sp.GetRequiredService<IIconPathRepository>(),
                 sp.GetRequiredService<ClingyWindowManager>(),
                 sp.GetRequiredService<MenuFactory>(),
                 sp.GetRequiredService<GtkUtilsService>());
