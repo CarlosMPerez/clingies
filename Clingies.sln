@@ -1,9 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies", "Clingies\Clingies.csproj", "{30F14BCE-D172-4050-812D-96D0B9332A43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.ApplicationLogic", "Clingies.ApplicationLogic\Clingies.ApplicationLogic.csproj", "{DD251D64-0A6E-4375-A999-FC726D37E942}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Application", "Clingies.Application\Clingies.Application.csproj", "{DD251D64-0A6E-4375-A999-FC726D37E942}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Domain", "Clingies.Domain\Clingies.Domain.csproj", "{09D3BA25-B528-40DB-AFCF-9E22EBC37957}"
 EndProject
@@ -12,6 +11,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.GtkFront", "Clingies.GtkFront\Clingies.GtkFront.csproj", "{F9317428-30CC-46CC-B47F-10F6F2E5838E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Utils", "Clingies.Utils\Clingies.Utils.csproj", "{8DA71D53-4DB4-4527-842A-1B17E08999FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Infrastructure.Mapping", "Clingies.Infrastructure.Mapping\Clingies.Infrastructure.Mapping.csproj", "{E14D24F7-D184-4715-A990-3B1D2E0E7756}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +44,10 @@ Global
 		{8DA71D53-4DB4-4527-842A-1B17E08999FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DA71D53-4DB4-4527-842A-1B17E08999FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DA71D53-4DB4-4527-842A-1B17E08999FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E14D24F7-D184-4715-A990-3B1D2E0E7756}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E14D24F7-D184-4715-A990-3B1D2E0E7756}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E14D24F7-D184-4715-A990-3B1D2E0E7756}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E14D24F7-D184-4715-A990-3B1D2E0E7756}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

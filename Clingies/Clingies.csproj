@@ -16,8 +16,8 @@
         <PackageReference Include="System.Reactive" Version="6.0.2" />
     </ItemGroup>    
     <ItemGroup>
+      <ProjectReference Include="../Clingies.Application/Clingies.Application.csproj" />
       <ProjectReference Include="../Clingies.GtkFront/Clingies.GtkFront.csproj" />
-      <ProjectReference Include="..\Clingies.ApplicationLogic\Clingies.ApplicationLogic.csproj" />
       <ProjectReference Include="..\Clingies.Utils\Clingies.Utils.csproj" />
     </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
 using System;
-using Clingies.ApplicationLogic.Interfaces;
+using Clingies.Application.Interfaces;
 using Clingies.Domain.Interfaces;
 using Gtk;
 

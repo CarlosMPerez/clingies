@@ -2,11 +2,11 @@
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using Clingies.ApplicationLogic.Services;
+using Clingies.Application.Services;
 using Clingies.Domain.Interfaces;
 using Clingies.Infrastructure.Data;
-using Clingies.ApplicationLogic.Interfaces;
-using Clingies.ApplicationLogic.Providers;
+using Clingies.Application.Interfaces;
+using Clingies.Application.Providers;
 using Clingies.GtkFront;
 using Clingies.Infrastructure.Migrations;
 using Gtk;

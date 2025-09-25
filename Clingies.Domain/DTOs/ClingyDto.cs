@@ -1,10 +1,7 @@
-using Clingies.Domain.Models;
-
 namespace Clingies.Domain.DTOs;
 
 public class ClingyDto
 {
-    // base and meta
     public int Id { get; set; }
     public Enums.ClingyType Type { get; set; }
     public string Title { get; set; } = string.Empty;
@@ -34,35 +31,5 @@ public class ClingyDto
         Height = AppConstants.Dimensions.DefaultClingyHeight;
         Width = AppConstants.Dimensions.DefaultClingyWidth;
         CreatedAt = DateTime.UtcNow;
-    }
-
-    public Clingy ToEntity()
-    {
-        return new Clingy()
-        {
-            Id = Id,
-            Type = Type,
-            Title = Title,
-            CreatedAt = CreatedAt,
-            IsDeleted = IsDeleted,
-            Content = new ClingyContent
-            {
-                Id = Id,
-                Text = Text,
-                Png = PngBytes
-            },
-            Properties = new ClingyProperties
-            {
-                Id = Id,
-                PositionX = PositionX,
-                PositionY = PositionY,
-                Width = Width,
-                Height = Height,
-                IsPinned = IsPinned,
-                IsLocked = IsLocked,
-                IsRolled = IsRolled,
-                IsStanding = IsStanding,
-            }
-        };
     }
 }

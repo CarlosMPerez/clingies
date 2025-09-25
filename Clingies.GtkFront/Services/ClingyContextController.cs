@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using Clingies.ApplicationLogic.CustomEventArgs;
-using Clingies.ApplicationLogic.Interfaces;
+using Clingies.Application.CustomEventArgs;
+using Clingies.Application.Interfaces;
 using Clingies.GtkFront.Windows;
 
 namespace Clingies.GtkFront.Services;

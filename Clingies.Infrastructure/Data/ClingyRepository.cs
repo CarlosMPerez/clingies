@@ -1,7 +1,8 @@
 using System.Data;
 using System.Reflection;
 using Clingies.Domain.Interfaces;
-using Clingies.Domain.Models;
+using Clingies.Infrastructure.Interfaces;
+using Clingies.Infrastructure.Models;
 using Dapper;
 
 namespace Clingies.Infrastructure.Data;

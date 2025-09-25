@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Clingies.ApplicationLogic\Clingies.ApplicationLogic.csproj" />
+    <ProjectReference Include="../Clingies.ApplicationLogic/Clingies.Application.csproj" />
     <ProjectReference Include="..\Clingies.Domain\Clingies.Domain.csproj" />
     <ProjectReference Include="..\Clingies.Infrastructure\Clingies.Infrastructure.csproj" />
     <ProjectReference Include="..\Clingies.Utils\Clingies.Utils.csproj" />

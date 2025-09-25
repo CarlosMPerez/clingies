@@ -46,7 +46,7 @@ src/
     Clingies.sln
     Clingies/                    # App composition / bootstrap (host)
     Clingies.Domain/             # Core models (DB-mirrors) and enums used across layers
-    Clingies.ApplicationLogic/   # DTOs, mapping, services (domain-centric, no UI types)
+    Clingies.Application/   # DTOs, mapping, services (domain-centric, no UI types)
     Clingies.Infrastructure/     # Repositories, migrations, connection factory
     Clingies.GtkFront/           # GTK3 front-end (widgets, windows, utils)
     Clingies.Utils/         # (Shared) constants, attributes, small enums (UI-agnostic) [optional]
@@ -55,7 +55,7 @@ src/
 **Layering rule of thumb**
 
 - **Infrastructure** deals with **Models** (1:1 with tables).
-- **ApplicationLogic** maps Models ⇄ DTOs and enforces invariants.
+- **Application** maps Models ⇄ DTOs and enforces invariants.
 - **GtkFront** converts DTO bytes to `Gdk.Pixbuf` for rendering (UI types never leak down).
 
 ---

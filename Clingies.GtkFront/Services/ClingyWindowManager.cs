@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Clingies.ApplicationLogic.CustomEventArgs;
-using Clingies.ApplicationLogic.Interfaces;
-using Clingies.ApplicationLogic.Services;
+using Clingies.Application.CustomEventArgs;
+using Clingies.Application.Interfaces;
+using Clingies.Application.Services;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.DTOs;
 using Clingies.GtkFront.Windows;

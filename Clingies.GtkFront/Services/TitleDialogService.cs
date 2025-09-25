@@ -1,4 +1,4 @@
-using Clingies.ApplicationLogic.Interfaces;
+using Clingies.Application.Interfaces;
 using Clingies.GtkFront.Windows;
 
 namespace Clingies.GtkFront.Services;

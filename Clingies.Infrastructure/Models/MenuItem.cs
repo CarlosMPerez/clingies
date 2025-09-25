@@ -1,6 +1,6 @@
-namespace Clingies.Domain.DTOs;
+namespace Clingies.Infrastructure.Models;
 
-public class MenuItemDto
+public class MenuItem
 {
     public string Id { get; set; } = default!;
     public string? Label { get; set; }
@@ -10,4 +10,6 @@ public class MenuItemDto
     public bool Separator { get; set; }
     public string? ParentId { get; set; }
     public int SortOrder { get; set; }
+    // Populated later:
+    public List<MenuItem> Children { get; } = new();
 }

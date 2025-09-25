@@ -2,10 +2,10 @@ using System;
 using System.Linq;
 using System.Windows.Input;
 using Gtk;
-using Clingies.ApplicationLogic.Interfaces;
+using Clingies.Application.Interfaces;
 using Clingies.Domain.Interfaces;
 using Clingies.Domain.DTOs;
-using Clingies.ApplicationLogic.Services;
+using Clingies.Application.Services;
 
 namespace Clingies.GtkFront.Services;
 
@@ -47,7 +47,7 @@ public class MenuFactory(MenuService menuService,
                 AppConstants.ContextMenuCommands.RollDown => isRolled,
                 _ => !isLocked
             };
-            
+
             if (item.Separator) menu.Append(new SeparatorMenuItem());
             else menu.Append(BuildContextMenuItemRecursive(item));
         }

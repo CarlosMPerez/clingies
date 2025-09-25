@@ -1,6 +1,6 @@
 using System;
-using Clingies.ApplicationLogic.CustomEventArgs;
-using Clingies.ApplicationLogic.Interfaces;
+using Clingies.Application.CustomEventArgs;
+using Clingies.Application.Interfaces;
 using Clingies.Domain.DTOs;
 using Clingies.GtkFront.Services;
 using Clingies.GtkFront.Windows.Parts;
