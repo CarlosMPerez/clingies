@@ -45,22 +45,17 @@ Sticky‑note–style desktop app for Linux. Each note is a **Clingy**: lightwei
 src/
     Clingies.sln
     Clingies/                    # App composition / bootstrap (host)
-    Clingies.Domain/             # Core models (DB-mirrors) and enums used across layers
-    Clingies.Application/   # DTOs, mapping, services (domain-centric, no UI types)
-    Clingies.Infrastructure/     # Repositories, migrations, connection factory
+    Clingies.Domain/             # Business models
+    Clingies.Application/   # Interfaces, services 
+    Clingies.Infrastructure/     # Repositories, mappers, entities, migrations, connection factory
     Clingies.GtkFront/           # GTK3 front-end (widgets, windows, utils)
     Clingies.Utils/         # (Shared) constants, attributes, small enums (UI-agnostic) [optional]
 ```
 
-**Layering rule of thumb**
-
-- **Infrastructure** deals with **Models** (1:1 with tables).
-- **Application** maps Models ⇄ DTOs and enforces invariants.
-- **GtkFront** converts DTO bytes to `Gdk.Pixbuf` for rendering (UI types never leak down).
-
 ---
 
 ## Getting Started
+Package to be done. 
 
 ### Prerequisites
 
@@ -78,34 +73,6 @@ dotnet build -c Release
 # run GTK front-end
 dotnet run --project src/Clingies.GtkFront
 ```
-
-**Foreign keys:** enable enforcement per connection string or PRAGMA after open.
-
-```csharp
-var csb = new SqliteConnectionStringBuilder {
-  DataSource = dbPath,
-  ForeignKeys = true,
-  Mode = SqliteOpenMode.ReadWriteCreate
-};
-using var conn = new SqliteConnection(csb.ToString());
-conn.Open();
-```
-
-**Dapper snake_case mapping:** call once at startup.
-
-```csharp
-Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-```
-
----
-
-## Repositories (Models only)
-
-- Repos operate strictly on **Models** (`Clingy`, `ClingyProperties`, `ClingyContent`).
-- Services map to DTOs and handle UI-facing logic.
-- Creation inserts parent, then children (shared PK), all in one transaction.
-- Update is **dirty-aware** (loads current aggregate, compares, and updates only changed tables in one TX).
-- Soft delete flips `is_deleted`; hard delete removes parent and cascades to children.
 
 ---
 
