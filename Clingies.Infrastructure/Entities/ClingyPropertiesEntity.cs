@@ -1,7 +1,7 @@
 
-namespace Clingies.Infrastructure.Models;
+namespace Clingies.Infrastructure.Entities;
 
-public sealed class ClingyProperties
+public sealed class ClingyPropertiesEntity
 {
     public int Id { get; set; }
     public double PositionX { get; set; }

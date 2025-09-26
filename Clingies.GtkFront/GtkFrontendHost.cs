@@ -3,7 +3,7 @@ using Gdk;
 using Gtk;
 using Clingies.GtkFront.Windows;
 using Clingies.GtkFront.Services;
-using Clingies.Domain.Interfaces;
+using Clingies.Application.Interfaces;
 using Clingies.GtkFront.Utils;
 
 namespace Clingies.GtkFront

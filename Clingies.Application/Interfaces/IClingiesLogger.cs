@@ -1,5 +1,5 @@
 
-namespace Clingies.Domain.Interfaces;
+namespace Clingies.Application.Interfaces;
 
 public interface IClingiesLogger
 {

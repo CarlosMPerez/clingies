@@ -1,7 +1,7 @@
 
-namespace Clingies.Infrastructure.Models;
+namespace Clingies.Infrastructure.Entities;
 
-public sealed class ClingyContent
+public sealed class ClingyContentEntity
 {
     public int Id { get; set; }
     public string? Text { get; set; }

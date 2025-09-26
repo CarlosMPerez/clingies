@@ -1,6 +1,6 @@
-namespace Clingies.Infrastructure.Models;
+namespace Clingies.Infrastructure.Entities;
 
-public class MenuItem
+public class MenuItemEntity
 {
     public string Id { get; set; } = default!;
     public string? Label { get; set; }
@@ -11,5 +11,5 @@ public class MenuItem
     public string? ParentId { get; set; }
     public int SortOrder { get; set; }
     // Populated later:
-    public List<MenuItem> Children { get; } = new();
+    public List<MenuItemEntity> Children { get; } = new();
 }

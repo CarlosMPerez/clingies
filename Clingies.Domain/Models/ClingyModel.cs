@@ -1,6 +1,6 @@
-namespace Clingies.Domain.DTOs;
+namespace Clingies.Domain.Models;
 
-public class ClingyDto
+public class ClingyModel
 {
     public int Id { get; set; }
     public Enums.ClingyType Type { get; set; }
@@ -23,7 +23,7 @@ public class ClingyDto
     public string? Text { get; set; }
     public byte[]? PngBytes { get; set; }
 
-    public ClingyDto()
+    public ClingyModel()
     {
         // default values
         Id = 0;

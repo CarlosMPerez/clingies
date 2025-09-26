@@ -1,5 +1,5 @@
 using System;
-using Clingies.Domain.DTOs;
+using Clingies.Domain.Models;
 using Gtk;
 
 namespace Clingies.GtkFront.Windows.Parts;
@@ -30,7 +30,7 @@ public sealed class ClingyBody : Overlay
         _rightGrip = new EventBox();
     }
 
-    public static ClingyBody Build(ClingyDto dto,
+    public static ClingyBody Build(ClingyModel model,
                                     Gtk.Window owner,
                                     ClingyWindowCallbacks cb)
     {
@@ -45,7 +45,7 @@ public sealed class ClingyBody : Overlay
 
 
         // init + caret behavior
-        overlay._content.Buffer.Text = dto.Text ?? string.Empty;
+        overlay._content.Buffer.Text = model.Text ?? string.Empty;
         overlay._content.MapEvent += (_, __) => GLib.Idle.Add(() => { overlay._content.GrabFocus(); return false; });
         overlay._content.EnterNotifyEvent += (_, e) =>
         {

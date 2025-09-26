@@ -1,6 +1,6 @@
-namespace Clingies.Domain.DTOs;
+namespace Clingies.Domain.Models;
 
-public class MenuItemDto
+public class MenuItemModel
 {
     public string Id { get; set; } = default!;
     public string? Label { get; set; }

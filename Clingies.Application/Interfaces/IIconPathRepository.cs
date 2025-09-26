@@ -1,4 +1,4 @@
-namespace Clingies.Infrastructure.Interfaces;
+namespace Clingies.Application.Interfaces;
 
 public interface IIconPathRepository
 {

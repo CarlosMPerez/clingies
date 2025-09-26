@@ -3,8 +3,7 @@ using System.Linq;
 using System.Windows.Input;
 using Gtk;
 using Clingies.Application.Interfaces;
-using Clingies.Domain.Interfaces;
-using Clingies.Domain.DTOs;
+using Clingies.Domain.Models;
 using Clingies.Application.Services;
 
 namespace Clingies.GtkFront.Services;
@@ -55,7 +54,7 @@ public class MenuFactory(MenuService menuService,
         return menu;
     }
 
-    private MenuItem BuildContextMenuItemRecursive(MenuItemDto item)
+    private MenuItem BuildContextMenuItemRecursive(MenuItemModel item)
     {
         var children = menuService.GetChildren(item.Id)
                         .OrderBy(c => c.SortOrder)
@@ -113,7 +112,7 @@ public class MenuFactory(MenuService menuService,
         return menu;
     }
 
-    private MenuItem BuildGtkTrayMenuItemRecursive(MenuItemDto item)
+    private MenuItem BuildGtkTrayMenuItemRecursive(MenuItemModel item)
     {
         var children = menuService.GetChildren(item.Id)
                         .OrderBy(c => c.SortOrder)

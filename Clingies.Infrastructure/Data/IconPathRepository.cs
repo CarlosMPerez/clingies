@@ -1,6 +1,5 @@
 using System.Data;
-using Clingies.Domain.Interfaces;
-using Clingies.Infrastructure.Interfaces;
+using Clingies.Application.Interfaces;
 using Dapper;
 
 namespace Clingies.Infrastructure.Data;

@@ -1,4 +1,4 @@
-using Clingies.Domain.Interfaces;
+using Clingies.Application.Interfaces;
 using Serilog;
 
 

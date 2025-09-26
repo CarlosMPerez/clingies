@@ -3,13 +3,11 @@ using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Clingies.Application.Services;
-using Clingies.Domain.Interfaces;
-using Clingies.Infrastructure.Data;
 using Clingies.Application.Interfaces;
+using Clingies.Infrastructure.Data;
 using Clingies.Application.Providers;
 using Clingies.GtkFront;
 using Clingies.Infrastructure.Migrations;
-using Gtk;
 using Clingies.GtkFront.Services;
 
 namespace Clingies;
@@ -36,14 +34,14 @@ internal sealed class Program
             // turns position_x to PositionX (other cases use ALIAS in the query)
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
-            Application.Init();
+            Gtk.Application.Init();
             GtkFrontendHost host = new GtkFrontendHost(
                 sp.GetRequiredService<IClingiesLogger>(),
                 sp.GetRequiredService<ClingyWindowManager>(),
                 sp.GetRequiredService<MenuFactory>(),
                 sp.GetRequiredService<GtkUtilsService>());
             host.Run();
-            Application.Run();
+            Gtk.Application.Run();
         }
         catch (Exception ex)
         {

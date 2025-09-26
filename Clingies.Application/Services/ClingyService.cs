@@ -1,16 +1,15 @@
-using Clingies.Infrastructure.Interfaces;
-using Clingies.Domain.Interfaces;
-using Clingies.Domain.DTOs;
+using Clingies.Application.Interfaces;
+using Clingies.Domain.Models;
 
 namespace Clingies.Application.Services;
 
 public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
 {
-    public List<ClingyDto> GetAllActive()
+    public List<ClingyModel> GetAllActive()
     {
         try
         {
-            return repo.GetAllActive().Select(dto => dto.ToDto()).ToList();
+            return repo.GetAllActive().ToList();
         }
         catch (Exception ex)
         {
@@ -19,11 +18,11 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
     }
 
-    public ClingyDto? Get(int id)
+    public ClingyModel? Get(int id)
     {
         try
         {
-            return repo.Get(id)?.ToDto();
+            return repo.Get(id);
         }
         catch (Exception ex)
         {
@@ -33,13 +32,12 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
 
     }
 
-    public int Create(ClingyDto dto)
+    public int Create(ClingyModel model)
     {
         try
         {
-            var entity = dto.ToEntity();
-            entity.CreatedAt = DateTime.UtcNow;
-            return repo.Create(entity);
+            model.CreatedAt = DateTime.UtcNow;
+            return repo.Create(model);
         }
         catch (Exception ex)
         {
@@ -48,11 +46,11 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
     }
 
-    public void Update(ClingyDto clingy)
+    public void Update(ClingyModel model)
     {
         try
         {
-            repo.Update(clingy.ToEntity());
+            repo.Update(model);
         }
         catch (Exception ex)
         {

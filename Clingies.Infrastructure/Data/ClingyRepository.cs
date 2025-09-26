@@ -1,8 +1,9 @@
 using System.Data;
 using System.Reflection;
-using Clingies.Domain.Interfaces;
-using Clingies.Infrastructure.Interfaces;
-using Clingies.Infrastructure.Models;
+using Clingies.Application.Interfaces;
+using Clingies.Domain.Models;
+using Clingies.Infrastructure.Entities;
+using Clingies.Infrastructure.Mapping;
 using Dapper;
 
 namespace Clingies.Infrastructure.Data;
@@ -10,11 +11,11 @@ namespace Clingies.Infrastructure.Data;
 public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLogger logger) : IClingyRepository
 {
     private IDbConnection Conn => connectionFactory.GetConnection();
-    public List<Clingy> GetAllActive()
+    public List<ClingyModel> GetAllActive()
     {
         try
         {
-            List<Clingy> clingies = new List<Clingy>();
+            List<ClingyModel> clingies = new List<ClingyModel>();
             var sql =
                 """
                     SELECT c.id, c.title, c.type_id AS Type, c.created_at, c.is_deleted,
@@ -27,7 +28,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     JOIN clingy_content as cc on cc.id = c.id
                     WHERE c.is_deleted = 0 AND c.type_id = @TypeId;
                 """;
-            var data = Conn.Query<Clingy, ClingyProperties, ClingyContent, Clingy>(
+            var data = Conn.Query<ClingyEntity, ClingyPropertiesEntity, ClingyContentEntity, ClingyEntity>(
                 sql,
                 (c, p, ct) =>
                 {
@@ -41,7 +42,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 splitOn: "PropsId, ContentId"
             ).ToList();
 
-            return data;
+            return data.Select(entity => entity.ToModel()).ToList();
         }
         catch (Exception ex)
         {
@@ -49,7 +50,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             throw;
         }
     }
-    public Clingy? Get(int id)
+    public ClingyModel? Get(int id)
     {
         try
         {
@@ -65,7 +66,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     JOIN clingy_content AS cc ON cc.id = c.id
                     WHERE c.id = @Id;
                 """;
-            return Conn.Query<Clingy, ClingyProperties, ClingyContent, Clingy>(
+            var result = Conn.Query<ClingyEntity, ClingyPropertiesEntity, ClingyContentEntity, ClingyEntity>(
                 sql,
                 (c, p, ct) =>
                 {
@@ -76,6 +77,9 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 new { Id = id },
                 splitOn: "Id, Id"
             ).SingleOrDefault();
+
+            if (result == null) return null;
+            else return result.ToModel();
         }
         catch (Exception ex)
         {
@@ -84,8 +88,9 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
-    public int Create(Clingy clingy)
+    public int Create(ClingyModel clingy)
     {
+        var entity = clingy.ToEntity();
         using var tx = Conn.BeginTransaction();
         try
         {
@@ -95,15 +100,15 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                   SELECT last_insert_rowid();",
                 new
                 {
-                    TypeId = clingy.Type,
-                    Title = clingy.Title,
-                    CreatedAt = clingy.CreatedAt == default ? DateTime.UtcNow : clingy.CreatedAt
+                    TypeId = entity.Type,
+                    Title = entity.Title,
+                    CreatedAt = entity.CreatedAt == default ? DateTime.UtcNow : clingy.CreatedAt
                 },
                 tx
             );
-            clingy.Id = (int)newId;
+            entity.Id = (int)newId;
 
-            clingy.Properties.Id = clingy.Id;
+            entity.Properties.Id = clingy.Id;
             Conn.Execute(
                 """
                     INSERT INTO clingy_properties
@@ -111,21 +116,21 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     VALUES
                     (@Id, @PositionX, @PositionY, @Width, @Height, @IsPinned, @IsRolled, @IsLocked, @IsStanding);
                 """,
-                clingy.Properties, tx
+                entity.Properties, tx
             );
 
             // NEW clingies are ALWAYS created with content as null, either TEXT or PNG
-            clingy.Content.Id = clingy.Id;
+            entity.Content.Id = clingy.Id;
             Conn.Execute(
                 """
                     INSERT INTO clingy_content (id, text, png)
                     VALUES (@Id, null, null);
                 """,
-                clingy.Content, tx
+                entity.Content, tx
             );
 
             tx.Commit();
-            return clingy.Id;
+            return entity.Id;
         }
         catch (Exception ex)
         {
@@ -135,8 +140,9 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
-    public void Update(Clingy incoming)
+    public void Update(ClingyModel modified)
     {
+        var incoming = modified.ToEntity();
         if (incoming is null) throw new ArgumentNullException(nameof(incoming));
         if (incoming.Id <= 0) throw new ArgumentOutOfRangeException(nameof(incoming.Id));
 
@@ -215,14 +221,14 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
-    private void NormalizeContent(ClingyContent? content)
+    private void NormalizeContent(ClingyContentEntity? content)
     {
         if (content is null) return;
         if (string.IsNullOrWhiteSpace(content.Text)) content.Text = null;
         if (content.Png is { Length: 0 }) content.Png = null;
     }
 
-    private void UpdateMain(Clingy main, IDbTransaction tx)
+    private void UpdateMain(ClingyEntity main, IDbTransaction tx)
     {
         var rows = Conn.Execute(
             """
@@ -235,7 +241,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         EnsureFound(rows, main.Id, "clingies");
     }
 
-    private void UpdateProps(Clingy main, IDbTransaction tx)
+    private void UpdateProps(ClingyEntity main, IDbTransaction tx)
     {
         var props = main.Properties!;
         var rows = Conn.Execute(
@@ -262,7 +268,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         EnsureFound(rows, main.Id, "clingy_properties");
     }
 
-    private void UpdateContent(Clingy main, IDbTransaction tx)
+    private void UpdateContent(ClingyEntity main, IDbTransaction tx)
     {
         var hasText = !string.IsNullOrEmpty(main.Content!.Text);
         int rows;
@@ -295,7 +301,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             throw new KeyNotFoundException($"No row in '{table}' with id={id}.");
     }
 
-    private Clingy? LoadAggregateForUpdate(int id, IDbTransaction tx)
+    private ClingyEntity? LoadAggregateForUpdate(int id, IDbTransaction tx)
     {
         const string sql =
             """
@@ -309,7 +315,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 JOIN clingy_content AS cc ON cc.id = c.id
                 WHERE c.id = @Id;
             """;
-        var x = Conn.Query<Clingy, ClingyProperties, ClingyContent, Clingy>(
+        var x = Conn.Query<ClingyEntity, ClingyPropertiesEntity, ClingyContentEntity, ClingyEntity>(
             sql,
             (c, p, ct) =>
             {

@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
+    <ProjectReference Include="..\Clingies.Application\Clingies.Application.csproj" />
     <ProjectReference Include="..\Clingies.Domain\Clingies.Domain.csproj" />
     <ProjectReference Include="..\Clingies.Utils\Clingies.Utils.csproj" />
   </ItemGroup>

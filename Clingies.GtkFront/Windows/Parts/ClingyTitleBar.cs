@@ -1,4 +1,4 @@
-using Clingies.Domain.DTOs;
+using Clingies.Domain.Models;
 using Clingies.GtkFront.Services;
 using Gtk;
 using Pango;
@@ -49,15 +49,15 @@ public sealed class ClingyTitleBar : Box
         PackEnd(_rightSide, false, false, 0);
     }
 
-    public static ClingyTitleBar Build(ClingyDto dto, Window owner,
+    public static ClingyTitleBar Build(ClingyModel model, Window owner,
         GtkUtilsService utils, ClingyWindowCallbacks callbacks)
     {
         var bar = new ClingyTitleBar();
 
         // initialize state & title
-        bar._isPinned = dto.IsPinned;
-        bar._isLocked = dto.IsLocked;
-        bar._titleLabel.Text = dto.Title ?? string.Empty;
+        bar._isPinned = model.IsPinned;
+        bar._isLocked = model.IsLocked;
+        bar._titleLabel.Text = model.Title ?? string.Empty;
 
         // left: pin, lock ----------------------------------------------------
         bar._pinButton = utils.MakeImgButton(
@@ -86,10 +86,10 @@ public sealed class ClingyTitleBar : Box
         {
             // do NOT check for islocked for all actions of mouse or right click menu will be blocked
             // ask individually
-            if (e.Event.Button == 1 && !dto.IsLocked && e.Event.Type == Gdk.EventType.TwoButtonPress)
-                callbacks.RollChanged(!dto.IsRolled);
+            if (e.Event.Button == 1 && !model.IsLocked && e.Event.Type == Gdk.EventType.TwoButtonPress)
+                callbacks.RollChanged(!model.IsRolled);
 
-            if (e.Event.Button == 1 && !dto.IsLocked && e.Event.Type == Gdk.EventType.ButtonPress)
+            if (e.Event.Button == 1 && !model.IsLocked && e.Event.Type == Gdk.EventType.ButtonPress)
                 owner.BeginMoveDrag((int)e.Event.Button, (int)e.Event.XRoot, (int)e.Event.YRoot, e.Event.Time);
         };
         bar._dragArea.ButtonReleaseEvent += (_, __) =>

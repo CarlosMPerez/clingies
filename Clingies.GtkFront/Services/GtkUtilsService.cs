@@ -1,9 +1,8 @@
 using System;
 using System.IO;
-using Clingies.Domain.Interfaces;
+using Clingies.Application.Interfaces;
 using Gdk;
 using Gtk;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Clingies.GtkFront.Services
 {
@@ -38,7 +37,7 @@ namespace Clingies.GtkFront.Services
 
         public Image? CreateImageFromPath(string fullPath, int size)
         {
-            if (fullPath.IsNullOrEmpty()) return null;
+            if (string.IsNullOrEmpty(fullPath)) return null;
             var pixbuf = new Pixbuf(fullPath, size, size, true); // consider caching or scaling if you ship multiple DPI sizes
             return new Image(pixbuf);
         }
@@ -46,7 +45,7 @@ namespace Clingies.GtkFront.Services
         public Image? CreateImageFromDb(string iconId, int size, bool isDarkPath = false)
         {
             string? path = LoadPathFromDb(iconId, isDarkPath);
-            if (path.IsNullOrEmpty()) return null;
+            if (string.IsNullOrEmpty(path)) return null;
             var pixbuf = new Pixbuf(path, size, size, true); // consider caching or scaling if you ship multiple DPI sizes
             return new Image(pixbuf);
         }
@@ -55,7 +54,7 @@ namespace Clingies.GtkFront.Services
         public Pixbuf? LoadPixbuf(string iconId, int size, bool isDarkPath = false)
         {
             string? path = LoadPathFromDb(iconId, isDarkPath);
-            if (path.IsNullOrEmpty()) return null;
+            if (string.IsNullOrEmpty(path)) return null;
             return TryLoad(path!, size, size);
         }
 

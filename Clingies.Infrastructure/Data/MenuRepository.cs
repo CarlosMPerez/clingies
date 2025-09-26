@@ -1,7 +1,8 @@
 using System.Data;
-using Clingies.Domain.Interfaces;
-using Clingies.Infrastructure.Interfaces;
-using Clingies.Infrastructure.Models;
+using Clingies.Application.Interfaces;
+using Clingies.Domain.Models;
+using Clingies.Infrastructure.Entities;
+using Clingies.Infrastructure.Mapper;
 using Dapper;
 
 namespace Clingies.Infrastructure.Data;
@@ -10,7 +11,7 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
 {
     private IDbConnection Conn => connectionFactory.GetConnection();
 
-    public List<MenuItem> GetAllParents(string menuType)
+    public List<MenuItemModel> GetAllParents(string menuType)
     {
         try
         {
@@ -21,8 +22,8 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
                 AND parent_id IS NULL
                 ORDER BY sort_order
             """;
-            var items = Conn.Query<MenuItem>(sql, parms).ToList();
-            return items;
+            var items = Conn.Query<MenuItemEntity>(sql, parms).ToList();
+            return items.Select(entity => entity.ToModel()).ToList();
         }
         catch (Exception ex)
         {
@@ -31,7 +32,7 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
         }
     }
 
-    public List<MenuItem> GetChildren(string parentId)
+    public List<MenuItemModel> GetChildren(string parentId)
     {
         try
         {
@@ -42,8 +43,8 @@ public class MenuRepository(IConnectionFactory connectionFactory, IClingiesLogge
                 WHERE parent_id = @parentId
                 ORDER BY sort_order
             """;
-            var items = Conn.Query<MenuItem>(sql, parms).ToList();
-            return items;
+            var items = Conn.Query<MenuItemEntity>(sql, parms).ToList();
+            return items.Select(entity => entity.ToModel()).ToList();
         }
         catch (Exception ex)
         {

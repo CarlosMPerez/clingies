@@ -1,8 +1,5 @@
 using System;
-using System.Linq;
-using Clingies.Application.CustomEventArgs;
 using Clingies.Application.Interfaces;
-using Clingies.GtkFront.Windows;
 
 namespace Clingies.GtkFront.Services;
 
@@ -23,7 +20,7 @@ public class ClingyContextController : IContextCommandController
 
     public void ShowChangeTitleDialog()
     {
-        var prevTitle = _manager.GetClingyDtoById(_clingyId)?.Title;
+        var prevTitle = _manager.GetClingyModelById(_clingyId)?.Title;
         var owner = _manager.GetClingyWindowById(_clingyId);
         var newTitle = _titleDialog.ShowChangeTitleDialog(owner, prevTitle);
         if (newTitle == null) return;

@@ -1,7 +1,7 @@
 using System;
 using Clingies.Application.CustomEventArgs;
 using Clingies.Application.Interfaces;
-using Clingies.Domain.DTOs;
+using Clingies.Domain.Models;
 using Clingies.GtkFront.Services;
 using Clingies.GtkFront.Windows.Parts;
 using Gtk;
@@ -10,8 +10,8 @@ namespace Clingies.GtkFront.Windows
 {
     public sealed class ClingyWindow : Window
     {
-        private readonly ClingyDto dto;
-        public int ClingyId => dto.Id;
+        private readonly ClingyModel model;
+        public int ClingyId => model.Id;
 
         public event EventHandler<int>? CloseRequested;
         public event EventHandler<PinRequestedEventArgs>? PinRequested;
@@ -32,11 +32,11 @@ namespace Clingies.GtkFront.Windows
         private ClingyBody _body;
         private Box _root;
 
-        public ClingyWindow(ClingyDto clingyDto, GtkUtilsService utils,
+        public ClingyWindow(ClingyModel clingyModel, GtkUtilsService utils,
                             MenuFactory menuFactory, ClingyContextController contextController)
-                            : base(clingyDto.Title ?? string.Empty)
+                            : base(clingyModel.Title ?? string.Empty)
         {
-            dto = clingyDto;
+            model = clingyModel;
             _srvUtils = utils;
             _menuFactory = menuFactory;
             _contextController = contextController;
@@ -45,22 +45,22 @@ namespace Clingies.GtkFront.Windows
             SkipTaskbarHint = true;
             SkipPagerHint = true;
 
-            DefaultWidth = Math.Max(AppConstants.Dimensions.DefaultClingyWidth, (int)dto.Width);
-            DefaultHeight = Math.Max(AppConstants.Dimensions.DefaultClingyHeight, (int)dto.Height);
-            Move((int)dto.PositionX, (int)dto.PositionY);
-            _lastX = (int)dto.PositionX;
-            _lastY = (int)dto.PositionY;
+            DefaultWidth = Math.Max(AppConstants.Dimensions.DefaultClingyWidth, (int)model.Width);
+            DefaultHeight = Math.Max(AppConstants.Dimensions.DefaultClingyHeight, (int)model.Height);
+            Move((int)model.PositionX, (int)model.PositionY);
+            _lastX = (int)model.PositionX;
+            _lastY = (int)model.PositionY;
 
             // Build callbacks that *raise the same events* the Manager already listens to
             var cb = new ClingyWindowCallbacks(
-                dto.Id,
-                closeRequested: () => CloseRequested?.Invoke(this, dto.Id),
-                positionChanged: (x, y) => PositionChangeRequested?.Invoke(this, new PositionChangeRequestedEventArgs(dto.Id, x, y)),
-                sizeChanged: (w, h) => UpdateWindowSizeRequested?.Invoke(this, new UpdateWindowSizeRequestedEventArgs(dto.Id, w, h)),
-                contentChanged: text => ContentChangeRequested?.Invoke(this, new ContentChangeRequestedEventArgs(dto.Id, text)),
-                titleChanged: title => TitleChangeRequested?.Invoke(this, new TitleChangeRequestedEventArgs(dto.Id, title)),
-                pinChanged: isPinned => PinRequested?.Invoke(this, new PinRequestedEventArgs(dto.Id, isPinned)),
-                rollChanged: isRolled => RollRequested?.Invoke(this, new RollRequestedEventArgs(dto.Id, isRolled))
+                model.Id,
+                closeRequested: () => CloseRequested?.Invoke(this, model.Id),
+                positionChanged: (x, y) => PositionChangeRequested?.Invoke(this, new PositionChangeRequestedEventArgs(model.Id, x, y)),
+                sizeChanged: (w, h) => UpdateWindowSizeRequested?.Invoke(this, new UpdateWindowSizeRequestedEventArgs(model.Id, w, h)),
+                contentChanged: text => ContentChangeRequested?.Invoke(this, new ContentChangeRequestedEventArgs(model.Id, text)),
+                titleChanged: title => TitleChangeRequested?.Invoke(this, new TitleChangeRequestedEventArgs(model.Id, title)),
+                pinChanged: isPinned => PinRequested?.Invoke(this, new PinRequestedEventArgs(model.Id, isPinned)),
+                rollChanged: isRolled => RollRequested?.Invoke(this, new RollRequestedEventArgs(model.Id, isRolled))
             );
 
             // Compose UI
@@ -69,8 +69,8 @@ namespace Clingies.GtkFront.Windows
                 Name = AppConstants.CssSections.ClingyWindow,
                 BorderWidth = 0
             };
-            _titleBar = ClingyTitleBar.Build(dto, this, _srvUtils, cb);
-            _body = ClingyBody.Build(dto, this, cb);
+            _titleBar = ClingyTitleBar.Build(model, this, _srvUtils, cb);
+            _body = ClingyBody.Build(model, this, cb);
 
             _root.PackStart(_titleBar, false, false, 0);
             _root.PackStart(_body, true, true, 0);
@@ -95,7 +95,7 @@ namespace Clingies.GtkFront.Windows
             this.SizeAllocated += (_, a) =>
             {
                 UpdateWindowSizeRequested?.Invoke(this,
-                    new UpdateWindowSizeRequestedEventArgs(dto.Id, a.Allocation.Width, a.Allocation.Height));
+                    new UpdateWindowSizeRequestedEventArgs(model.Id, a.Allocation.Width, a.Allocation.Height));
             };
 
             // Add on focus title bar color change
@@ -104,8 +104,8 @@ namespace Clingies.GtkFront.Windows
 
             AddEvents((int)Gdk.EventMask.StructureMask);
             ConfigureEvent += OnConfigureEvent;
-            ApplyLockState(dto.IsLocked);
-            ApplyRollState(dto.IsRolled);
+            ApplyLockState(model.IsLocked);
+            ApplyRollState(model.IsRolled);
         }
 
         [GLib.ConnectBefore]
@@ -122,10 +122,10 @@ namespace Clingies.GtkFront.Windows
                 // for now both the if and the else do the same, placeholder for when we adapt the app to Wayland
                 if (_srvUtils.IsX11())
                     PositionChangeRequested?.Invoke(this,
-                        new PositionChangeRequestedEventArgs(dto.Id, x, y));
+                        new PositionChangeRequestedEventArgs(model.Id, x, y));
                 else
                     PositionChangeRequested?.Invoke(this,
-                        new PositionChangeRequestedEventArgs(dto.Id, x, y));
+                        new PositionChangeRequestedEventArgs(model.Id, x, y));
             }
 
             // Don't swallow the event
@@ -135,7 +135,7 @@ namespace Clingies.GtkFront.Windows
         private void OnRightClick(object? sender, ButtonPressEventArgs e)
         {
             if (e.Event.Button != 3) return; // only right button
-            var menu = _menuFactory.BuildClingyMenu(CommandProvider!, dto.IsLocked, dto.IsRolled);
+            var menu = _menuFactory.BuildClingyMenu(CommandProvider!, model.IsLocked, model.IsRolled);
             menu.ShowAll();
             menu.PopupAtPointer(e.Event);
             e.RetVal = true; // stop further handling
@@ -155,7 +155,7 @@ namespace Clingies.GtkFront.Windows
 
             if (isShiftF10 || isMenuKey)
             {
-                var menu = _menuFactory.BuildClingyMenu(CommandProvider!, dto.IsLocked, dto.IsRolled);
+                var menu = _menuFactory.BuildClingyMenu(CommandProvider!, model.IsLocked, model.IsRolled);
                 menu.ShowAll();
                 menu.PopupAtWidget(this, Gdk.Gravity.SouthWest, Gdk.Gravity.NorthWest, null);
             }
@@ -182,6 +182,6 @@ namespace Clingies.GtkFront.Windows
 
         // public accessor for window manager (only knows isRolled)
         public void ApplyRollState(bool isRolled) =>
-            _body.ApplyRollState(this, _root, isRolled, (int)dto.Width);
+            _body.ApplyRollState(this, _root, isRolled, (int)model.Width);
     }
 }

@@ -17,13 +17,6 @@ public sealed class ClingyWindowCallbacks
     /// <summary>
     /// Class for calling WindowManager events from inside the window, or title or content
     /// </summary>
-    /// <param name="clingyId"></param>
-    /// <param name="closeRequested"></param>
-    /// <param name="positionChanged"></param>
-    /// <param name="sizeChanged"></param>
-    /// <param name="titleChanged"></param>
-    /// <param name="contentChanged"></param>
-    /// <param name="pinChanged"></param>
     public ClingyWindowCallbacks(int clingyId,
                                 Action closeRequested,
                                 Action<int, int> positionChanged,

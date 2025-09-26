@@ -1,16 +1,15 @@
-using Clingies.Domain.Interfaces;
-using Clingies.Infrastructure.Interfaces;
-using Clingies.Domain.DTOs;
+using Clingies.Application.Interfaces;
+using Clingies.Domain.Models;
 
 namespace Clingies.Application.Services;
 
 public class MenuService(IMenuRepository repo, IClingiesLogger logger)
 {
-    public List<MenuItemDto> GetAllParents(string menuType)
+    public List<MenuItemModel> GetAllParents(string menuType)
     {
         try
         {
-            return repo.GetAllParents(menuType).Select(dto => dto.ToDto()).ToList();
+            return repo.GetAllParents(menuType).ToList();
         }
         catch (Exception ex)
         {
@@ -19,11 +18,11 @@ public class MenuService(IMenuRepository repo, IClingiesLogger logger)
         }
     }
 
-    public List<MenuItemDto> GetChildren(string parentId)
+    public List<MenuItemModel> GetChildren(string parentId)
     {
         try
         {
-            return repo.GetChildren(parentId).Select(dto => dto.ToDto()).ToList();
+            return repo.GetChildren(parentId).ToList();
         }
         catch (Exception ex)
         {

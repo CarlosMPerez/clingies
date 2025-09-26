@@ -4,8 +4,7 @@ using System.Linq;
 using Clingies.Application.CustomEventArgs;
 using Clingies.Application.Interfaces;
 using Clingies.Application.Services;
-using Clingies.Domain.Interfaces;
-using Clingies.Domain.DTOs;
+using Clingies.Domain.Models;
 using Clingies.GtkFront.Windows;
 
 namespace Clingies.GtkFront.Services;
@@ -17,7 +16,7 @@ public class ClingyWindowManager(ClingyService clingyService,
                             ITitleDialogService titleDialogService,
                             Func<IContextCommandController, IContextCommandProvider> providerFactory)
 {
-    private readonly List<ClingyDto> _activeClingies = new List<ClingyDto>();
+    private readonly List<ClingyModel> _activeClingies = new List<ClingyModel>();
     private readonly List<ClingyWindow> _activeWindows = new List<ClingyWindow>();
     private readonly ClingyService _srvClingy = clingyService;
     private readonly IClingiesLogger _srvLogger = loggerService;
@@ -30,7 +29,7 @@ public class ClingyWindowManager(ClingyService clingyService,
         try
         {
             var centerPoint = _srvUtils.GetCenterPointDefaultMonitor(AppConstants.Dimensions.DefaultClingyWidth, AppConstants.Dimensions.DefaultClingyHeight);
-            var clingy = new ClingyDto();
+            var clingy = new ClingyModel();
             // default values
             clingy.PositionX = centerPoint.X;
             clingy.PositionY = centerPoint.Y;
@@ -110,7 +109,7 @@ public class ClingyWindowManager(ClingyService clingyService,
         }
     }
 
-    public ClingyDto? GetClingyDtoById(int clingyId) =>
+    public ClingyModel? GetClingyModelById(int clingyId) =>
         _activeClingies.Where(x => x.Id == clingyId).FirstOrDefault();
 
     public ClingyWindow? GetClingyWindowById(int clingyId) =>
