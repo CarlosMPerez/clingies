@@ -10,18 +10,23 @@ namespace Clingies.Infrastructure.Migrations
         {
             // using Dapper/ADO: "" per-connection.
 
-            // --- Lookup: clingy_types (manual IDs, protected from delete if in use)
-            Create.Table("clingy_types")
-                .WithColumn("id").AsInt32().PrimaryKey() // manual IDs
-                .WithColumn("name").AsString().NotNullable();
+            if (!Schema.Table("clingy_types").Exists())
+            {
+                // --- Lookup: clingy_types (manual IDs, protected from delete if in use)
+                Create.Table("clingy_types")
+                    .WithColumn("id").AsInt32().PrimaryKey() // manual IDs
+                    .WithColumn("name").AsString().NotNullable();
 
-            Create.Index("ux_clingy_types_name")
-                .OnTable("clingy_types")
-                .WithOptions().Unique()
-                .OnColumn("name").Ascending();
+                Create.Index("ux_clingy_types_name")
+                    .OnTable("clingy_types")
+                    .WithOptions().Unique()
+                    .OnColumn("name").Ascending();
+            }
 
-            // --- Root: clingies (auto rowid)
-            Create.Table("clingies")
+            if (!Schema.Table("clingies").Exists())
+            {
+                // --- Root: clingies (auto rowid)
+                Create.Table("clingies")
                 .WithColumn("id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("type_id").AsInt32().NotNullable()
                     .ForeignKey("fk_clingies_type", "clingy_types", "id")
@@ -30,12 +35,15 @@ namespace Clingies.Infrastructure.Migrations
                 .WithColumn("created_at").AsDateTime().NotNullable()
                 .WithColumn("is_deleted").AsBoolean().NotNullable().WithDefaultValue(false);
 
-            Create.Index("ix_clingies_type_id")
-                .OnTable("clingies")
-                .OnColumn("type_id").Ascending();
+                Create.Index("ix_clingies_type_id")
+                    .OnTable("clingies")
+                    .OnColumn("type_id").Ascending();
+            }
 
-            // --- 1:1 child: clingy_properties (shared PK, cascade on clingy delete)
-            Create.Table("clingy_properties")
+            if (!Schema.Table("clingy_properties").Exists())
+            {
+                // --- 1:1 child: clingy_properties (shared PK, cascade on clingy delete)
+                Create.Table("clingy_properties")
                 .WithColumn("id").AsInt32().PrimaryKey() // shared-PK; no Identity
                     .ForeignKey("fk_props_clingy", "clingies", "id")
                     .OnDelete(Rule.Cascade).OnUpdate(Rule.Cascade)
@@ -47,23 +55,32 @@ namespace Clingies.Infrastructure.Migrations
                 .WithColumn("is_rolled").AsBoolean().NotNullable().WithDefaultValue(false)
                 .WithColumn("is_locked").AsBoolean().NotNullable().WithDefaultValue(false)
                 .WithColumn("is_standing").AsBoolean().NotNullable().WithDefaultValue(false);
+            }
 
-            // --- 1:1 child: clingy_content (shared PK, cascade on clingy delete)
-            Create.Table("clingy_content")
+            if (!Schema.Table("clingy_content").Exists())
+            {
+                // --- 1:1 child: clingy_content (shared PK, cascade on clingy delete)
+                Create.Table("clingy_content")
                 .WithColumn("id").AsInt32().PrimaryKey() // shared-PK; no Identity
                     .ForeignKey("fk_content_clingy", "clingies", "id")
                     .OnDelete(Rule.Cascade).OnUpdate(Rule.Cascade)
                 .WithColumn("text").AsString(int.MaxValue).Nullable() // app ensures XOR with png
                 .WithColumn("png").AsBinary().Nullable();
+            }
 
-            // --- Non-menu icons (app-wide)
-            Create.Table("app_icon_paths")
+            if (!Schema.Table("app_icon_paths").Exists())
+            {
+                // --- Non-menu icons (app-wide)
+                Create.Table("app_icon_paths")
                 .WithColumn("id").AsString().PrimaryKey()
                 .WithColumn("light_path").AsString().Nullable()
                 .WithColumn("dark_path").AsString().Nullable();
+            }
 
-            // --- System menu (self-referencing tree; cascade delete subtrees)
-            Create.Table("system_menu")
+            if (!Schema.Table("system_menu").Exists())
+            {
+                // --- System menu (self-referencing tree; cascade delete subtrees)
+                Create.Table("system_menu")
                 .WithColumn("id").AsString().PrimaryKey()
                 .WithColumn("menu_type").AsString().NotNullable()
                 .WithColumn("parent_id").AsInt32().Nullable()
@@ -75,11 +92,12 @@ namespace Clingies.Infrastructure.Migrations
                 .WithColumn("separator").AsBoolean().NotNullable().WithDefaultValue(false)
                 .WithColumn("sort_order").AsInt32().NotNullable().WithDefaultValue(0);
 
-            Create.Index("ux_system_menu_parent_sort")
-                .OnTable("system_menu")
-                .WithOptions().Unique()
-                .OnColumn("parent_id").Ascending()
-                .OnColumn("sort_order").Ascending();
+                Create.Index("ux_system_menu_parent_sort")
+                    .OnTable("system_menu")
+                    .WithOptions().Unique()
+                    .OnColumn("parent_id").Ascending()
+                    .OnColumn("sort_order").Ascending();
+            }
         }
 
         public override void Down()
@@ -87,19 +105,19 @@ namespace Clingies.Infrastructure.Migrations
             // Drop in reverse dependency order
 
             Delete.Index("ux_system_menu_parent_sort").OnTable("system_menu");
-            Delete.Table("system_menu");
+            if (Schema.Table("system_menu").Exists()) Delete.Table("system_menu");
 
-            Delete.Table("app_icon_paths");
+            if (Schema.Table("app_icon_paths").Exists()) Delete.Table("app_icon_paths");
 
-            Delete.Table("clingy_content");
+            if (Schema.Table("clingy_content").Exists()) Delete.Table("clingy_content");
 
-            Delete.Table("clingy_properties");
+            if (Schema.Table("clingy_properties").Exists()) Delete.Table("clingy_properties");
 
             Delete.Index("ix_clingies_type_id").OnTable("clingies");
-            Delete.Table("clingies");
+            if (Schema.Table("clingies").Exists()) Delete.Table("clingies");
 
             Delete.Index("ux_clingy_types_name").OnTable("clingy_types");
-            Delete.Table("clingy_types");
+            if (Schema.Table("clingy_types").Exists()) Delete.Table("clingy_types");
         }
     }
 }
