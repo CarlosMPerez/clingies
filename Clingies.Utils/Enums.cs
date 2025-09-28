@@ -29,5 +29,14 @@ public class Enums
         Stored = 5
     }
 
+    [Flags]
+    public enum FontDecorations
+    {
+        None = 0,
+        Bold = 1,
+        Italic = 2,
+        Underline = 4,
+        Strikethrough = 8
+    }
 
 }

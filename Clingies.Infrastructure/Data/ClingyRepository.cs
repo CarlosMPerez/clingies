@@ -22,7 +22,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     SELECT c.id, c.title, c.type_id AS Type, c.created_at, c.is_deleted,
                     p.Id as PropsId, p.position_x, p.position_y, 
                     p.width, p.height, p.is_pinned, p.is_rolled, 
-                    p.is_locked, p.is_standing, 
+                    p.is_locked, p.is_standing, p.style_id,
                     cc.Id as ContentId, cc.text, cc.png,
                     s.Id as StyleId, s.style_name, s.body_color, s.body_font_name, s.body_font_color,
                     s.body_font_size, s.body_font_decorations, s.is_default, s.is_active
@@ -38,9 +38,8 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 sql,
                 (c, p, ct, s) =>
                 {
-                    p.Id = c.Id;
-                    c.Id = p.Id;
-                    p.StyleId = s.Id;
+                    s.Id = p.StyleId;
+                    p.Style = s;
                     c.Properties = p;
                     c.Content = ct;
                     return c;
@@ -66,7 +65,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     SELECT c.id, c.type_id AS Type, c.title, c.created_at, c.is_deleted,
                     p.Id as PropsId, p.position_x, p.position_y, p.width, 
                     p.height, p.is_pinned, p.is_rolled, 
-                    p.is_locked, p.is_standing, 
+                    p.is_locked, p.is_standing, p.style_id,
                     c.Id as ContentId, cc.text, cc.png,
                     s.Id as StyleId, s.style_name, s.body_color, s.body_font_name, s.body_font_color,
                     s.body_font_size, s.body_font_decorations, s.is_default, s.is_active
@@ -82,7 +81,8 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 sql,
                 (c, p, ct, s) =>
                 {
-                    p.StyleId = s.Id;
+                    s.Id = p.StyleId;
+                    p.Style = s;
                     c.Properties = p;
                     c.Content = ct;
                     return c;
@@ -121,7 +121,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             );
             entity.Id = (int)newId;
 
-            entity.Properties.Id = clingy.Id;
+            entity.Properties.Id = entity.Id;
             Conn.Execute(
                 """
                     INSERT INTO clingy_properties
@@ -133,7 +133,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             );
 
             // NEW clingies are ALWAYS created with content as null, either TEXT or PNG
-            entity.Content.Id = clingy.Id;
+            entity.Content.Id = entity.Id;
             Conn.Execute(
                 """
                     INSERT INTO clingy_content (id, text, png)
@@ -346,7 +346,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 SELECT c.id, c.type_id AS Type, c.title, c.created_at, c.is_deleted,
                 p.Id as PropsId, p.position_x, p.position_y, p.width, 
                 p.height, p.is_pinned, p.is_rolled, 
-                p.is_locked, p.is_standing, 
+                p.is_locked, p.is_standing, p.style_id,
                 cc.Id as ContentId, cc.text, cc.png,
                 s.Id as StyleId, s.style_name, s.body_color, s.body_font_name, s.body_font_color,
                 s.body_font_size, s.body_font_decorations, s.is_default, s.is_active
@@ -362,9 +362,8 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             sql,
             (c, p, ct, s) =>
             {
-                p.Id = c.Id;
-                c.Id = p.Id;
-                p.StyleId = s.Id;
+                s.Id = p.StyleId;
+                p.Style = s;
                 c.Properties = p;
                 c.Content = ct;
                 return c;

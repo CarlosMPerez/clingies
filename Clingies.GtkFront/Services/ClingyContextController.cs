@@ -1,5 +1,6 @@
 using System;
 using Clingies.Application.Interfaces;
+using Clingies.GtkFront.Windows;
 
 namespace Clingies.GtkFront.Services;
 
@@ -25,6 +26,12 @@ public class ClingyContextController : IContextCommandController
         var newTitle = _titleDialog.ShowChangeTitleDialog(owner, prevTitle);
         if (newTitle == null) return;
         _manager.RequestTitleChange(_clingyId, newTitle);
+    }
+
+    public void ShowStyleManagerDialog()
+    {
+        var dialog = new StyleManagerWindow();
+        dialog.Show();
     }
 
     public void ShowColorWindow() => Console.WriteLine("COLOR TO BE IMPLEMENTED");
