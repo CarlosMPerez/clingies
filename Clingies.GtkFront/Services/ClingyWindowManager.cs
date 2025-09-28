@@ -11,6 +11,7 @@ namespace Clingies.GtkFront.Services;
 
 public class ClingyWindowManager(ClingyService clingyService,
                             GtkUtilsService utilsService,
+                            StyleService styleService,
                             MenuFactory menuFactory,
                             IClingiesLogger loggerService,
                             ITitleDialogService titleDialogService,
@@ -19,6 +20,7 @@ public class ClingyWindowManager(ClingyService clingyService,
     private readonly List<ClingyModel> _activeClingies = new List<ClingyModel>();
     private readonly List<ClingyWindow> _activeWindows = new List<ClingyWindow>();
     private readonly ClingyService _srvClingy = clingyService;
+    private readonly StyleService _styleService = styleService;
     private readonly IClingiesLogger _srvLogger = loggerService;
     private readonly ITitleDialogService _titleDialogService = titleDialogService;
     private readonly GtkUtilsService _srvUtils = utilsService;
@@ -31,6 +33,7 @@ public class ClingyWindowManager(ClingyService clingyService,
             var centerPoint = _srvUtils.GetCenterPointDefaultMonitor(AppConstants.Dimensions.DefaultClingyWidth, AppConstants.Dimensions.DefaultClingyHeight);
             var clingy = new ClingyModel();
             // default values
+            clingy.StyleId = _styleService.GetSystemStyleId();
             clingy.PositionX = centerPoint.X;
             clingy.PositionY = centerPoint.Y;
             clingy.Type = Enums.ClingyType.Desktop;

@@ -18,10 +18,13 @@ public class ClingyModel
     public bool IsRolled { get; set; }
     public bool IsLocked { get; set; }
     public bool IsStanding { get; set; }
+    public int StyleId { get; set; }
 
     // content
     public string? Text { get; set; }
     public byte[]? PngBytes { get; set; }
+
+    public StyleModel Style { get; set; }
 
     public ClingyModel()
     {
@@ -31,5 +34,6 @@ public class ClingyModel
         Height = AppConstants.Dimensions.DefaultClingyHeight;
         Width = AppConstants.Dimensions.DefaultClingyWidth;
         CreatedAt = DateTime.UtcNow;
+        Style = new StyleModel();
     }
 }

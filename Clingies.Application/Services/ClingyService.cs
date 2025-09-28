@@ -26,7 +26,7 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "Error retrieving Clingie Id {0}", id);
+            logger.Error(ex, "Error retrieving Clingy Id {0}", id);
             throw;
         }
 
@@ -41,7 +41,7 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "Error creating a Clingie");
+            logger.Error(ex, "Error creating a Clingy");
             throw;
         }
     }
@@ -54,7 +54,7 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "Error updating a Clingie");
+            logger.Error(ex, "Error updating a Clingy");
             throw;
         }
     }
@@ -67,8 +67,20 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "Error soft deleting a Clingie");
+            logger.Error(ex, "Error soft deleting a Clingy");
             throw;
+        }
+    }
+
+    public void UnDelete(int id)
+    {
+        try
+        {
+            repo.UnDelete(id);
+        }
+        catch (Exception ex)
+        {
+            logger.Error(ex, "Error trying to recover a deleted Clingy");
         }
     }
 

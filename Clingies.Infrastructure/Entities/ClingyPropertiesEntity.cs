@@ -13,4 +13,9 @@ public sealed class ClingyPropertiesEntity
     public bool IsLocked { get; set; }
     public bool IsStanding { get; set; }
 
+    public int StyleId { get; set; }
+
+    public StyleEntity Style { get; set; }
+
+    public ClingyPropertiesEntity() => Style = new StyleEntity();
 }

@@ -23,6 +23,20 @@ namespace Clingies.Infrastructure.Migrations
                     .OnColumn("name").Ascending();
             }
 
+            if (!Schema.Table("styles").Exists())
+            {
+                Create.Table("styles")
+                    .WithColumn("id").AsInt32().PrimaryKey().Identity()
+                    .WithColumn("style_name").AsString().NotNullable()
+                    .WithColumn("body_color").AsString().NotNullable()
+                    .WithColumn("body_font_name").AsString().NotNullable()
+                    .WithColumn("body_font_color").AsString().NotNullable()
+                    .WithColumn("body_font_size").AsInt32().NotNullable()
+                    .WithColumn("body_font_decorations").AsString().NotNullable()
+                    .WithColumn("is_default").AsBoolean().NotNullable().WithDefaultValue(false)
+                    .WithColumn("is_active").AsBoolean().NotNullable().WithDefaultValue(true);
+            }
+
             if (!Schema.Table("clingies").Exists())
             {
                 // --- Root: clingies (auto rowid)
@@ -54,7 +68,10 @@ namespace Clingies.Infrastructure.Migrations
                 .WithColumn("is_pinned").AsBoolean().NotNullable().WithDefaultValue(false)
                 .WithColumn("is_rolled").AsBoolean().NotNullable().WithDefaultValue(false)
                 .WithColumn("is_locked").AsBoolean().NotNullable().WithDefaultValue(false)
-                .WithColumn("is_standing").AsBoolean().NotNullable().WithDefaultValue(false);
+                .WithColumn("is_standing").AsBoolean().NotNullable().WithDefaultValue(false)
+                .WithColumn("style_id").AsInt32().NotNullable().WithDefaultValue(1)
+                    .ForeignKey("fk_clingy_style", "styles", "id")
+                    .OnDelete(Rule.None).OnUpdate(Rule.None);
             }
 
             if (!Schema.Table("clingy_content").Exists())

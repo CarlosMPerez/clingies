@@ -70,11 +70,13 @@ internal sealed class Program
             });
             services.AddSingleton<IClingyRepository, ClingyRepository>();
             services.AddSingleton<IMenuRepository, MenuRepository>();
+            services.AddSingleton<IStyleRepository, StyleRepository>();
             services.AddSingleton<IIconPathRepository, IconPathRepository>();
             services.AddSingleton<MenuFactory>();
             services.AddSingleton<ClingyWindowManager>();
             services.AddSingleton<ClingyService>();
             services.AddSingleton<MenuService>();
+            services.AddSingleton<StyleService>();
             services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
             services.AddSingleton<Func<ITrayCommandProvider>>(sp =>
                                 () => sp.GetRequiredService<ITrayCommandProvider>());

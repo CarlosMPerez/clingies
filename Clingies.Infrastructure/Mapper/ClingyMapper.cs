@@ -29,6 +29,19 @@ public static class EntitiesMapper
             IsLocked = model.IsLocked,
             IsRolled = model.IsRolled,
             IsStanding = model.IsStanding,
+            StyleId = model.StyleId,
+            Style = new StyleEntity()
+            {
+                Id = model.StyleId,
+                StyleName = model.Style.StyleName,
+                BodyColor = model.Style.BodyColor,
+                BodyFontName = model.Style.BodyFontName,
+                BodyFontColor = model.Style.BodyFontColor,
+                BodyFontSize = model.Style.BodyFontSize,
+                BodyFontDecorations = model.Style.BodyFontDecorations,
+                IsDefault = model.Style.IsDefault,
+                IsActive = model.Style.IsActive
+            }
         }
     };
 
@@ -48,6 +61,19 @@ public static class EntitiesMapper
         IsPinned = entity.Properties.IsPinned,
         IsLocked = entity.Properties.IsLocked,
         IsRolled = entity.Properties.IsRolled,
-        IsStanding = entity.Properties.IsStanding
+        IsStanding = entity.Properties.IsStanding,
+        StyleId = entity.Properties.StyleId,
+        Style = new StyleModel()
+        {
+            Id = entity.Properties.Style.Id,
+            StyleName = entity.Properties.Style.StyleName,
+            BodyColor = entity.Properties.Style.BodyColor,
+            BodyFontName = entity.Properties.Style.BodyFontName,
+            BodyFontColor = entity.Properties.Style.BodyFontColor,
+            BodyFontSize = entity.Properties.Style.BodyFontSize,
+            BodyFontDecorations = entity.Properties.Style.BodyFontDecorations,
+            IsDefault = entity.Properties.Style.IsDefault,
+            IsActive = entity.Properties.Style.IsActive
+        }
     };
 }

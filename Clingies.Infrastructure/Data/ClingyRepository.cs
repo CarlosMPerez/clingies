@@ -1,10 +1,11 @@
+using Dapper;
 using System.Data;
 using System.Reflection;
 using Clingies.Application.Interfaces;
 using Clingies.Domain.Models;
 using Clingies.Infrastructure.Entities;
 using Clingies.Infrastructure.Mapping;
-using Dapper;
+using static Clingies.Utils.Enums;
 
 namespace Clingies.Infrastructure.Data;
 
@@ -22,24 +23,30 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     p.Id as PropsId, p.position_x, p.position_y, 
                     p.width, p.height, p.is_pinned, p.is_rolled, 
                     p.is_locked, p.is_standing, 
-                    cc.Id as ContentId, cc.text, cc.png
+                    cc.Id as ContentId, cc.text, cc.png,
+                    s.Id as StyleId, s.style_name, s.body_color, s.body_font_name, s.body_font_color,
+                    s.body_font_size, s.body_font_decorations, s.is_default, s.is_active
                     FROM clingies AS c
                     JOIN clingy_properties as p ON p.id = c.id
                     JOIN clingy_content as cc on cc.id = c.id
+                    JOIN styles as s on s.id = p.style_id
                     WHERE c.is_deleted = 0 AND c.type_id = @TypeId;
                 """;
-            var data = Conn.Query<ClingyEntity, ClingyPropertiesEntity, ClingyContentEntity, ClingyEntity>(
+            var data = Conn.Query<ClingyEntity, ClingyPropertiesEntity,
+                                    ClingyContentEntity, StyleEntity, ClingyEntity>
+            (
                 sql,
-                (c, p, ct) =>
+                (c, p, ct, s) =>
                 {
                     p.Id = c.Id;
                     c.Id = p.Id;
+                    p.StyleId = s.Id;
                     c.Properties = p;
                     c.Content = ct;
                     return c;
                 },
                 new { TypeId = (int)Enums.ClingyType.Desktop },
-                splitOn: "PropsId, ContentId"
+                splitOn: "PropsId, ContentId, StyleId"
             ).ToList();
 
             return data.Select(entity => entity.ToModel()).ToList();
@@ -57,25 +64,31 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             var sql =
                 """
                     SELECT c.id, c.type_id AS Type, c.title, c.created_at, c.is_deleted,
-                    p.Id as Id, p.position_x, p.position_y, p.width, 
+                    p.Id as PropsId, p.position_x, p.position_y, p.width, 
                     p.height, p.is_pinned, p.is_rolled, 
                     p.is_locked, p.is_standing, 
-                    c.Id as Id, cc.text, cc.png
+                    c.Id as ContentId, cc.text, cc.png,
+                    s.Id as StyleId, s.style_name, s.body_color, s.body_font_name, s.body_font_color,
+                    s.body_font_size, s.body_font_decorations, s.is_default, s.is_active
                     FROM clingies AS c
                     JOIN clingy_properties AS p ON p.id = c.id
                     JOIN clingy_content AS cc ON cc.id = c.id
+                    JOIN styles as s on s.id = p.style_id
                     WHERE c.id = @Id;
                 """;
-            var result = Conn.Query<ClingyEntity, ClingyPropertiesEntity, ClingyContentEntity, ClingyEntity>(
+            var result = Conn.Query<ClingyEntity, ClingyPropertiesEntity,
+                                    ClingyContentEntity, StyleEntity, ClingyEntity>
+            (
                 sql,
-                (c, p, ct) =>
+                (c, p, ct, s) =>
                 {
+                    p.StyleId = s.Id;
                     c.Properties = p;
                     c.Content = ct;
                     return c;
                 },
                 new { Id = id },
-                splitOn: "Id, Id"
+                splitOn: "PropsId, ContentId, StyleId"
             ).SingleOrDefault();
 
             if (result == null) return null;
@@ -112,9 +125,9 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             Conn.Execute(
                 """
                     INSERT INTO clingy_properties
-                    (id, position_x, position_y, width, height, is_pinned, is_rolled, is_locked, is_standing)
+                    (id, position_x, position_y, width, height, is_pinned, is_rolled, is_locked, is_standing, style_id)
                     VALUES
-                    (@Id, @PositionX, @PositionY, @Width, @Height, @IsPinned, @IsRolled, @IsLocked, @IsStanding);
+                    (@Id, @PositionX, @PositionY, @Width, @Height, @IsPinned, @IsRolled, @IsLocked, @IsStanding, @StyleId);
                 """,
                 entity.Properties, tx
             );
@@ -209,9 +222,12 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             var rows = Conn.Execute(
                 """
-                    UPDATE clingies SET is_deleted = 1 WHERE id = @Id;
+                    UPDATE clingies SET 
+                    is_deleted = 1,
+                    type_id = @TypeId
+                    WHERE id = @Id;
                 """,
-                new { Id = id });
+                new { Id = id, TypeId = ClingyType.Closed });
             EnsureFound(rows, id, "clingies");
         }
         catch (Exception ex)
@@ -221,6 +237,26 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
+    public void UnDelete(int id)
+    {
+        try
+        {
+            var rows = Conn.Execute(
+                """
+                    UPDATE clingies SET 
+                    is_deleted = 0,
+                    type_id = @TypeId
+                    WHERE id = @Id;
+                """,
+                new { Id = id, TypeId = ClingyType.Desktop });
+            EnsureFound(rows, id, "clingies");
+        }
+        catch (Exception ex)
+        {
+            logger.Error(ex, "Error soft deleting clingy");
+            throw;
+        }
+    }
     private void NormalizeContent(ClingyContentEntity? content)
     {
         if (content is null) return;
@@ -250,7 +286,8 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 SET position_x=@PositionX, position_y=@PositionY,
                     width=@Width, height=@Height,
                     is_pinned=@IsPinned, is_rolled=@IsRolled,
-                    is_locked=@IsLocked, is_standing=@IsStanding
+                    is_locked=@IsLocked, is_standing=@IsStanding,
+                    style_id=@StyleId
                 WHERE id=@Id;
             """,
             new
@@ -263,7 +300,8 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 props.IsPinned,
                 props.IsRolled,
                 props.IsLocked,
-                props.IsStanding
+                props.IsStanding,
+                props.StyleId
             }, tx);
         EnsureFound(rows, main.Id, "clingy_properties");
     }
@@ -306,25 +344,33 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         const string sql =
             """
                 SELECT c.id, c.type_id AS Type, c.title, c.created_at, c.is_deleted,
-                p.Id as Id, p.position_x, p.position_y, p.width, 
+                p.Id as PropsId, p.position_x, p.position_y, p.width, 
                 p.height, p.is_pinned, p.is_rolled, 
                 p.is_locked, p.is_standing, 
-                cc.Id as Id, cc.text, cc.png
+                cc.Id as ContentId, cc.text, cc.png,
+                s.Id as StyleId, s.style_name, s.body_color, s.body_font_name, s.body_font_color,
+                s.body_font_size, s.body_font_decorations, s.is_default, s.is_active
                 FROM clingies AS c
                 JOIN clingy_properties AS p ON p.id = c.id
                 JOIN clingy_content AS cc ON cc.id = c.id
+                JOIN styles as s on s.id = p.style_id
                 WHERE c.id = @Id;
             """;
-        var x = Conn.Query<ClingyEntity, ClingyPropertiesEntity, ClingyContentEntity, ClingyEntity>(
+        var x = Conn.Query<ClingyEntity, ClingyPropertiesEntity,
+                            ClingyContentEntity, StyleEntity, ClingyEntity>
+        (
             sql,
-            (c, p, ct) =>
+            (c, p, ct, s) =>
             {
+                p.Id = c.Id;
+                c.Id = p.Id;
+                p.StyleId = s.Id;
                 c.Properties = p;
                 c.Content = ct;
                 return c;
             },
             new { Id = id }, tx,
-            splitOn: "Id, Id"
+            splitOn: "PropsId, ContentId, StyleId"
         ).SingleOrDefault();
         return x;
     }

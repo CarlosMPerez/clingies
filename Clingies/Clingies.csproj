@@ -4,8 +4,6 @@
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-        <EnableDefaultAvaloniaAnalyzers>true</EnableDefaultAvaloniaAnalyzers>
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
         <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>        
     </PropertyGroup>

@@ -82,4 +82,14 @@ public static class AppConstants
 
         public const int TitleHeight = 20;
     }
+
+    public static class SystemStyle
+    {
+        public const string Name = "System";
+        public const string BodyColor = "#FFFFB8";
+        public const string BodyFontName = "monospace";
+        public const string BodyFontColor = "#000000";
+        public const int BodyFontSize = 14;
+        public const string BodyFontDecorations = "0000";
+    }
 }

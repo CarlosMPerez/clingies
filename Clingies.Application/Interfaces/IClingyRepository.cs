@@ -9,6 +9,7 @@ public interface IClingyRepository
     int Create(ClingyModel clingy);
     void Update(ClingyModel clingy);
     void SoftDelete(int id);
+    void UnDelete(int id);
     void HardDelete(int id);
 
 }

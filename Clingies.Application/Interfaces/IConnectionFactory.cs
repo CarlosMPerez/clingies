@@ -1,6 +1,6 @@
 using System.Data;
 
-namespace Clingies.Infrastructure.Data;
+namespace Clingies.Application.Interfaces;
 
 public interface IConnectionFactory
 {
