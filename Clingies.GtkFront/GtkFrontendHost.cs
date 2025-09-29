@@ -29,8 +29,8 @@ namespace Clingies.GtkFront
 
         public int Run()
         {
-            var provider = new ClingyCssProvider();
-            StyleContext.AddProviderForScreen(Screen.Default, provider, StyleProviderPriority.Application);
+            var baseProvider = new GlobalClingyBaseCssProvider();
+            StyleContext.AddProviderForScreen(Screen.Default, baseProvider, StyleProviderPriority.Application);
 
             DrawTrayIconAndMenu();
 

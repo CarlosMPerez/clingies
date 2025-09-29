@@ -21,6 +21,8 @@ public class TrayCommandProvider : ITrayCommandProvider
     public ICommand AboutCommand { get; }
     public ICommand ExitCommand { get; }
 
+    public ICommand StyleManagerCommand { get; }
+
     public TrayCommandProvider(ITrayCommandController controller)
     {
         NewCommand = new RelayCommand(controller.CreateNewClingy);
@@ -37,5 +39,6 @@ public class TrayCommandProvider : ITrayCommandProvider
         HelpCommand = new RelayCommand(controller.ShowHelpWindow);
         AboutCommand = new RelayCommand(controller.ShowAboutWindow);
         ExitCommand = new RelayCommand(controller.ExitApp);
+        StyleManagerCommand = new RelayCommand(controller.ShowStyleManager);
     }
 }

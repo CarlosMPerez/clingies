@@ -38,6 +38,7 @@ public static class AppConstants
         public const string Help = "help";
         public const string About = "about";
         public const string Exit = "exit";
+        public const string StyleManager = "style_manager";
     }
 
     public static class ContextMenuCommands
@@ -51,6 +52,7 @@ public static class AppConstants
         public const string RollUp = "rollup";
         public const string RollDown = "rolldown";
         public const string Properties = "properties";
+        public const string StyleManager = "style_manager";
     }
 
     public static class CssSections

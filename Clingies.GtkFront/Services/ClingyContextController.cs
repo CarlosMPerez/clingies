@@ -28,12 +28,6 @@ public class ClingyContextController : IContextCommandController
         _manager.RequestTitleChange(_clingyId, newTitle);
     }
 
-    public void ShowStyleManagerDialog()
-    {
-        var dialog = new StyleManagerWindow();
-        dialog.Show();
-    }
-
     public void ShowColorWindow() => Console.WriteLine("COLOR TO BE IMPLEMENTED");
 
     public void ShowPropertiesWindow() => Console.WriteLine("PROPERTIES TO BE IMPLEMENTED");

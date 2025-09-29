@@ -30,4 +30,6 @@ public class TrayCommandController : ITrayCommandController
     public void ShowAboutWindow() => Console.WriteLine("ABOUT WINDOW NOT IMPLEMENTED");
 
     public void CreateNewClingy() => _windowFactory.CreateNewWindow();
+
+    public void ShowStyleManager() => _windowFactory.ShowStyleManagerDialog();
 }

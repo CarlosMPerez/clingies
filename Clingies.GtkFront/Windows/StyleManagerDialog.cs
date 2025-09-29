@@ -2,11 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Gtk;
 using Gdk;
-using Pango;
 
 namespace Clingies.GtkFront.Windows
 {
-    public sealed class StyleManagerWindow : Dialog
+    public sealed class StyleManagerDialog : Dialog
     {
         // Styles list
         public TreeView StylesView { get; private set; }
@@ -28,8 +27,9 @@ namespace Clingies.GtkFront.Windows
         // Actions
         public Button BtnDelete { get; private set; }
         public Button BtnSave { get; private set; }
+        public Button BtnCancel { get; private set; }
 
-        public StyleManagerWindow(Gtk.Window parent = null) : base("Style Manager", parent, DialogFlags.Modal)
+        public StyleManagerDialog(Gtk.Window parent = null) : base("Style Manager", parent, DialogFlags.Modal)
         {
             // ---- dialog/window behavior ----
             DefaultWidth = 560;
@@ -92,7 +92,7 @@ namespace Clingies.GtkFront.Windows
             grid.Attach(EntryStyleName, 1, r, 2, 1);
 
             var flagsBox = new Box(Orientation.Horizontal, 8);
-            ChkActive  = new CheckButton("Active");
+            ChkActive = new CheckButton("Active");
             ChkDefault = new CheckButton("Default");
             flagsBox.PackStart(ChkActive, false, false, 0);
             flagsBox.PackStart(ChkDefault, false, false, 0);
@@ -120,10 +120,10 @@ namespace Clingies.GtkFront.Windows
             r++;
             grid.Attach(new Label("Font Decorations") { Xalign = 0 }, 0, r, 1, 1);
             var decoBox = new Box(Orientation.Horizontal, 12);
-            CbBold      = new CheckButton("Bold");
-            CbItalic    = new CheckButton("Italics");
+            CbBold = new CheckButton("Bold");
+            CbItalic = new CheckButton("Italics");
             CbUnderline = new CheckButton("Underline");
-            CbStrike    = new CheckButton("Strikethrough");
+            CbStrike = new CheckButton("Strikethrough");
             decoBox.PackStart(CbBold, false, false, 0);
             decoBox.PackStart(CbItalic, false, false, 0);
             decoBox.PackStart(CbUnderline, false, false, 0);
@@ -134,10 +134,13 @@ namespace Clingies.GtkFront.Windows
 
             // === Actions ==============================================================
             var actions = new Box(Orientation.Horizontal, 8) { Halign = Align.End };
+            BtnCancel = new Button("Cancel");
+            BtnCancel.StyleContext.AddClass("action");
             BtnDelete = new Button("Delete");
             BtnDelete.StyleContext.AddClass("destructive-action");
             BtnSave = new Button("Save");
             BtnSave.StyleContext.AddClass("suggested-action");
+            actions.PackStart(BtnCancel, false, false, 0);
             actions.PackEnd(BtnSave, false, false, 0);
             actions.PackEnd(BtnDelete, false, false, 0);
 

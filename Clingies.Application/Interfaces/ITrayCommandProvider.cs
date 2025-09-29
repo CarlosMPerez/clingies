@@ -18,4 +18,5 @@ public interface ITrayCommandProvider
     ICommand HelpCommand { get; }
     ICommand AboutCommand { get; }
     ICommand ExitCommand { get; }
+    ICommand StyleManagerCommand { get; }
 }

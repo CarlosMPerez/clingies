@@ -9,7 +9,7 @@ public class _20250914_01_AddRollToClingyContextMenu : Migration
     {
         // ROLL UP
         string sql = SqlBuilder.BuildInsertSystemTrayMenuItem("rollup", "clingy", null, "Roll Up",
-                "Rolls up the Clingy content", true, false, 80);
+                "Rolls up the Clingy content", true, false, 60);
         Execute.Sql(sql);
         sql = SqlBuilder.BuildInsertSystemTrayIcon("rollup",
             "Assets/menu_light/menu_rollup.png",
@@ -17,7 +17,7 @@ public class _20250914_01_AddRollToClingyContextMenu : Migration
         Execute.Sql(sql);
         // ROLL DOWN
         sql = SqlBuilder.BuildInsertSystemTrayMenuItem("rolldown", "clingy", null, "Roll Down",
-                "Rolls down the Clingy content", true, false, 90);
+                "Rolls down the Clingy content", true, false, 70);
         Execute.Sql(sql);
         sql = SqlBuilder.BuildInsertSystemTrayIcon("rolldown",
             "Assets/menu_light/menu_rolldown.png",

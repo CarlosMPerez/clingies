@@ -172,6 +172,7 @@ public class MenuFactory(MenuService menuService,
             AppConstants.TrayMenuCommands.Help => prov.HelpCommand,
             AppConstants.TrayMenuCommands.About => prov.AboutCommand,
             AppConstants.TrayMenuCommands.Exit => prov.ExitCommand,
+            AppConstants.TrayMenuCommands.StyleManager => prov.StyleManagerCommand,
             _ => null
         };
     }
@@ -187,6 +188,7 @@ public class MenuFactory(MenuService menuService,
         AppConstants.ContextMenuCommands.RollUp => _contextCommandProvider!.RollUpCommand,
         AppConstants.ContextMenuCommands.RollDown => _contextCommandProvider!.RollDownCommand,
         AppConstants.ContextMenuCommands.Properties => _contextCommandProvider!.ShowPropertiesWindowCommand,
+        AppConstants.ContextMenuCommands.StyleManager => _contextCommandProvider!.ShowStyleManagerCommand,
         _ => null
     };
 

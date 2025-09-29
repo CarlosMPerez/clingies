@@ -17,4 +17,5 @@ public interface ITrayCommandController
     void ShowHelpWindow();
     void ShowAboutWindow();
     void ExitApp();
+    void ShowStyleManager();
 }

@@ -13,4 +13,5 @@ public interface IContextCommandProvider
     ICommand RollUpCommand { get; }
     ICommand RollDownCommand { get; }
     ICommand ShowPropertiesWindowCommand { get; }
+    ICommand ShowStyleManagerCommand { get; }
 }

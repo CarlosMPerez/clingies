@@ -17,7 +17,7 @@ public class _20250912_04_SeedClingyMenu : Migration
         Execute.Sql(sql);
         // Alarm
         sql = SqlBuilder.BuildInsertSystemTrayMenuItem("alarm", "clingy", null, "Alarm...",
-                "Set an Alarm on the Clingy", true, false, 40);
+                "Set an Alarm on the Clingy", true, false, 20);
         Execute.Sql(sql);
         sql = SqlBuilder.BuildInsertSystemTrayIcon("alarm",
             "Assets/menu_light/menu_alarm.png",
@@ -25,7 +25,7 @@ public class _20250912_04_SeedClingyMenu : Migration
         Execute.Sql(sql);
         // Set title
         sql = SqlBuilder.BuildInsertSystemTrayMenuItem("title", "clingy", null, "Set Title...\t\tShift+Ctrl+T",
-                "Changes the Title on the Clingy", true, false, 50);
+                "Changes the Title on the Clingy", true, false, 30);
         Execute.Sql(sql);
         sql = SqlBuilder.BuildInsertSystemTrayIcon("title",
             "Assets/menu_light/menu_title.png",
@@ -33,7 +33,7 @@ public class _20250912_04_SeedClingyMenu : Migration
         Execute.Sql(sql);
         // Lock Content
         sql = SqlBuilder.BuildInsertSystemTrayMenuItem("lock", "clingy", null, "Lock",
-                "Locks the Clingy contents", true, false, 70);
+                "Locks the Clingy contents", true, false, 40);
         Execute.Sql(sql);
         sql = SqlBuilder.BuildInsertSystemTrayIcon("lock",
             "Assets/menu_light/menu_locked.png",
@@ -41,7 +41,7 @@ public class _20250912_04_SeedClingyMenu : Migration
         Execute.Sql(sql);
         // Unlock Content
         sql = SqlBuilder.BuildInsertSystemTrayMenuItem("unlock", "clingy", null, "Unlock",
-                "Unlocks the Clingy contents", true, false, 70);
+                "Unlocks the Clingy contents", true, false, 50);
         Execute.Sql(sql);
         sql = SqlBuilder.BuildInsertSystemTrayIcon("unlock",
             "Assets/menu_light/menu_unlocked.png",

@@ -25,6 +25,7 @@ public class ClingyWindowManager(ClingyService clingyService,
     private readonly ITitleDialogService _titleDialogService = titleDialogService;
     private readonly GtkUtilsService _srvUtils = utilsService;
     private readonly MenuFactory _menuFactory = menuFactory;
+    private readonly ClingyStylingService _styling = new(styleService);
 
     public void CreateNewWindow()
     {
@@ -42,6 +43,9 @@ public class ClingyWindowManager(ClingyService clingyService,
             var controller = new ClingyContextController(this, _titleDialogService, clingy.Id);
             var provider = providerFactory(controller);
             var window = new ClingyWindow(clingy, _srvUtils, _menuFactory, controller);
+            // Styling
+            window.StyleContext.AddClass("clingy");
+            _styling.ApplyTo(window, clingy.Id, clingy.StyleId);
 
             window.Move(centerPoint.X, centerPoint.Y);
 
@@ -67,6 +71,9 @@ public class ClingyWindowManager(ClingyService clingyService,
                 var controller = new ClingyContextController(this, _titleDialogService, clingy.Id);
                 var provider = providerFactory(controller);
                 var window = new ClingyWindow(clingy, _srvUtils, _menuFactory, controller);
+                // Styling
+                window.StyleContext.AddClass("clingy");
+                _styling.ApplyTo(window, clingy.Id, clingy.StyleId);
                 window.SetContextCommandProvider(provider);
                 SubscribeWindowToEvents(window);
                 window.KeepAbove = clingy.IsPinned;
@@ -80,6 +87,12 @@ public class ClingyWindowManager(ClingyService clingyService,
             _srvLogger.Error(ex, "Error loading all active Clingies");
             throw;
         }
+    }
+
+    public void ShowStyleManagerDialog()
+    {
+        var dialog = new StyleManagerDialog();
+        dialog.Show();
     }
 
     public void RequestLock(int clingyId) =>

@@ -17,6 +17,8 @@ public class ContextCommandProvider : IContextCommandProvider
     public ICommand RollDownCommand { get; }
     public ICommand ShowPropertiesWindowCommand { get; }
 
+    public ICommand ShowStyleManagerCommand { get; }
+
     public ContextCommandProvider(IContextCommandController controller)
     {
         _controller = controller ?? throw new ArgumentNullException(nameof(controller));
