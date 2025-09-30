@@ -5,10 +5,12 @@ using Gtk;
 using Clingies.Application.Interfaces;
 using Clingies.Domain.Models;
 using Clingies.Application.Services;
+using System.Collections.Generic;
 
 namespace Clingies.GtkFront.Services;
 
 public class MenuFactory(MenuService menuService,
+                        StyleService styleService,
                         IClingiesLogger logger,
                         Func<ITrayCommandProvider> trayCommandProviderFactory,
                         GtkUtilsService utils)
@@ -16,6 +18,7 @@ public class MenuFactory(MenuService menuService,
 {
     private IContextCommandProvider? _contextCommandProvider;
     private readonly Func<ITrayCommandProvider> _trayCommandProviderFactory = trayCommandProviderFactory;
+    private string prefix = "set_style_";
 
     public Menu BuildTrayMenu()
     {
@@ -48,51 +51,108 @@ public class MenuFactory(MenuService menuService,
             };
 
             if (item.Separator) menu.Append(new SeparatorMenuItem());
-            else menu.Append(BuildContextMenuItemRecursive(item));
+            else 
+            {
+                if (item.Id == AppConstants.ContextMenuCommands.SetStyle)
+                    menu.Append(BuildAvailableStylesMenu(item));
+                else
+                    menu.Append(BuildContextMenuItemRecursive(item));
+            }
         }
 
         return menu;
     }
 
-    private MenuItem BuildContextMenuItemRecursive(MenuItemModel item)
+    private MenuItem BuildContextMenuItemRecursive(MenuItemModel model)
     {
-        var children = menuService.GetChildren(item.Id)
+        MenuItem ret;
+        var children = menuService.GetChildren(model.Id)
                         .OrderBy(c => c.SortOrder)
                         .ToList();
 
-        if (children.Count > 0)
+        if (children.Count > 0) ret = BuildParentContextMenuItem(model, children);
+        else ret = BuildNonParentContextMenuItem(model);
+
+        return ret;
+    }
+
+    private MenuItem BuildParentContextMenuItem(MenuItemModel model, List<MenuItemModel> children)
+    {
+        var parent = NewMenuItemWithOptionalIcon(model.Label ?? model.Id, model.Id, utils);
+        parent.Sensitive = model.Enabled;
+
+        var sub = new Menu();
+        foreach (var child in children)
+            sub.Append(BuildContextMenuItemRecursive(child));
+
+        parent.Submenu = sub;
+        return parent;
+    }
+
+    private MenuItem BuildNonParentContextMenuItem(MenuItemModel model)
+    {
+        var menuItem = NewMenuItemWithOptionalIcon(model.Label ?? model.Id, model.Id, utils);
+        menuItem.Sensitive = model.Enabled;
+
+        var command = ResolveContextCommand(model.Id);
+        if (command is not null)
         {
-            var parent = NewMenuItemWithOptionalIcon(item.Label ?? item.Id, item.Id, utils);
-            parent.Sensitive = item.Enabled;
-
-            var sub = new Menu();
-            foreach (var child in children)
-                sub.Append(BuildContextMenuItemRecursive(child));
-
-            parent.Submenu = sub;
-            return parent;
+            menuItem.Activated += (_, __) =>
+            {
+                if (command.CanExecute(null))
+                    command.Execute(null);
+            };
         }
         else
         {
-            var menuItem = NewMenuItemWithOptionalIcon(item.Label ?? item.Id, item.Id, utils);
-            menuItem.Sensitive = item.Enabled;
-
-            var command = ResolveContextCommand(item.Id);
-            if (command is not null)
+            if (model.Id[..10] == prefix)
             {
-                menuItem.Activated += (_, __) =>
-                {
-                    if (command.CanExecute(null))
-                        command.Execute(null);
-                };
+                menuItem.Name = model.Id;
+                menuItem.Activated += OnApplyStyleActivated;
             }
-            else
-            {
-                logger.Warning($"[ClingyMenu] No command defined for item id '{item.Id}'");
-            }
-
-            return menuItem;
+            else logger.Warning($"[ClingyMenu] No command defined for item id '{model.Id}'");
         }
+
+        return menuItem;
+    }
+
+    private MenuItem BuildAvailableStylesMenu(MenuItemModel model)
+    {
+        MenuItem ret;
+        var styles = styleService.GetAllActive().OrderBy(c => c.StyleName).ToList();
+
+        if (styles.Count > 0)
+        {
+            List<MenuItemModel> convertedStyles = new List<MenuItemModel>();
+            int sortOrder = 0;
+            foreach (var style in styles)
+            {
+                MenuItemModel converted = new()
+                {
+                    Id = $"set_style_{style.Id}",
+                    Label = style.StyleName,
+                    Tooltip = $"Set Style ${style.StyleName} to Clingy",
+                    Icon = null,
+                    Enabled = true,
+                    Separator = false,
+                    ParentId = model.Id,
+                    SortOrder = sortOrder += 10
+                };
+                convertedStyles.Add(converted);
+            }
+
+            ret = BuildParentContextMenuItem(model, convertedStyles);
+        }
+        else ret = BuildNonParentContextMenuItem(model);
+
+        return ret;
+    }
+
+    private void OnApplyStyleActivated(object? sender, EventArgs e)
+    {
+        int id = 0;
+        int.TryParse(((MenuItem)sender!).Name.Substring(prefix.Length), out id);
+        _contextCommandProvider!.ApplyStyleCommand.Execute(id);
     }
 
     private Menu BuildGtkTrayMenu()
@@ -179,6 +239,7 @@ public class MenuFactory(MenuService menuService,
 
     private ICommand? ResolveContextCommand(string itemId) => itemId switch
     {
+        
         AppConstants.ContextMenuCommands.Sleep => _contextCommandProvider!.SleepCommand,
         AppConstants.ContextMenuCommands.Alarm => _contextCommandProvider!.ShowAlarmWindowCommand,
         AppConstants.ContextMenuCommands.Title => _contextCommandProvider!.ShowChangeTitleDialogCommand,
@@ -188,7 +249,6 @@ public class MenuFactory(MenuService menuService,
         AppConstants.ContextMenuCommands.RollUp => _contextCommandProvider!.RollUpCommand,
         AppConstants.ContextMenuCommands.RollDown => _contextCommandProvider!.RollDownCommand,
         AppConstants.ContextMenuCommands.Properties => _contextCommandProvider!.ShowPropertiesWindowCommand,
-        AppConstants.ContextMenuCommands.StyleManager => _contextCommandProvider!.ShowStyleManagerCommand,
         _ => null
     };
 

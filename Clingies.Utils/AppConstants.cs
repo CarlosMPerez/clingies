@@ -52,7 +52,7 @@ public static class AppConstants
         public const string RollUp = "rollup";
         public const string RollDown = "rolldown";
         public const string Properties = "properties";
-        public const string StyleManager = "style_manager";
+        public const string SetStyle = "set_style";
     }
 
     public static class CssSections

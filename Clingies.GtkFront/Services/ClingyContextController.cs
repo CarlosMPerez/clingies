@@ -28,6 +28,8 @@ public class ClingyContextController : IContextCommandController
         _manager.RequestTitleChange(_clingyId, newTitle);
     }
 
+    public void ApplyStyle(int styleId) => Console.WriteLine($"APPLY STYLE {styleId}");
+
     public void ShowColorWindow() => Console.WriteLine("COLOR TO BE IMPLEMENTED");
 
     public void ShowPropertiesWindow() => Console.WriteLine("PROPERTIES TO BE IMPLEMENTED");

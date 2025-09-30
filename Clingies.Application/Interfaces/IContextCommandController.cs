@@ -11,4 +11,5 @@ public interface IContextCommandController
     void RollUpClingy();
     void RollDownClingy();
     void ShowPropertiesWindow();
+    void ApplyStyle(int styleId);
 }

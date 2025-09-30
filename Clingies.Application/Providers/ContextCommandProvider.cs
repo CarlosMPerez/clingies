@@ -16,8 +16,7 @@ public class ContextCommandProvider : IContextCommandProvider
     public ICommand RollUpCommand { get; }
     public ICommand RollDownCommand { get; }
     public ICommand ShowPropertiesWindowCommand { get; }
-
-    public ICommand ShowStyleManagerCommand { get; }
+    public ICommand ApplyStyleCommand { get; }
 
     public ContextCommandProvider(IContextCommandController controller)
     {
@@ -31,5 +30,6 @@ public class ContextCommandProvider : IContextCommandProvider
         RollUpCommand = new RelayCommand(_controller.RollUpClingy);
         RollDownCommand = new RelayCommand(_controller.RollDownClingy);
         ShowPropertiesWindowCommand = new RelayCommand(_controller.ShowPropertiesWindow);
+        ApplyStyleCommand = new RelayCommand<int>(_controller.ApplyStyle);
     }
 }
