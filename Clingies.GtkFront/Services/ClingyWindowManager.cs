@@ -25,7 +25,7 @@ public class ClingyWindowManager(ClingyService clingyService,
     private readonly ITitleDialogService _titleDialogService = titleDialogService;
     private readonly GtkUtilsService _srvUtils = utilsService;
     private readonly MenuFactory _menuFactory = menuFactory;
-    private readonly ClingyStylingService _styling = new(styleService);
+    private readonly ClingyStylingService _stylingService = new(styleService);
 
     public void CreateNewWindow()
     {
@@ -40,12 +40,12 @@ public class ClingyWindowManager(ClingyService clingyService,
             clingy.Type = Enums.ClingyType.Desktop;
             clingy.Id = _srvClingy.Create(clingy);
 
-            var controller = new ClingyContextController(this, _titleDialogService, clingy.Id);
+            var controller = new ClingyContextController(this, _stylingService, _titleDialogService, clingy.Id);
             var provider = providerFactory(controller);
             var window = new ClingyWindow(clingy, _srvUtils, _menuFactory, controller);
             // Styling
             window.StyleContext.AddClass("clingy");
-            _styling.ApplyTo(window, clingy.Id, clingy.StyleId);
+            _stylingService.ApplyTo(window, clingy.Id, clingy.StyleId);
 
             window.Move(centerPoint.X, centerPoint.Y);
 
@@ -68,12 +68,12 @@ public class ClingyWindowManager(ClingyService clingyService,
         {
             foreach (var clingy in _srvClingy.GetAllActive())
             {
-                var controller = new ClingyContextController(this, _titleDialogService, clingy.Id);
+                var controller = new ClingyContextController(this, _stylingService, _titleDialogService, clingy.Id);
                 var provider = providerFactory(controller);
                 var window = new ClingyWindow(clingy, _srvUtils, _menuFactory, controller);
                 // Styling
                 window.StyleContext.AddClass("clingy");
-                _styling.ApplyTo(window, clingy.Id, clingy.StyleId);
+                _stylingService.ApplyTo(window, clingy.Id, clingy.StyleId);
                 window.SetContextCommandProvider(provider);
                 SubscribeWindowToEvents(window);
                 window.KeepAbove = clingy.IsPinned;
@@ -88,10 +88,9 @@ public class ClingyWindowManager(ClingyService clingyService,
             throw;
         }
     }
-
     public void ShowStyleManagerDialog()
     {
-        var dialog = new StyleManagerDialog();
+        var dialog = new StyleManagerDialog(_styleService);
         dialog.Show();
     }
 
@@ -135,6 +134,9 @@ public class ClingyWindowManager(ClingyService clingyService,
         HandleTitleChangeRequested(sender: this,
             args: new TitleChangeRequestedEventArgs(clingyId, newTitle));
 
+    public void RequestStyleChange(int clingyId, int styleId) =>
+        HandleStyleChangeRequested(sender: this, args: new StyleChangeRequestedEventArgs(clingyId, styleId));
+
     private void SubscribeWindowToEvents(ClingyWindow window)
     {
         window.CloseRequested += HandleCloseRequested;
@@ -144,6 +146,7 @@ public class ClingyWindowManager(ClingyService clingyService,
         window.TitleChangeRequested += HandleTitleChangeRequested;
         window.UpdateWindowSizeRequested += HandleUpdateWindowSizeRequested;
         window.RollRequested += HandleRollRequested;
+        window.StyleChangeRequested += HandleStyleChangeRequested;
     }
 
     private void HandleCloseRequested(object? sender, int id)
@@ -273,6 +276,24 @@ public class ClingyWindowManager(ClingyService clingyService,
             throw;
         }
     }
+
+    private void HandleStyleChangeRequested(object? sender, StyleChangeRequestedEventArgs args)
+    {
+        try
+        {
+            var window = _activeWindows.Single(x => x.ClingyId == args.ClingyId);
+            var clingy = _activeClingies.Single(x => x.Id == args.ClingyId);
+            if (clingy.IsLocked) return;
+            clingy.StyleId = args.StyleId;
+            _srvClingy.Update(clingy);
+        }
+        catch (Exception ex)
+        {
+            _srvLogger.Error(ex, "Error at HandleRollRequested");
+            throw;
+        }
+    }
+
 
     private void HandleRollRequested(object? sender, RollRequestedEventArgs args)
     {

@@ -20,6 +20,7 @@ namespace Clingies.GtkFront.Windows
         public event EventHandler<ContentChangeRequestedEventArgs>? ContentChangeRequested;
         public event EventHandler<UpdateWindowSizeRequestedEventArgs>? UpdateWindowSizeRequested;
         public event EventHandler<RollRequestedEventArgs>? RollRequested;
+        public event EventHandler<StyleChangeRequestedEventArgs>? StyleChangeRequested;
 
         public IContextCommandProvider? CommandProvider { get; private set; }
 

@@ -1,12 +1,15 @@
-using System.Collections.Generic;
 using System.Linq;
 using Gtk;
 using Gdk;
+using Clingies.Application.Services;
+using System;
 
 namespace Clingies.GtkFront.Windows
 {
     public sealed class StyleManagerDialog : Dialog
     {
+        private readonly StyleService _styleService;
+        private int? selectedId;
         // Styles list
         public TreeView StylesView { get; private set; }
         public ListStore StylesStore { get; private set; }
@@ -23,14 +26,15 @@ namespace Clingies.GtkFront.Windows
         public CheckButton CbItalic { get; private set; }
         public CheckButton CbUnderline { get; private set; }
         public CheckButton CbStrike { get; private set; }
+        public Entry HiddenStyleId { get; private set; }        
 
         // Actions
-        public Button BtnDelete { get; private set; }
         public Button BtnSave { get; private set; }
         public Button BtnCancel { get; private set; }
 
-        public StyleManagerDialog(Gtk.Window parent = null) : base("Style Manager", parent, DialogFlags.Modal)
+        public StyleManagerDialog(StyleService styleService, Gtk.Window parent = null) : base("Style Manager", parent, DialogFlags.Modal)
         {
+            _styleService = styleService;
             // ---- dialog/window behavior ----
             DefaultWidth = 560;
             DefaultHeight = 420;
@@ -56,7 +60,8 @@ namespace Clingies.GtkFront.Windows
 
             BuildUi();
             WireSignals();
-            PopulateFontFamilies();
+            LoadFontFamilies();
+            LoadStyles();
 
             ShowAll();
         }
@@ -64,6 +69,17 @@ namespace Clingies.GtkFront.Windows
         void BuildUi()
         {
             var root = new Box(Orientation.Vertical, 8);
+
+            // === Hidden entry with style id ===========================================
+            HiddenStyleId = new Entry
+            {
+                Name = "style_id_hidden",
+                Visible = false,
+                NoShowAll = true,
+                Sensitive = false
+            };
+
+            root.PackStart(HiddenStyleId, false, false, 0);
 
             // === Styles list ==========================================================
             var stylesFrame = new Frame { Label = "Styles" };
@@ -78,6 +94,7 @@ namespace Clingies.GtkFront.Windows
             col.AddAttribute(cell, "text", 1);
             StylesView.AppendColumn(col);
             StylesView.Selection.Mode = SelectionMode.Single;
+            //StylesView.SelectionGet += OnSelectionGet;
 
             scStyles.Add(StylesView);
             stylesFrame.Add(scStyles);
@@ -136,13 +153,10 @@ namespace Clingies.GtkFront.Windows
             var actions = new Box(Orientation.Horizontal, 8) { Halign = Align.End };
             BtnCancel = new Button("Cancel");
             BtnCancel.StyleContext.AddClass("action");
-            BtnDelete = new Button("Delete");
-            BtnDelete.StyleContext.AddClass("destructive-action");
             BtnSave = new Button("Save");
             BtnSave.StyleContext.AddClass("suggested-action");
             actions.PackStart(BtnCancel, false, false, 0);
             actions.PackEnd(BtnSave, false, false, 0);
-            actions.PackEnd(BtnDelete, false, false, 0);
 
             // === Pack into dialog content area ========================================
             root.PackStart(stylesFrame, true, true, 0);
@@ -159,9 +173,27 @@ namespace Clingies.GtkFront.Windows
         {
             // Standard close
             DeleteEvent += (_, a) => a.RetVal = false;
+            StylesView.Selection.Changed += OnStyleSelectionChanged;
         }
 
-        void PopulateFontFamilies()
+        private void OnStyleSelectionChanged(object? sender, EventArgs e)
+        {
+            selectedId = GetSelectedStyleId();
+            HiddenStyleId.Text = selectedId?.ToString() ?? string.Empty;
+            if (selectedId.HasValue) LoadStyleData(selectedId.Value);
+        }
+
+        private void LoadStyleData(int styleId)
+        {
+            var style = _styleService.Get(styleId);
+            EntryStyleName.Text = style.StyleName;
+            ChkActive.Active = style.IsActive;
+            ChkDefault.Active = style.IsDefault;
+            // combobox CmbFont
+            //BtnFontColor.
+        }
+
+        private void LoadFontFamilies()
         {
             var families = CreatePangoContext().Families;
             foreach (var name in families.Select(f => f.Name).OrderBy(n => n))
@@ -169,35 +201,40 @@ namespace Clingies.GtkFront.Windows
             if (CmbFont.Model != null) CmbFont.Active = 0;
         }
 
-        // ---------- Helpers ----------
-        public void SetStyles(IEnumerable<(int id, string name)> items, int? selectId = null)
+        public void LoadStyles()
         {
             StylesStore.Clear();
-            foreach (var (id, name) in items)
-                StylesStore.AppendValues(id, name);
+            var items = _styleService.GetAllActive();
+            foreach (var item in items)
+                StylesStore.AppendValues(item.Id, item.StyleName);
 
-            if (selectId.HasValue && TryFindIterById(selectId.Value, out var it))
+            if (selectedId != null && TryFindIterById(selectedId, out var it))
+            {
                 StylesView.Selection.SelectIter(it);
+                HiddenStyleId.Text = selectedId.Value.ToString();
+            }
+            else HiddenStyleId.Text = string.Empty;
         }
 
         public int? GetSelectedStyleId()
         {
             return StylesView.Selection.GetSelected(out TreeIter it)
-                ? (int)StylesStore.GetValue(it, 0)
-                : (int?)null;
+                ? (int?)StylesStore.GetValue(it, 0)
+                : null;
         }
 
-        bool TryFindIterById(int id, out TreeIter iter)
+        bool TryFindIterById(int? id, out TreeIter iter)
         {
             if (StylesStore.GetIterFirst(out iter))
             {
                 do
                 {
-                    if ((int)StylesStore.GetValue(iter, 0) == id) return true;
+                    if ((int?)StylesStore.GetValue(iter, 0) == id) return true;
                 } while (StylesStore.IterNext(ref iter));
             }
             return false;
         }
+
         public Enums.FontDecorations GetDecorations()
         {
             Enums.FontDecorations f = Enums.FontDecorations.None;

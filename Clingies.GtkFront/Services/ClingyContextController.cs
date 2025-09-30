@@ -8,12 +8,17 @@ public class ClingyContextController : IContextCommandController
 {
     private readonly ClingyWindowManager _manager;
     private readonly ITitleDialogService _titleDialog;
+    private readonly ClingyStylingService _stylingService;
     private readonly int _clingyId;
 
-    public ClingyContextController(ClingyWindowManager manager, ITitleDialogService titleDialog, int clingyId)
+    public ClingyContextController(ClingyWindowManager manager,
+                                    ClingyStylingService stylingService,
+                                    ITitleDialogService titleDialog,
+                                    int clingyId)
     {
         _manager = manager;
         _titleDialog = titleDialog;
+        _stylingService = stylingService;
         _clingyId = clingyId;
     }
 
@@ -28,7 +33,12 @@ public class ClingyContextController : IContextCommandController
         _manager.RequestTitleChange(_clingyId, newTitle);
     }
 
-    public void ApplyStyle(int styleId) => Console.WriteLine($"APPLY STYLE {styleId}");
+    public void ApplyStyle(int styleId)
+    {
+        var owner = _manager.GetClingyWindowById(_clingyId);
+        _stylingService.ApplyTo(owner!, _clingyId, styleId);
+        _manager.RequestStyleChange(_clingyId, styleId);
+    }
 
     public void ShowColorWindow() => Console.WriteLine("COLOR TO BE IMPLEMENTED");
 
