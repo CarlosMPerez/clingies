@@ -5,6 +5,7 @@ using Clingies.Domain.Models;
 using Clingies.Infrastructure.Entities;
 using Clingies.Infrastructure.Mapper;
 using Clingies.Infrastructure.CustomExceptions;
+
 namespace Clingies.Infrastructure.Data;
 
 public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogger logger) : IStyleRepository
@@ -17,7 +18,7 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
             List<StyleModel> styles = new List<StyleModel>();
             var sql = """
                 SELECT id, style_name, body_color, body_font_name, body_font_color, 
-                    body_font_size, body_font_decorations, is_default, is_active
+                    body_font_size, body_font_decorations, is_system, is_default, is_active
                 FROM styles
             """;
             styles = Conn.Query<StyleEntity>(sql).Select(entity => entity.ToModel()).ToList();
@@ -67,7 +68,7 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
             var parms = new Dictionary<string, object> { { "@Id", id } };
             var sql = """
                 SELECT id, style_name, body_color, body_font_name, body_font_color, 
-                    body_font_size, body_font_decorations, is_default, is_active
+                    body_font_size, body_font_decorations, is_system, is_default, is_active
                 FROM styles
                 WHERE id = @Id
             """;
@@ -87,13 +88,17 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
     {
         try
         {
+            if (style.IsSystem)
+                throw new CannotUpdateSystemStyleException("You cannot insert an Style marked as System.");
+            if (style.StyleName == AppConstants.SystemStyle.Name)
+                throw new ReservedStyleNameException("You cannot use the 'System' name for a style. Please choose another.");
             if (CountAllActive() >= 10 && style.IsActive)
                 throw new TooManyActiveStylesException("Cannot create a new Active style, there are already 10 Active styles");
             var sql = """
                 INSERT INTO styles (id, style_name, body_color, body_font_name, body_font_color, 
-                    body_font_size, body_font_decorations, is_default, is_active)
+                    body_font_size, body_font_decorations, is_system, is_default, is_active)
                 VALUES (@id, @style_name, @body_color, @body_font_name, @body_font_color, 
-                    @body_font_size, @body_font_decorations, @is_default, @is_active)
+                    @body_font_size, @body_font_decorations, 0, @is_default, @is_active)
                 """;
 
             Conn.Execute(sql, style.ToEntity());
@@ -109,8 +114,10 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
     {
         try
         {
-            if (style.StyleName == AppConstants.SystemStyle.Name)
+            if (style.IsSystem)
                 throw new CannotUpdateSystemStyleException("The system style cannot be modified.");
+            if (style.StyleName == AppConstants.SystemStyle.Name)
+                throw new ReservedStyleNameException("You cannot use the 'System' name for a style. Please choose another.");
             var styles = GetAllActive();
             if (styles.Count >= 10 && styles.Any(x => x.Id == style.Id) && style.IsActive)
                 throw new TooManyActiveStylesException("Cannot create a new Active style, there are already 10 Active styles");
@@ -123,6 +130,7 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
                     body_font_color = @body_font_color, 
                     body_font_size = @body_font_size, 
                     body_font_decorations = @body_font_decorations,
+                    is_system = 0,
                     is_default = @is_default,
                     is_active = @is_active
                 WHERE id = @id
@@ -142,7 +150,7 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
         {
             var style = Get(id);
             if (style == null) throw new KeyNotFoundException();
-            if (style.StyleName == AppConstants.SystemStyle.Name) throw new CannotDeleteSystemStyleException("The system style cannot be deleted");
+            if (style.IsSystem) throw new CannotDeleteSystemStyleException("The system style cannot be deleted");
             if (style.IsActive) throw new CannotDeleteActiveStyle("The active style cannot be deleted");
 
             var parms = new Dictionary<string, object> { { "@id", id } };
@@ -214,7 +222,7 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
         {
             var sql = """
                 SELECT id, style_name, body_color, body_font_name, body_font_color, 
-                    body_font_size, body_font_decorations, is_default, is_active
+                    body_font_size, body_font_decorations, is_system, is_default, is_active
                 FROM styles
                 WHERE is_default = 1
             """;
@@ -239,15 +247,14 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
     {
         try
         {
-            var parms = new Dictionary<string, object> { { "@StyleName", AppConstants.SystemStyle.Name } };
             var sql = """
                 SELECT id, style_name, body_color, body_font_name, body_font_color, 
-                    body_font_size, body_font_decorations, is_default, is_active
+                    body_font_size, body_font_decorations, is_system, is_default, is_active
                 FROM styles
-                WHERE style_name = @StyleName
+                WHERE is_system = 1
             """;
 
-            var style = Conn.Query<StyleEntity>(sql, parms)
+            var style = Conn.Query<StyleEntity>(sql)
                 .Select(entity => entity.ToModel()).FirstOrDefault() ?? throw new KeyNotFoundException();
             return style;
         }

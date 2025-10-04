@@ -92,6 +92,6 @@ public static class AppConstants
         public const string BodyFontName = "monospace";
         public const string BodyFontColor = "#000000";
         public const int BodyFontSize = 14;
-        public const string BodyFontDecorations = "0000";
+        public const int BodyFontDecorations = 0;
     }
 }

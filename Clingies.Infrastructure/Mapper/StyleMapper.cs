@@ -14,6 +14,7 @@ public static class StyleMapper
         BodyFontColor = model.BodyFontColor,
         BodyFontSize = model.BodyFontSize,
         BodyFontDecorations = model.BodyFontDecorations,
+        IsSystem = model.IsSystem,
         IsDefault = model.IsDefault,
         IsActive = model.IsActive
     };
@@ -27,6 +28,7 @@ public static class StyleMapper
         BodyFontColor = entity.BodyFontColor,
         BodyFontSize = entity.BodyFontSize,
         BodyFontDecorations = entity.BodyFontDecorations,
+        IsSystem = entity.IsSystem,
         IsDefault = entity.IsDefault,
         IsActive = entity.IsActive
     };

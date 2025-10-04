@@ -32,7 +32,8 @@ namespace Clingies.Infrastructure.Migrations
                     .WithColumn("body_font_name").AsString().NotNullable()
                     .WithColumn("body_font_color").AsString().NotNullable()
                     .WithColumn("body_font_size").AsInt32().NotNullable()
-                    .WithColumn("body_font_decorations").AsString().NotNullable()
+                    .WithColumn("body_font_decorations").AsInt32().NotNullable().WithDefaultValue(0)
+                    .WithColumn("is_system").AsBoolean().NotNullable().WithDefaultValue(false)
                     .WithColumn("is_default").AsBoolean().NotNullable().WithDefaultValue(false)
                     .WithColumn("is_active").AsBoolean().NotNullable().WithDefaultValue(true);
             }
