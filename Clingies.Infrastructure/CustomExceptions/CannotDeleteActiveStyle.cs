@@ -1,8 +1,7 @@
-using System;
 
 namespace Clingies.Infrastructure.CustomExceptions;
 
-public class CannotDeleteActiveStyle : Exception
+public class CannotDeleteActiveStyle : CustomException
 {
     public CannotDeleteActiveStyle(string message) : base(message) { }
 }

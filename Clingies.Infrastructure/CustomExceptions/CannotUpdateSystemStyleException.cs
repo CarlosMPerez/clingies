@@ -1,8 +1,7 @@
-using System;
 
 namespace Clingies.Infrastructure.CustomExceptions;
 
-public class CannotUpdateSystemStyleException: Exception
+public class CannotUpdateSystemStyleException: CustomException
 {
     public CannotUpdateSystemStyleException(string message) : base(message) {}
 }

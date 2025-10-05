@@ -4,6 +4,7 @@ using Gdk;
 using Clingies.Application.Services;
 using System;
 using Clingies.Domain.Models;
+using Clingies.Application.Interfaces;
 
 namespace Clingies.GtkFront.Windows
 {
@@ -11,8 +12,6 @@ namespace Clingies.GtkFront.Windows
     {
         private const int Height  = 480;
 
-        // State
-        private bool _isExpanded;
         private const int SystemStyleId = 1;
 
         // Hidden selection id (empty for New)
@@ -48,11 +47,13 @@ namespace Clingies.GtkFront.Windows
         private Button BtnSave;
 
         private readonly StyleService _styleService;
+        private readonly IClingiesLogger _logger;
 
-        public StyleManagerDialog(StyleService styleService, Gtk.Window parent = null)
+        public StyleManagerDialog(StyleService styleService, IClingiesLogger logger, Gtk.Window parent = null)
             : base("Style Manager", parent, DialogFlags.Modal)
         {
             _styleService = styleService;
+            _logger = logger;
             // Dialog chrome/behavior
             DefaultWidth = 560;
             DefaultHeight = Height;
@@ -231,30 +232,35 @@ namespace Clingies.GtkFront.Windows
 
         private void LoadStyles(int? selectId = null)
         {
-
-            StylesStore.Clear();
-            foreach (var s in _styleService.GetAll())
-                StylesStore.AppendValues(s.Id, s.StyleName, s.IsSystem);
-
-            // selection
-            TreeIter iter;
-            if (selectId.HasValue && TryFindIterById(selectId.Value, out iter))
+            try
             {
-                StylesView.Selection.SelectIter(iter);
-            }
-            else
-            {
-                StylesView.Selection.UnselectAll();
-            }
+                StylesStore.Clear();
+                foreach (var s in _styleService.GetAll())
+                    StylesStore.AppendValues(s.Id, s.StyleName, s.IsSystem);
 
-            // enable/disable delete button
-            UpdateDeleteSensitivity();
+                // selection
+                TreeIter iter;
+                if (selectId.HasValue && TryFindIterById(selectId.Value, out iter))
+                {
+                    StylesView.Selection.SelectIter(iter);
+                }
+                else
+                {
+                    StylesView.Selection.UnselectAll();
+                }
+
+                // enable/disable delete button
+                UpdateDeleteSensitivity();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error retrieving styles");
+            }
         }
 
         // --------------------- BEHAVIOR ---------------------
         private void OnNewClicked(object? sender, EventArgs e)
         {
-            Console.WriteLine("[StyleManager] New clicked -> expanded editor with defaults.");
             StylesView.Selection.UnselectAll();
             HiddenStyleId.Text = "";  // no id
             LoadEditorDefaults();
@@ -271,12 +277,6 @@ namespace Clingies.GtkFront.Windows
             string n = (string)StylesStore.GetValue(it, 1);
             bool isSystem = (bool)StylesStore.GetValue(it, 2);
 
-            if (isSystem)
-            {
-                Console.WriteLine("[StyleManager] Refusing to delete System style.");
-                return;
-            }
-
             using var md = new MessageDialog(this, DialogFlags.Modal, MessageType.Question, ButtonsType.OkCancel,
                 $"Delete style “{n}”?");
             var resp = (ResponseType)md.Run();
@@ -284,43 +284,63 @@ namespace Clingies.GtkFront.Windows
 
             if (resp == ResponseType.Ok)
             {
-                Console.WriteLine($"[StyleManager] Deleting style id={id} (mock).");
-                _styleService.Delete(id);
-                // reload list, collapse editor
-                LoadStyles();
+                try
+                {
+                    _styleService.Delete(id);
+                    // reload list, collapse editor
+                    LoadStyles();
+                }
+                catch (CustomException custom)
+                {
+                    var errMd = new MessageDialog(this, DialogFlags.Modal,
+                        MessageType.Error, ButtonsType.Ok, custom.Message);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Unexpected error while deleting style");
+                }
             }
         }
 
         private void OnSaveClicked(object? sender, EventArgs e)
         {
             var idText = HiddenStyleId.Text;
-
-            if (string.IsNullOrWhiteSpace(idText))
+            try
             {
-                // create
-                StyleModel model = ReadUiIntoModel();
-                Console.WriteLine($"[StyleManager] Creating style -> {model.Id}, {model.StyleName}");
-                _styleService.Create(model);
-                LoadStyles(model.Id);
-            }
-            else
-            {
-                // update
-                int id = int.Parse(idText);
-                var existing = ReadUiIntoModel();
-                if (existing != null)
+                if (string.IsNullOrWhiteSpace(idText))
                 {
-                    Console.WriteLine($"[StyleManager] Updating style id={id}.");
-                    _styleService.Update(existing);
+                    // create
+                    StyleModel model = ReadUiIntoModel();
+                    _styleService.Create(model);
                 }
-                LoadStyles(id);
+                else
+                {
+                    // update
+                    int id = int.Parse(idText);
+                    var existing = ReadUiIntoModel();
+                    if (existing != null)
+                    {
+                        _styleService.Update(existing);
+                        if(existing.IsDefault) _styleService.MarkDefault(existing.Id, existing.IsDefault);
+                    }
+                }
+
+                LoadStyles();
+            }
+            catch (CustomException custom)
+            {
+                var errMd = new MessageDialog(this, DialogFlags.Modal,
+                    MessageType.Error, ButtonsType.Ok, custom.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Fatal error trying to create or update the style");
             }
         }
 
         private void OnCancelClicked(object? sender, EventArgs e)
         {
-            Console.WriteLine("[StyleManager] Cancel -> close dialog.");
-            Respond(ResponseType.Cancel); // same as clicking X
+            Respond(ResponseType.Cancel);
             Destroy();
         }
 
@@ -412,21 +432,28 @@ namespace Clingies.GtkFront.Windows
 
         private void LoadStyle(int id)
         {
-            var style = _styleService.Get(id);
-            if (style == null) { LoadEditorDefaults(); return; }
+            try
+            {
+                var style = _styleService.Get(id);
+                if (style == null) { LoadEditorDefaults(); return; }
 
-            EntryStyleName.Text = style.StyleName;
-            ChkActive.Active  = style.IsActive;
-            ChkDefault.Active = style.IsDefault;
+                EntryStyleName.Text = style.StyleName;
+                ChkActive.Active  = style.IsActive;
+                ChkDefault.Active = style.IsDefault;
 
-            // Font combo best-effort match
-            SetComboActiveText(CmbFont, style.BodyFontName);
-            SpinFontSize.Value = style.BodyFontSize;
+                // Font combo best-effort match
+                SetComboActiveText(CmbFont, style.BodyFontName);
+                SpinFontSize.Value = style.BodyFontSize;
 
-            BtnFontColor.Rgba = ParseHex(style.BodyFontColor);
-            BtnBodyColor.Rgba = ParseHex(style.BodyColor);
+                BtnFontColor.Rgba = ParseHex(style.BodyFontColor);
+                BtnBodyColor.Rgba = ParseHex(style.BodyColor);
 
-            SetDecorations(style.BodyFontDecorations);
+                SetDecorations(style.BodyFontDecorations);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Fatal error trying to retrieve the style");
+            }
         }
 
         private void SetComboActiveText(ComboBoxText combo, string text)

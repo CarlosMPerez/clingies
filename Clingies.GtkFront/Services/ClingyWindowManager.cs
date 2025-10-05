@@ -90,7 +90,7 @@ public class ClingyWindowManager(ClingyService clingyService,
     }
     public void ShowStyleManagerDialog()
     {
-        var dialog = new StyleManagerDialog(_styleService);
+        var dialog = new StyleManagerDialog(_styleService, _srvLogger);
         dialog.Show();
     }
 

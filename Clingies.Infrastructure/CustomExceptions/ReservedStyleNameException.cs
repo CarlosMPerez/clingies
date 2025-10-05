@@ -1,8 +1,7 @@
-using System;
 
 namespace Clingies.Infrastructure.CustomExceptions;
 
-public class ReservedStyleNameException : Exception
+public class ReservedStyleNameException : CustomException
 {
     public ReservedStyleNameException(string message) : base(message) {}
 }

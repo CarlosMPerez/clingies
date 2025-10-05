@@ -97,8 +97,8 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
             var sql = """
                 INSERT INTO styles (id, style_name, body_color, body_font_name, body_font_color, 
                     body_font_size, body_font_decorations, is_system, is_default, is_active)
-                VALUES (@id, @style_name, @body_color, @body_font_name, @body_font_color, 
-                    @body_font_size, @body_font_decorations, 0, @is_default, @is_active)
+                VALUES (@Id, @StyleName, @BodyColor, @BodyFontName, @BodyFontColor, 
+                    @BodyFontSize, @BodyFontDecorations, 0, @IsDefault, @IsActive)
                 """;
 
             Conn.Execute(sql, style.ToEntity());
@@ -124,16 +124,16 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
 
             var sql = """
                 UPDATE styles SET 
-                    style_name = @style_name,
-                    body_color = @body_color, 
-                    body_font_name = @body_font_name, 
-                    body_font_color = @body_font_color, 
-                    body_font_size = @body_font_size, 
-                    body_font_decorations = @body_font_decorations,
+                    style_name = @StyleName,
+                    body_color = @BodyColor, 
+                    body_font_name = @BodyFontName, 
+                    body_font_color = @BodyFontColor, 
+                    body_font_size = @BodyFontSize, 
+                    body_font_decorations = @BodyFontDecorations,
                     is_system = 0,
-                    is_default = @is_default,
-                    is_active = @is_active
-                WHERE id = @id
+                    is_default = @IsDefault,
+                    is_active = @IsActive
+                WHERE id = @Id
                 """;
             Conn.Execute(sql, style.ToEntity());
         }
@@ -156,7 +156,7 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
             var parms = new Dictionary<string, object> { { "@id", id } };
             var sql = """
                 DELETE FROM styles 
-                WHERE id = @id
+                WHERE id = @Id
                 """;
 
             Conn.Execute(sql, parms);
@@ -179,11 +179,11 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
             if (!isActive && futureActives < 1)
                 throw new AtLeastOneActiveStyleException("You must have at least one active style");
 
-            var parms = new Dictionary<string, object> { { "@id", id }, { "@is_active", isActive } };
+            var parms = new Dictionary<string, object> { { "@Id", id }, { "@IsActive", isActive } };
             var sql = """
                 UPDATE styles SET 
-                    is_active = @is_active
-                WHERE id = @id
+                    is_active = @IsActive
+                WHERE id = @Id
                 """;
             Conn.Execute(sql, parms);
         }
@@ -198,15 +198,27 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
     {
         try
         {
-            var parms = new Dictionary<string, object> { { "@id", id }, { "@is_default", isDefault } };
-            // SET ALL STYLES TO NON-DEFAULT AND THEN SET ONLY THE CHOSEN ONE
-            var sql = """
-                UPDATE styles SET 
-                    is_default = 0;
-                UPDATE styles SET 
-                    is_default = 1
-                WHERE id = @id;
+            var parms = new Dictionary<string, object> { { "@Id", id }, { "@IsDefault", isDefault } };
+            var sql = "";
+            if (isDefault)
+            {
+                // SET ALL STYLES TO NON-DEFAULT AND THEN SET ONLY THE CHOSEN ONE
+                sql = """
+                    UPDATE styles SET 
+                        is_default = 0;
+                    UPDATE styles SET 
+                        is_default = 1
+                    WHERE id = @Id;
                 """;
+            }
+            else
+            {
+                sql = """
+                    UPDATE styles SET 
+                        is_default = @IsDefault;
+                    WHERE id = @Id;
+                """;
+            }
             Conn.Execute(sql, parms);
         }
         catch (Exception ex)
