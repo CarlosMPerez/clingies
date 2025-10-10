@@ -136,6 +136,8 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
                 WHERE id = @Id
                 """;
             Conn.Execute(sql, style.ToEntity());
+
+            CheckAtLeastOneDefault();
         }
         catch (Exception ex)
         {
@@ -228,7 +230,7 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
         }
     }
 
-    public StyleModel GetDefault()
+    public StyleModel? GetDefault()
     {
         try
         {
@@ -240,7 +242,7 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
             """;
 
             var style = Conn.Query<StyleEntity>(sql)
-                .Select(entity => entity.ToModel()).FirstOrDefault() ?? throw new KeyNotFoundException();
+                .Select(entity => entity.ToModel()).FirstOrDefault();
             return style;
         }
         catch (Exception ex)
@@ -274,6 +276,14 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
         {
             logger.Error(ex, "Error at StyleRepository.GetDefault");
             throw;
+        }
+    }
+
+    private void CheckAtLeastOneDefault()
+    {
+        if(GetDefault() == null)
+        {
+            MarkDefault(GetSystemStyleId(), true);
         }
     }
 }

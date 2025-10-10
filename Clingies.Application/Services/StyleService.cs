@@ -1,4 +1,3 @@
-using System;
 using Clingies.Application.Interfaces;
 using Clingies.Domain.Models;
 

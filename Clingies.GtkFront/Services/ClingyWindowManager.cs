@@ -34,7 +34,7 @@ public class ClingyWindowManager(ClingyService clingyService,
             var centerPoint = _srvUtils.GetCenterPointDefaultMonitor(AppConstants.Dimensions.DefaultClingyWidth, AppConstants.Dimensions.DefaultClingyHeight);
             var clingy = new ClingyModel();
             // default values
-            clingy.StyleId = _styleService.GetSystemStyleId();
+            clingy.StyleId = _styleService.GetDefault().Id;
             clingy.PositionX = centerPoint.X;
             clingy.PositionY = centerPoint.Y;
             clingy.Type = Enums.ClingyType.Desktop;

@@ -49,7 +49,7 @@ namespace Clingies.GtkFront.Windows
         private readonly StyleService _styleService;
         private readonly IClingiesLogger _logger;
 
-        public StyleManagerDialog(StyleService styleService, IClingiesLogger logger, Gtk.Window parent = null)
+        public StyleManagerDialog(StyleService styleService, IClingiesLogger logger, Gtk.Window? parent = null)
             : base("Style Manager", parent, DialogFlags.Modal)
         {
             _styleService = styleService;
@@ -234,7 +234,7 @@ namespace Clingies.GtkFront.Windows
         {
             try
             {
-                StylesStore.Clear();
+                StylesStore!.Clear();
                 foreach (var s in _styleService.GetAll())
                     StylesStore.AppendValues(s.Id, s.StyleName, s.IsSystem);
 

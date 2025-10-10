@@ -4,9 +4,9 @@ namespace Clingies.Utils;
 /// <summary>
 /// Application-wide constants to avoid magic numbers and strings.
 /// </summary>
-public static class AppConstants
+public record AppConstants
 {
-    public static class IconNames
+    public record IconNames
     {
         public const string ClingyPinned = "clingy_pinned.png";
         public const string ClingyUnpinned = "clingy_unpinned.png";
@@ -16,13 +16,13 @@ public static class AppConstants
         public const string Application = "clingy_icon";
     }
 
-    public static class MenuOptions
+    public record MenuOptions
     {
         public const string ClingyMenuType = "clingy";
         public const string TrayMenuType = "tray";
     }
 
-    public static class TrayMenuCommands
+    public record TrayMenuCommands
     {
         public const string New = "new";
         public const string RollUp = "rolled_up";
@@ -41,7 +41,7 @@ public static class AppConstants
         public const string StyleManager = "style_manager";
     }
 
-    public static class ContextMenuCommands
+    public record ContextMenuCommands
     {
         public const string Sleep = "sleep";
         public const string Alarm = "alarm";
@@ -55,7 +55,7 @@ public static class AppConstants
         public const string SetStyle = "set_style";
     }
 
-    public static class CssSections
+    public record CssSections
     {
         public const string ClingyWindow = "clingy-window";
         public const string ClingyTitle = "clingy-title";

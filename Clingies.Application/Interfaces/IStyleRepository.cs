@@ -7,7 +7,7 @@ public interface IStyleRepository
     public List<StyleModel> GetAll();
     public List<StyleModel> GetAllActive();
     public StyleModel? Get(int id);
-    public StyleModel GetDefault();
+    public StyleModel? GetDefault();
     public void Create(StyleModel style);
     public void Update(StyleModel style);
     public void Delete(int id);
