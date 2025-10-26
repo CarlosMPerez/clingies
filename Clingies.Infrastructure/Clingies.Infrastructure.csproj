@@ -5,10 +5,10 @@
     <ProjectReference Include="..\Clingies.Utils\Clingies.Utils.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="FluentMigrator.Runner" Version="7.1.0" />
-    <PackageReference Include="FluentMigrator.Runner.SQLite" Version="7.1.0" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.9" />
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="FluentMigrator.Runner" />
+    <PackageReference Include="FluentMigrator.Runner.SQLite" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>

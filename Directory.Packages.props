@@ -1,0 +1,20 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="GtkSharp" Version="3.24.24.95" />
+    <PackageVersion Include="Dapper" Version="2.1.66" />
+    <PackageVersion Include="FluentMigrator.Runner" Version="7.1.0" />
+    <PackageVersion Include="FluentMigrator.Runner.SQLite" Version="7.1.0" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.9" />
+    <PackageVersion Include="Serilog" Version="4.3.0" />
+    <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
+    <PackageVersion Include="System.Reactive" Version="6.0.2" />
+  </ItemGroup>
+
+</Project>
