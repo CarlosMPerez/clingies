@@ -95,9 +95,9 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
             if (CountAllActive() >= 10 && style.IsActive)
                 throw new TooManyActiveStylesException("Cannot create a new Active style, there are already 10 Active styles");
             var sql = """
-                INSERT INTO styles (id, style_name, body_color, body_font_name, body_font_color, 
+                INSERT INTO styles (style_name, body_color, body_font_name, body_font_color, 
                     body_font_size, body_font_decorations, is_system, is_default, is_active)
-                VALUES (@Id, @StyleName, @BodyColor, @BodyFontName, @BodyFontColor, 
+                VALUES (@StyleName, @BodyColor, @BodyFontName, @BodyFontColor, 
                     @BodyFontSize, @BodyFontDecorations, 0, @IsDefault, @IsActive)
                 """;
 
@@ -153,9 +153,9 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
             var style = Get(id);
             if (style == null) throw new KeyNotFoundException();
             if (style.IsSystem) throw new CannotDeleteSystemStyleException("The system style cannot be deleted");
-            if (style.IsActive) throw new CannotDeleteActiveStyle("The active style cannot be deleted");
+            if (CheckStyleIsInUse(id)) throw new CannotDeleteStyleInUse("Cannot delete the selected style, is being used by at least one active Clingy");
 
-            var parms = new Dictionary<string, object> { { "@id", id } };
+            var parms = new Dictionary<string, object> { { "@Id", id } };
             var sql = """
                 DELETE FROM styles 
                 WHERE id = @Id
@@ -281,9 +281,23 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
 
     private void CheckAtLeastOneDefault()
     {
-        if(GetDefault() == null)
+        if (GetDefault() == null)
         {
             MarkDefault(GetSystemStyleId(), true);
         }
+    }
+    
+    private bool CheckStyleIsInUse(int styleId)
+    {
+        var parms = new Dictionary<string, object> { { "@StyleId", styleId } };
+        var notesUsingStyles = Conn.ExecuteScalar<int>(
+            """
+                SELECT COUNT(*)
+                FROM clingies AS c 
+                INNER JOIN clingy_properties AS p ON p.id = c.id
+                WHERE p.style_id = @StyleId AND c.is_deleted = 0
+            """, parms);
+
+        return notesUsingStyles > 0;
     }
 }

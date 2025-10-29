@@ -8,9 +8,9 @@ using Clingies.Application.Interfaces;
 
 namespace Clingies.GtkFront.Windows
 {
- public sealed class StyleManagerDialog : Dialog
+    public sealed class StyleManagerDialog : Dialog
     {
-        private const int Height  = 480;
+        private const int Height = 480;
 
         private const int SystemStyleId = 1;
 
@@ -144,7 +144,7 @@ namespace Clingies.GtkFront.Windows
             EditorGrid.Attach(EntryStyleName, 1, r, 2, 1);
 
             var flagsBox = new Box(Orientation.Horizontal, 8);
-            ChkActive  = new CheckButton("Active");
+            ChkActive = new CheckButton("Active");
             ChkDefault = new CheckButton("Default");
             flagsBox.PackStart(ChkActive, false, false, 0);
             flagsBox.PackStart(ChkDefault, false, false, 0);
@@ -172,10 +172,10 @@ namespace Clingies.GtkFront.Windows
             r++;
             EditorGrid.Attach(new Label("Font Decorations") { Xalign = 0 }, 0, r, 1, 1);
             var decoBox = new Box(Orientation.Horizontal, 12);
-            CbBold      = new CheckButton("Bold");
-            CbItalic    = new CheckButton("Italics");
+            CbBold = new CheckButton("Bold");
+            CbItalic = new CheckButton("Italics");
             CbUnderline = new CheckButton("Underline");
-            CbStrike    = new CheckButton("Strikethrough");
+            CbStrike = new CheckButton("Strikethrough");
             decoBox.PackStart(CbBold, false, false, 0);
             decoBox.PackStart(CbItalic, false, false, 0);
             decoBox.PackStart(CbUnderline, false, false, 0);
@@ -195,9 +195,9 @@ namespace Clingies.GtkFront.Windows
             footer.PackStart(spacer, true, true, 0);
 
             BtnCancel = new Button("Cancel");
-            BtnSave   = new Button("Save");
+            BtnSave = new Button("Save");
             BtnSave.StyleContext.AddClass("suggested-action");
-            footer.PackEnd(BtnSave,   false, false, 0);
+            footer.PackEnd(BtnSave, false, false, 0);
             footer.PackEnd(BtnCancel, false, false, 0);
 
             root.PackEnd(footer, false, false, 0);
@@ -216,9 +216,9 @@ namespace Clingies.GtkFront.Windows
             };
 
             StylesView.Selection.Changed += OnStylesSelectionChanged;
-            BtnNew.Clicked    += OnNewClicked;
+            BtnNew.Clicked += OnNewClicked;
             BtnDelete.Clicked += OnDeleteClicked;
-            BtnSave.Clicked   += OnSaveClicked;
+            BtnSave.Clicked += OnSaveClicked;
             BtnCancel.Clicked += OnCancelClicked;
         }
 
@@ -273,9 +273,8 @@ namespace Clingies.GtkFront.Windows
             if (!StylesView.Selection.GetSelected(out TreeIter it))
                 return;
 
-            int id   = (int)StylesStore.GetValue(it, 0);
+            int id = (int)StylesStore.GetValue(it, 0);
             string n = (string)StylesStore.GetValue(it, 1);
-            bool isSystem = (bool)StylesStore.GetValue(it, 2);
 
             using var md = new MessageDialog(this, DialogFlags.Modal, MessageType.Question, ButtonsType.OkCancel,
                 $"Delete style “{n}”?");
@@ -288,7 +287,7 @@ namespace Clingies.GtkFront.Windows
                 {
                     _styleService.Delete(id);
                     // reload list, collapse editor
-                    LoadStyles();
+                    LoadStyles(1);
                 }
                 catch (CustomException custom)
                 {
@@ -321,11 +320,11 @@ namespace Clingies.GtkFront.Windows
                     if (existing != null)
                     {
                         _styleService.Update(existing);
-                        if(existing.IsDefault) _styleService.MarkDefault(existing.Id, existing.IsDefault);
+                        if (existing.IsDefault) _styleService.MarkDefault(existing.Id, existing.IsDefault);
                     }
                 }
 
-                LoadStyles();
+                LoadStyles(1);
             }
             catch (CustomException custom)
             {
@@ -370,17 +369,17 @@ namespace Clingies.GtkFront.Windows
 
             var model = new StyleModel
             {
-                Id         = id,
-                StyleName       = (EntryStyleName.Text ?? string.Empty).Trim(),
-                IsActive   = ChkActive.Active,
-                IsDefault  = ChkDefault.Active,
-                BodyFontName   = CmbFont.ActiveText ?? "Sans",
-                BodyFontSize   = SpinFontSize.ValueAsInt,
-                BodyFontColor  = ToHex(BtnFontColor.Rgba),
-                BodyColor  = ToHex(BtnBodyColor.Rgba),
+                Id = id,
+                StyleName = (EntryStyleName.Text ?? string.Empty).Trim(),
+                IsActive = ChkActive.Active,
+                IsDefault = ChkDefault.Active,
+                BodyFontName = CmbFont.ActiveText ?? "Sans",
+                BodyFontSize = SpinFontSize.ValueAsInt,
+                BodyFontColor = ToHex(BtnFontColor.Rgba),
+                BodyColor = ToHex(BtnBodyColor.Rgba),
                 BodyFontDecorations = GetDecorations(),
                 // For the mock we infer System by id; in real code, fetch IsSystem from DB.
-                IsSystem   = id == SystemStyleId
+                IsSystem = id == SystemStyleId
             };
 
             return model;
@@ -389,16 +388,16 @@ namespace Clingies.GtkFront.Windows
         private void SetEditorReadOnly(bool readOnly)
         {
             EntryStyleName.Sensitive = !readOnly;
-            ChkActive.Sensitive      = !readOnly;
-            ChkDefault.Sensitive     = !readOnly;
-            CmbFont.Sensitive        = !readOnly;
-            SpinFontSize.Sensitive   = !readOnly;
-            BtnFontColor.Sensitive   = !readOnly;
-            BtnBodyColor.Sensitive   = !readOnly;
-            CbBold.Sensitive         = !readOnly;
-            CbItalic.Sensitive       = !readOnly;
-            CbUnderline.Sensitive    = !readOnly;
-            CbStrike.Sensitive       = !readOnly;
+            ChkActive.Sensitive = !readOnly;
+            ChkDefault.Sensitive = !readOnly;
+            CmbFont.Sensitive = !readOnly;
+            SpinFontSize.Sensitive = !readOnly;
+            BtnFontColor.Sensitive = !readOnly;
+            BtnBodyColor.Sensitive = !readOnly;
+            CbBold.Sensitive = !readOnly;
+            CbItalic.Sensitive = !readOnly;
+            CbUnderline.Sensitive = !readOnly;
+            CbStrike.Sensitive = !readOnly;
 
             BtnSave.Sensitive = !readOnly; // cannot save System
         }
@@ -417,7 +416,7 @@ namespace Clingies.GtkFront.Windows
         private void LoadEditorDefaults()
         {
             EntryStyleName.Text = "";
-            ChkActive.Active  = true;
+            ChkActive.Active = true;
             ChkDefault.Active = false;
 
             // Best effort defaults
@@ -438,7 +437,7 @@ namespace Clingies.GtkFront.Windows
                 if (style == null) { LoadEditorDefaults(); return; }
 
                 EntryStyleName.Text = style.StyleName;
-                ChkActive.Active  = style.IsActive;
+                ChkActive.Active = style.IsActive;
                 ChkDefault.Active = style.IsDefault;
 
                 // Font combo best-effort match
@@ -478,19 +477,19 @@ namespace Clingies.GtkFront.Windows
         private Enums.FontDecorations GetDecorations()
         {
             Enums.FontDecorations f = Enums.FontDecorations.None;
-            if (CbBold.Active)      f |= Enums.FontDecorations.Bold;
-            if (CbItalic.Active)    f |= Enums.FontDecorations.Italic;
+            if (CbBold.Active) f |= Enums.FontDecorations.Bold;
+            if (CbItalic.Active) f |= Enums.FontDecorations.Italic;
             if (CbUnderline.Active) f |= Enums.FontDecorations.Underline;
-            if (CbStrike.Active)    f |= Enums.FontDecorations.Strikethrough;
+            if (CbStrike.Active) f |= Enums.FontDecorations.Strikethrough;
             return f;
         }
 
         private void SetDecorations(Enums.FontDecorations flags)
         {
-            CbBold.Active      = flags.HasFlag(Enums.FontDecorations.Bold);
-            CbItalic.Active    = flags.HasFlag(Enums.FontDecorations.Italic);
+            CbBold.Active = flags.HasFlag(Enums.FontDecorations.Bold);
+            CbItalic.Active = flags.HasFlag(Enums.FontDecorations.Italic);
             CbUnderline.Active = flags.HasFlag(Enums.FontDecorations.Underline);
-            CbStrike.Active    = flags.HasFlag(Enums.FontDecorations.Strikethrough);
+            CbStrike.Active = flags.HasFlag(Enums.FontDecorations.Strikethrough);
         }
 
         public static string ToHex(RGBA rgba)
@@ -523,5 +522,5 @@ namespace Clingies.GtkFront.Windows
             }
             return false;
         }
-    }    
+    }
 }

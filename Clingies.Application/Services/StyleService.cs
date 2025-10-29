@@ -104,6 +104,10 @@ public class StyleService(IStyleRepository repo, IClingiesLogger logger)
         {
             repo.Delete(id);
         }
+        catch(CustomException customEx)
+        {
+            throw customEx;
+        }
         catch (Exception ex)
         {
             logger.Error(ex, "Error deleting style {0}", id);
