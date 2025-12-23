@@ -291,8 +291,10 @@ namespace Clingies.GtkFront.Windows
                 }
                 catch (CustomException custom)
                 {
-                    var errMd = new MessageDialog(this, DialogFlags.Modal,
+                    using var errMd = new MessageDialog(this, DialogFlags.Modal,
                         MessageType.Error, ButtonsType.Ok, custom.Message);
+                    errMd.Run();
+                    errMd.Destroy();
                 }
                 catch (Exception ex)
                 {
@@ -328,8 +330,10 @@ namespace Clingies.GtkFront.Windows
             }
             catch (CustomException custom)
             {
-                var errMd = new MessageDialog(this, DialogFlags.Modal,
+                using var errMd = new MessageDialog(this, DialogFlags.Modal,
                     MessageType.Error, ButtonsType.Ok, custom.Message);
+                errMd.Run();
+                errMd.Destroy();
             }
             catch (Exception ex)
             {
