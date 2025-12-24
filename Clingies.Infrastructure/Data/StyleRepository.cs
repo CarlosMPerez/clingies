@@ -5,6 +5,7 @@ using Clingies.Domain.Models;
 using Clingies.Infrastructure.Entities;
 using Clingies.Infrastructure.Mapper;
 using Clingies.Infrastructure.CustomExceptions;
+using System.Security.Principal;
 
 namespace Clingies.Infrastructure.Data;
 
@@ -94,14 +95,17 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
                 throw new ReservedStyleNameException("You cannot use the 'System' name for a style. Please choose another.");
             if (CountAllActive() >= 10 && style.IsActive)
                 throw new TooManyActiveStylesException("Cannot create a new Active style, there are already 10 Active styles");
+
             var sql = """
                 INSERT INTO styles (style_name, body_color, body_font_name, body_font_color, 
                     body_font_size, body_font_decorations, is_system, is_default, is_active)
                 VALUES (@StyleName, @BodyColor, @BodyFontName, @BodyFontColor, 
-                    @BodyFontSize, @BodyFontDecorations, 0, @IsDefault, @IsActive)
+                    @BodyFontSize, @BodyFontDecorations, 0, @IsDefault, @IsActive);
+                SELECT last_insert_rowid();
                 """;
 
-            Conn.Execute(sql, style.ToEntity());
+            int newStyleId = Conn.ExecuteScalar<int>(sql, style.ToEntity());
+            if (style.IsDefault) MarkDefault(newStyleId, true);
         }
         catch (Exception ex)
         {
@@ -137,7 +141,7 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
                 """;
             Conn.Execute(sql, style.ToEntity());
 
-            CheckAtLeastOneDefault();
+            if (style.IsDefault) MarkDefault(style.Id, true);
         }
         catch (Exception ex)
         {
@@ -155,6 +159,8 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
             if (style.IsSystem) throw new CannotDeleteSystemStyleException("The system style cannot be deleted");
             if (CheckStyleIsInUse(id)) throw new CannotDeleteStyleInUse("Cannot delete the selected style, is being used by at least one active Clingy");
 
+            SetStyleToSystemForNotesUsingStyle(id);
+
             var parms = new Dictionary<string, object> { { "@Id", id } };
             var sql = """
                 DELETE FROM styles 
@@ -162,10 +168,43 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
                 """;
 
             Conn.Execute(sql, parms);
+
+            // We make SURE there's at least one style marked as default, in case we've just deleted the default
+            CheckOneAndOnlyOneDefault();
         }
         catch (Exception ex)
         {
             logger.Error(ex, "Error deleting style");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Cambiamos el estilo por defecto de las notas que usen el estilo que vamos a borrar
+    /// aunque la misma nota esté soft-deleted para evitar errores de FK (o que se restaure la nota con un 
+    /// estilo que ya no existe). Cambiamos por estilo System. 
+    /// </summary>
+    /// <param name="styleId"></param>
+    /// <returns>True si con éxito</returns>
+    private bool SetStyleToSystemForNotesUsingStyle(int styleId)
+    {
+        try
+        {
+            var systemStyleId = GetSystemStyleId();
+
+            var parms = new Dictionary<string, object> { { "@OldStyleId", styleId }, { "@SystemStyleId", systemStyleId } };
+            var sql = """
+                UPDATE clingy_properties SET 
+                    style_id = @SystemStyleId
+                WHERE style_id = @OldStyleId
+                """;
+
+            Conn.Execute(sql, parms);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.Error(ex, "Error setting default style for notes using deleted style");
             throw;
         }
     }
@@ -279,14 +318,14 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
         }
     }
 
-    private void CheckAtLeastOneDefault()
+    private void CheckOneAndOnlyOneDefault()
     {
         if (GetDefault() == null)
         {
             MarkDefault(GetSystemStyleId(), true);
         }
     }
-    
+
     private bool CheckStyleIsInUse(int styleId)
     {
         var parms = new Dictionary<string, object> { { "@StyleId", styleId } };

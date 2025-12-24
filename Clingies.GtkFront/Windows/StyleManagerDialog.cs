@@ -43,7 +43,7 @@ namespace Clingies.GtkFront.Windows
         private CheckButton CbStrike;
 
         // Footer buttons
-        private Button BtnCancel;
+        private Button BtnExit;
         private Button BtnSave;
 
         private readonly StyleService _styleService;
@@ -188,17 +188,17 @@ namespace Clingies.GtkFront.Windows
             // Footer: New | Cancel / Save
             var footer = new Box(Orientation.Horizontal, 8);
 
-            BtnNew = new Button("New");
-            footer.PackStart(BtnNew, false, false, 0);
+            BtnExit = new Button("Exit");
+            footer.PackStart(BtnExit, false, false, 0);
 
             var spacer = new Label(""); // pushes Cancel/Save to the right
             footer.PackStart(spacer, true, true, 0);
 
-            BtnCancel = new Button("Cancel");
+            BtnNew = new Button("New");
             BtnSave = new Button("Save");
             BtnSave.StyleContext.AddClass("suggested-action");
+            footer.PackEnd(BtnNew, false, false, 0);
             footer.PackEnd(BtnSave, false, false, 0);
-            footer.PackEnd(BtnCancel, false, false, 0);
 
             root.PackEnd(footer, false, false, 0);
 
@@ -219,7 +219,7 @@ namespace Clingies.GtkFront.Windows
             BtnNew.Clicked += OnNewClicked;
             BtnDelete.Clicked += OnDeleteClicked;
             BtnSave.Clicked += OnSaveClicked;
-            BtnCancel.Clicked += OnCancelClicked;
+            BtnExit.Clicked += OnExitClicked;
         }
 
         private void PopulateFontFamilies()
@@ -341,7 +341,7 @@ namespace Clingies.GtkFront.Windows
             }
         }
 
-        private void OnCancelClicked(object? sender, EventArgs e)
+        private void OnExitClicked(object? sender, EventArgs e)
         {
             Respond(ResponseType.Cancel);
             Destroy();

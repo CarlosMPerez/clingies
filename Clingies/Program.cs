@@ -14,9 +14,12 @@ namespace Clingies;
 
 internal sealed class Program
 {
+    private static FileStream? _singleInstanceLock;
+
     [STAThread]
     public static void Main(string[] args)
     {
+        if (CheckIfAlreadyRunning()) return;
         var logPath = Path.Combine(Path.Combine(AppContext.BaseDirectory, "logs"), "clingies.log");
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
@@ -108,6 +111,35 @@ internal sealed class Program
         migrator.MigrateUp();
 
         logger.Info("Migrations done");
+    }
+
+    /// <summary>
+    /// Checks if there's already a version of the application running
+    /// and refuses to run twice
+    /// </summary>
+    private static bool CheckIfAlreadyRunning()
+    {
+        var lockPath = Path.Combine(Environment
+                    .GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "Clingies", "clingies.lock");
+        Directory.CreateDirectory(Path.GetDirectoryName(lockPath)!);
+
+        try
+        {
+            _singleInstanceLock = new FileStream(lockPath, FileMode.OpenOrCreate, 
+                FileAccess.ReadWrite, FileShare.None);
+            return false;
+        }
+        catch (IOException)
+        {
+            Gtk.Application.Init();
+            using var md = new Gtk.MessageDialog(null, Gtk.DialogFlags.Modal, 
+                Gtk.MessageType.Info, Gtk.ButtonsType.Ok, 
+                "Clingies is already running");
+            md.Run();
+            md.Destroy();
+            return true;
+        }
     }
 }
 

@@ -16,7 +16,7 @@ namespace Clingies.GtkFront
 
         private readonly GtkUtilsService _srvUtils;
 
-        public GtkFrontendHost(IClingiesLogger logger, 
+        public GtkFrontendHost(IClingiesLogger logger,
                         ClingyWindowManager windowFactory,
                         MenuFactory menuFactory,
                         GtkUtilsService utilsService)
@@ -75,8 +75,7 @@ namespace Clingies.GtkFront
             var si = new StatusIcon(new Gdk.Pixbuf(iconPath, 24, 24))
             {
                 Visible = true,
-
-                //Tooltip = "Clingies"
+                TooltipText = "Clingies"
             };
             si.Activate += (_, __) => _windowFactory.RenderAllWindows();
             si.PopupMenu += (_, __) => { trayMenu.ShowAll(); trayMenu.Popup(); };
