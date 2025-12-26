@@ -122,9 +122,8 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
                 throw new CannotUpdateSystemStyleException("The system style cannot be modified.");
             if (style.StyleName == AppConstants.SystemStyle.Name)
                 throw new ReservedStyleNameException("You cannot use the 'System' name for a style. Please choose another.");
-            var styles = GetAllActive();
-            if (styles.Count >= 10 && styles.Any(x => x.Id == style.Id) && style.IsActive)
-                throw new TooManyActiveStylesException("Cannot create a new Active style, there are already 10 Active styles");
+            if (CountAllActive() >= 10 && style.IsActive)
+                throw new TooManyActiveStylesException("Cannot make Active this style, there are already 10 Active styles");
 
             var sql = """
                 UPDATE styles SET 

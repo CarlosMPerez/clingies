@@ -48,6 +48,9 @@ namespace Clingies.GtkFront.Windows
 
         private readonly StyleService _styleService;
         private readonly IClingiesLogger _logger;
+        private StyleModel? _baselineStyle;
+        private bool _supressDirtyCheck;
+        private bool _isEditorReadOnly;
 
         public StyleManagerDialog(StyleService styleService, IClingiesLogger logger, Gtk.Window? parent = null)
             : base("Style Manager", parent, DialogFlags.Modal)
@@ -76,6 +79,7 @@ namespace Clingies.GtkFront.Windows
             WireSignals();
             PopulateFontFamilies();
             LoadStyles();
+            UpdateSaveSensitivity();
 
             ShowAll();
         }
@@ -220,6 +224,18 @@ namespace Clingies.GtkFront.Windows
             BtnDelete.Clicked += OnDeleteClicked;
             BtnSave.Clicked += OnSaveClicked;
             BtnExit.Clicked += OnExitClicked;
+
+            EntryStyleName.Changed += OnEditorChanged;
+            ChkActive.Toggled += OnEditorChanged;
+            ChkDefault.Toggled += OnEditorChanged;
+            CmbFont.Changed += OnEditorChanged;
+            SpinFontSize.ValueChanged += OnEditorChanged;
+            BtnFontColor.ColorSet += OnEditorChanged;
+            BtnBodyColor.ColorSet += OnEditorChanged;
+            CbBold.Toggled += OnEditorChanged;
+            CbItalic.Toggled += OnEditorChanged;
+            CbUnderline.Toggled += OnEditorChanged;
+            CbStrike.Toggled += OnEditorChanged;
         }
 
         private void PopulateFontFamilies()
@@ -263,8 +279,11 @@ namespace Clingies.GtkFront.Windows
         {
             StylesView.Selection.UnselectAll();
             HiddenStyleId.Text = "";  // no id
-            LoadEditorDefaults();
             SetEditorReadOnly(false);
+            BeginAddOrUpdate();
+            LoadEditorDefaults();
+            _baselineStyle = ReadUiIntoModel();
+            EndAddOrUpdate();
             UpdateDeleteSensitivity();
         }
 
@@ -351,7 +370,9 @@ namespace Clingies.GtkFront.Windows
         {
             if (!StylesView.Selection.GetSelected(out TreeIter it))
             {
+                _baselineStyle = null;
                 UpdateDeleteSensitivity();
+                UpdateSaveSensitivity();
                 return;
             }
 
@@ -359,8 +380,8 @@ namespace Clingies.GtkFront.Windows
             bool isSystem = (bool)StylesStore.GetValue(it, 2);
 
             HiddenStyleId.Text = id.ToString();
-            LoadStyle(id);
             SetEditorReadOnly(isSystem);
+            LoadStyle(id);
             UpdateDeleteSensitivity();
         }
 
@@ -391,6 +412,7 @@ namespace Clingies.GtkFront.Windows
 
         private void SetEditorReadOnly(bool readOnly)
         {
+            _isEditorReadOnly = readOnly;
             EntryStyleName.Sensitive = !readOnly;
             ChkActive.Sensitive = !readOnly;
             ChkDefault.Sensitive = !readOnly;
@@ -403,7 +425,7 @@ namespace Clingies.GtkFront.Windows
             CbUnderline.Sensitive = !readOnly;
             CbStrike.Sensitive = !readOnly;
 
-            BtnSave.Sensitive = !readOnly; // cannot save System
+//            BtnSave.Sensitive = !readOnly; // cannot save System
         }
 
         private void UpdateDeleteSensitivity()
@@ -435,11 +457,18 @@ namespace Clingies.GtkFront.Windows
 
         private void LoadStyle(int id)
         {
+            BeginAddOrUpdate();
             try
             {
                 var style = _styleService.Get(id);
-                if (style == null) { LoadEditorDefaults(); return; }
+                if (style == null) 
+                { 
+                    LoadEditorDefaults(); 
+                    _baselineStyle = ReadUiIntoModel();
+                    return; 
+                }
 
+                _baselineStyle = style;
                 EntryStyleName.Text = style.StyleName;
                 ChkActive.Active = style.IsActive;
                 ChkDefault.Active = style.IsDefault;
@@ -456,7 +485,58 @@ namespace Clingies.GtkFront.Windows
             catch (Exception ex)
             {
                 _logger.Error(ex, "Fatal error trying to retrieve the style");
+                LoadEditorDefaults();
+                _baselineStyle = ReadUiIntoModel();
             }
+            finally
+            {
+                EndAddOrUpdate();
+            }
+        }
+
+        private void OnEditorChanged(object? sender, EventArgs e)
+        {
+            if (_supressDirtyCheck) return;
+            UpdateSaveSensitivity();
+        }
+
+        private void BeginAddOrUpdate()
+        {
+            _supressDirtyCheck = true;
+        }
+
+        private void EndAddOrUpdate()
+        {
+            _supressDirtyCheck = false;
+            UpdateSaveSensitivity();
+        }
+
+        private void UpdateSaveSensitivity()
+        {
+            if (_supressDirtyCheck) return;
+
+            if (_isEditorReadOnly || _baselineStyle == null)
+            {
+                BtnSave.Sensitive = false;
+                return;
+            }
+
+            var current = ReadUiIntoModel();
+            BtnSave.Sensitive = !StylesEqual(_baselineStyle, current);
+        }
+
+        private static bool StylesEqual(StyleModel left, StyleModel right)
+        {
+            return left.Id == right.Id &&
+                string.Equals(left.StyleName, right.StyleName, StringComparison.Ordinal) &&
+                string.Equals(left.BodyColor, right.BodyColor, StringComparison.Ordinal) &&
+                string.Equals(left.BodyFontName, right.BodyFontName, StringComparison.Ordinal) &&
+                string.Equals(left.BodyFontColor, right.BodyFontColor, StringComparison.Ordinal) &&
+                left.BodyFontSize == right.BodyFontSize &&
+                left.BodyFontDecorations == right.BodyFontDecorations &&
+                left.IsSystem == right.IsSystem &&
+                left.IsDefault == right.IsDefault &&
+                left.IsActive == right.IsActive;
         }
 
         private void SetComboActiveText(ComboBoxText combo, string text)
