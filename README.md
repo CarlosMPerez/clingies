@@ -86,10 +86,3 @@ dotnet run --project src/Clingies.GtkFront
 ## License
 
     - TO-DO
----
-
-## Notes
-
-- The project intentionally avoids DB triggers and stored procedures. The database stays “dumb”; invariants (like content XOR) live in code.
-- Images are stored as PNG **BLOBs** in `clingy_content`. UI converts `byte[]` ⇄ `Gdk.Pixbuf` at the boundary.
-- If/when search is added, consider FTS5 for `clingy_content.text`.
