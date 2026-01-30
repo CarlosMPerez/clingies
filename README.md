@@ -1,6 +1,6 @@
 # Clingies
 
-Sticky‑note–style desktop app for Linux. Each note is a **Clingy**: lightweight, always-on-top (when pinned), quick to create, easy to organize. Built with **GTK3** and **.NET** for speed and simplicity.
+Sticky‑note–style desktop app for Linux. Each note is a **Clingy**: lightweight, always-on-top (when pinned), quick to create, easy to organize. Built with **GTK3** and **.NET** for speed and simplicity. The project focuses on maintainability, clear architecture, and real-world usability rather than feature bloat.
 
 > **Status:** actively developed. Linux‑only (tested on Linux Mint 22 Cinnamon). Avalonia code was split off; current front‑end is GTK3.
 
