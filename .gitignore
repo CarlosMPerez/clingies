@@ -496,3 +496,9 @@ $RECYCLE.BIN/
 API/appsettings.json
 API/reactivities.db
 CourseAssets/
+
+# Codex local scratch
+.codex/local.md
+.codex/*.local.md
+.codex/tmp/
+.codex/sessions/
