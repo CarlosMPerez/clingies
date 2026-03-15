@@ -1,6 +1,6 @@
 # Clingies
 
-Sticky‑note–style desktop app for Linux. Each note is a **Clingy**: lightweight, always-on-top (when pinned), quick to create, easy to organize. Built with **GTK3** and **.NET** for speed and simplicity.
+Sticky‑note–style desktop app for Linux. Each note is a **Clingy**: lightweight, always-on-top (when pinned), quick to create, easy to organize. Built with **GTK3** and **.NET** for speed and simplicity. The project focuses on maintainability, clear architecture, and real-world usability rather than feature bloat.
 
 > **Status:** actively developed. Linux‑only (tested on Linux Mint 22 Cinnamon). Avalonia code was split off; current front‑end is GTK3.
 
@@ -86,10 +86,3 @@ dotnet run --project src/Clingies.GtkFront
 ## License
 
     - TO-DO
----
-
-## Notes
-
-- The project intentionally avoids DB triggers and stored procedures. The database stays “dumb”; invariants (like content XOR) live in code.
-- Images are stored as PNG **BLOBs** in `clingy_content`. UI converts `byte[]` ⇄ `Gdk.Pixbuf` at the boundary.
-- If/when search is added, consider FTS5 for `clingy_content.text`.
