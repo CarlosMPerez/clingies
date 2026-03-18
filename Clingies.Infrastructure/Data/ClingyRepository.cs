@@ -5,7 +5,7 @@ using Clingies.Application.Interfaces;
 using Clingies.Domain.Models;
 using Clingies.Infrastructure.Entities;
 using Clingies.Infrastructure.Mapping;
-using static Clingies.Utils.Enums;
+using static Clingies.Domain.Common.Enums;
 
 namespace Clingies.Infrastructure.Data;
 

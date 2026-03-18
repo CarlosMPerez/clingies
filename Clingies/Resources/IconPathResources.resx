@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="about_dark" xml:space="preserve"><value>Assets/menu_dark/menu_info.png</value></data>
+  <data name="about_light" xml:space="preserve"><value>Assets/menu_light/menu_info.png</value></data>
+  <data name="alarm_dark" xml:space="preserve"><value>Assets/menu_dark/menu_alarm.png</value></data>
+  <data name="alarm_light" xml:space="preserve"><value>Assets/menu_light/menu_alarm.png</value></data>
+  <data name="clingy_close_dark" xml:space="preserve"><value>Assets/clingy_close.png</value></data>
+  <data name="clingy_close_light" xml:space="preserve"><value>Assets/clingy_close.png</value></data>
+  <data name="clingy_icon_dark" xml:space="preserve"><value>Assets/clingy_icon_dark.png</value></data>
+  <data name="clingy_icon_light" xml:space="preserve"><value>Assets/clingy_icon_light.png</value></data>
+  <data name="clingy_locked_dark" xml:space="preserve"><value>Assets/clingy_locked.png</value></data>
+  <data name="clingy_locked_light" xml:space="preserve"><value>Assets/clingy_locked.png</value></data>
+  <data name="clingy_pinned_dark" xml:space="preserve"><value>Assets/clingy_pinned.png</value></data>
+  <data name="clingy_pinned_light" xml:space="preserve"><value>Assets/clingy_pinned.png</value></data>
+  <data name="clingy_unpinned_dark" xml:space="preserve"><value>Assets/clingy_unpinned.png</value></data>
+  <data name="clingy_unpinned_light" xml:space="preserve"><value>Assets/clingy_unpinned.png</value></data>
+  <data name="exit_dark" xml:space="preserve"><value>Assets/menu_dark/menu_exit.png</value></data>
+  <data name="exit_light" xml:space="preserve"><value>Assets/menu_light/menu_exit.png</value></data>
+  <data name="help_dark" xml:space="preserve"><value>Assets/menu_dark/menu_help.png</value></data>
+  <data name="help_light" xml:space="preserve"><value>Assets/menu_light/menu_help.png</value></data>
+  <data name="lock_dark" xml:space="preserve"><value>Assets/menu_dark/menu_locked.png</value></data>
+  <data name="lock_light" xml:space="preserve"><value>Assets/menu_light/menu_locked.png</value></data>
+  <data name="locked_dark" xml:space="preserve"><value>Assets/menu_dark/menu_locked.png</value></data>
+  <data name="locked_light" xml:space="preserve"><value>Assets/menu_light/menu_locked.png</value></data>
+  <data name="manage_clingies_dark" xml:space="preserve"><value>Assets/menu_dark/menu_manage.png</value></data>
+  <data name="manage_clingies_light" xml:space="preserve"><value>Assets/menu_light/menu_manage.png</value></data>
+  <data name="new_dark" xml:space="preserve"><value>Assets/menu_dark/menu_new.png</value></data>
+  <data name="new_light" xml:space="preserve"><value>Assets/menu_light/menu_new.png</value></data>
+  <data name="pinned_dark" xml:space="preserve"><value>Assets/menu_dark/menu_pinned.png</value></data>
+  <data name="pinned_light" xml:space="preserve"><value>Assets/menu_light/menu_pinned.png</value></data>
+  <data name="rolled_down_dark" xml:space="preserve"><value>Assets/menu_dark/menu_rolldown.png</value></data>
+  <data name="rolled_down_light" xml:space="preserve"><value>Assets/menu_light/menu_rolldown.png</value></data>
+  <data name="rolled_up_dark" xml:space="preserve"><value>Assets/menu_dark/menu_rollup.png</value></data>
+  <data name="rolled_up_light" xml:space="preserve"><value>Assets/menu_light/menu_rollup.png</value></data>
+  <data name="rolldown_dark" xml:space="preserve"><value>Assets/menu_dark/menu_rolldown.png</value></data>
+  <data name="rolldown_light" xml:space="preserve"><value>Assets/menu_light/menu_rolldown.png</value></data>
+  <data name="rollup_dark" xml:space="preserve"><value>Assets/menu_dark/menu_rollup.png</value></data>
+  <data name="rollup_light" xml:space="preserve"><value>Assets/menu_light/menu_rollup.png</value></data>
+  <data name="set_style_dark" xml:space="preserve"><value>Assets/menu_dark/menu_change_color.png</value></data>
+  <data name="set_style_light" xml:space="preserve"><value>Assets/menu_light/menu_change_color.png</value></data>
+  <data name="settings_dark" xml:space="preserve"><value>Assets/menu_dark/menu_settings.png</value></data>
+  <data name="settings_light" xml:space="preserve"><value>Assets/menu_light/menu_settings.png</value></data>
+  <data name="show_dark" xml:space="preserve"><value>Assets/menu_dark/menu_show.png</value></data>
+  <data name="show_light" xml:space="preserve"><value>Assets/menu_light/menu_show.png</value></data>
+  <data name="sleep_dark" xml:space="preserve"><value>Assets/menu_dark/menu_sleep.png</value></data>
+  <data name="sleep_light" xml:space="preserve"><value>Assets/menu_light/menu_sleep.png</value></data>
+  <data name="style_manager_dark" xml:space="preserve"><value>Assets/menu_dark/menu_change_color.png</value></data>
+  <data name="style_manager_light" xml:space="preserve"><value>Assets/menu_light/menu_change_color.png</value></data>
+  <data name="title_dark" xml:space="preserve"><value>Assets/menu_dark/menu_title.png</value></data>
+  <data name="title_light" xml:space="preserve"><value>Assets/menu_light/menu_title.png</value></data>
+  <data name="unlock_dark" xml:space="preserve"><value>Assets/menu_dark/menu_unlocked.png</value></data>
+  <data name="unlock_light" xml:space="preserve"><value>Assets/menu_light/menu_unlocked.png</value></data>
+  <data name="unlocked_dark" xml:space="preserve"><value>Assets/menu_dark/menu_unlocked.png</value></data>
+  <data name="unlocked_light" xml:space="preserve"><value>Assets/menu_light/menu_unlocked.png</value></data>
+  <data name="unpinned_dark" xml:space="preserve"><value>Assets/menu_dark/menu_unpinned.png</value></data>
+  <data name="unpinned_light" xml:space="preserve"><value>Assets/menu_light/menu_unpinned.png</value></data>
+</root>

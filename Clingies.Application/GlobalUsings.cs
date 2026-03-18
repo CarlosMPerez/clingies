@@ -1,1 +1,2 @@
-global using Clingies.Utils;
+global using Clingies.Application.Common;
+global using Clingies.Domain.Common;

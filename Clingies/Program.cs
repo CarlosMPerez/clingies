@@ -5,10 +5,8 @@ using Serilog;
 using Clingies.Application.Services;
 using Clingies.Application.Interfaces;
 using Clingies.Infrastructure.Data;
-using Clingies.Application.Providers;
-using Clingies.GtkFront;
 using Clingies.Infrastructure.Migrations;
-using Clingies.GtkFront.Services;
+using Clingies.Services;
 
 namespace Clingies;
 
@@ -41,7 +39,8 @@ internal sealed class Program
             GtkFrontendHost host = new GtkFrontendHost(
                 sp.GetRequiredService<IClingiesLogger>(),
                 sp.GetRequiredService<ClingyWindowManager>(),
-                sp.GetRequiredService<MenuFactory>(),
+                sp.GetRequiredService<TrayCommandController>(),
+                sp.GetRequiredService<AppMenuFactory>(),
                 sp.GetRequiredService<GtkUtilsService>());
             host.Run();
             Gtk.Application.Run();
@@ -72,20 +71,12 @@ internal sealed class Program
                 return new ConnectionFactory(dbPath, logger);
             });
             services.AddSingleton<IClingyRepository, ClingyRepository>();
-            services.AddSingleton<IMenuRepository, MenuRepository>();
             services.AddSingleton<IStyleRepository, StyleRepository>();
-            services.AddSingleton<IIconPathRepository, IconPathRepository>();
-            services.AddSingleton<MenuFactory>();
+            services.AddSingleton<AppMenuFactory>();
+            services.AddSingleton<TrayCommandController>();
             services.AddSingleton<ClingyWindowManager>();
             services.AddSingleton<ClingyService>();
-            services.AddSingleton<MenuService>();
             services.AddSingleton<StyleService>();
-            services.AddSingleton<ITrayCommandProvider, TrayCommandProvider>();
-            services.AddSingleton<Func<ITrayCommandProvider>>(sp =>
-                                () => sp.GetRequiredService<ITrayCommandProvider>());
-            services.AddSingleton<ITrayCommandController, TrayCommandController>();
-            services.AddSingleton<Func<IContextCommandController, IContextCommandProvider>>(sp =>
-                                    controller => new ContextCommandProvider(controller));
             services.AddSingleton<ITitleDialogService, TitleDialogService>();
             services.AddSingleton<GtkUtilsService>();
         }
@@ -142,4 +133,3 @@ internal sealed class Program
         }
     }
 }
-
