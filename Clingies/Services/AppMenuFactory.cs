@@ -15,9 +15,6 @@ public class AppMenuFactory(StyleService styleService,
                             GtkUtilsService utils)
 
 {
-    private ClingyContextController? _contextController;
-    private const string StyleCommandPrefix = "set_style_";
-
     public GtkMenu BuildTrayMenu(TrayCommandController trayController)
     {
         return BuildGtkTrayMenu(trayController);
@@ -25,11 +22,10 @@ public class AppMenuFactory(StyleService styleService,
 
     public GtkMenu BuildClingyMenu(ClingyContextController controller, bool isLocked, bool isRolled)
     {
-        _contextController = controller;
-        return BuildContextMenu(isLocked, isRolled);
+        return BuildContextMenu(controller, isLocked, isRolled);
     }
 
-    private GtkMenu BuildContextMenu(bool isLocked, bool isRolled)
+    private GtkMenu BuildContextMenu(ClingyContextController controller, bool isLocked, bool isRolled)
     {
         var menu = new GtkMenu();
 
@@ -50,93 +46,76 @@ public class AppMenuFactory(StyleService styleService,
             else 
             {
                 if (item.Id == AppConstants.ContextMenuCommands.SetStyle)
-                    menu.Append(BuildAvailableStylesMenu(item, enabled));
+                    menu.Append(BuildAvailableStylesMenu(item, controller, enabled));
                 else
-                    menu.Append(BuildContextMenuItemRecursive(item, enabled));
+                    menu.Append(BuildContextMenuItemRecursive(item, controller, enabled));
             }
         }
 
         return menu;
     }
 
-    private MenuItem BuildContextMenuItemRecursive(AppMenuDefinition model, bool enabledOverride = true)
+    private MenuItem BuildContextMenuItemRecursive(AppMenuDefinition model, ClingyContextController controller, bool enabledOverride = true)
     {
         MenuItem ret;
         var children = model.Children ?? [];
 
-        if (children.Count > 0) ret = BuildParentContextMenuItem(model, children);
-        else ret = BuildNonParentContextMenuItem(model, enabledOverride);
+        if (children.Count > 0) ret = BuildParentContextMenuItem(model, children, controller);
+        else ret = BuildNonParentContextMenuItem(model, controller, enabledOverride);
 
         return ret;
     }
 
-    private MenuItem BuildParentContextMenuItem(AppMenuDefinition model, IReadOnlyList<AppMenuDefinition> children)
+    private MenuItem BuildParentContextMenuItem(AppMenuDefinition model, IReadOnlyList<AppMenuDefinition> children, ClingyContextController controller)
     {
         var parent = NewMenuItemWithOptionalIcon(model.Label ?? model.Id, model.IconId, utils);
         parent.Sensitive = model.Enabled;
 
         var sub = new GtkMenu();
         foreach (var child in children)
-            sub.Append(BuildContextMenuItemRecursive(child));
+            sub.Append(BuildContextMenuItemRecursive(child, controller));
 
         parent.Submenu = sub;
         return parent;
     }
 
-    private MenuItem BuildNonParentContextMenuItem(AppMenuDefinition model, bool enabledOverride = true)
+    private MenuItem BuildNonParentContextMenuItem(AppMenuDefinition model, ClingyContextController controller, bool enabledOverride = true)
     {
         var menuItem = NewMenuItemWithOptionalIcon(model.Label ?? model.Id, model.IconId, utils);
         menuItem.Sensitive = model.Enabled && enabledOverride;
 
-        var action = ResolveContextAction(model.Id);
+        var action = ResolveContextAction(model.Id, controller);
         if (action is not null)
         {
             menuItem.Activated += (_, __) => action();
         }
         else
         {
-            if (model.Id.StartsWith(StyleCommandPrefix, StringComparison.Ordinal))
-            {
-                menuItem.Name = model.Id;
-                menuItem.Activated += OnApplyStyleActivated;
-            }
-            else logger.Warning($"[ClingyMenu] No command defined for item id '{model.Id}'");
+            logger.Warning($"[ClingyMenu] No command defined for item id '{model.Id}'");
         }
 
         return menuItem;
     }
 
-    private MenuItem BuildAvailableStylesMenu(AppMenuDefinition model, bool enabledOverride = true)
+    private MenuItem BuildAvailableStylesMenu(AppMenuDefinition model, ClingyContextController controller, bool enabledOverride = true)
     {
-        MenuItem ret;
         var styles = styleService.GetAllActive().OrderBy(c => c.StyleName).ToList();
+        var parent = NewMenuItemWithOptionalIcon(model.Label ?? model.Id, model.IconId, utils);
+        parent.Sensitive = model.Enabled && enabledOverride;
 
-        if (styles.Count > 0)
+        if (styles.Count == 0)
+            return parent;
+
+        var sub = new GtkMenu();
+        foreach (var style in styles)
         {
-            List<AppMenuDefinition> convertedStyles = [];
-            foreach (var style in styles)
-            {
-                AppMenuDefinition converted = new(
-                    $"set_style_{style.Id}",
-                    style.StyleName,
-                    $"Set Style {style.StyleName} to Clingy");
-                convertedStyles.Add(converted);
-            }
-
-            ret = BuildParentContextMenuItem(model, convertedStyles);
-            ret.Sensitive = model.Enabled && enabledOverride;
+            var menuItem = NewMenuItemWithOptionalIcon(style.StyleName, null, utils);
+            menuItem.Activated += (_, __) => controller.ApplyStyle(style.Id);
+            sub.Append(menuItem);
         }
-        else ret = BuildNonParentContextMenuItem(model, enabledOverride);
 
-        return ret;
-    }
-
-    private void OnApplyStyleActivated(object? sender, EventArgs e)
-    {
-        if (!int.TryParse(((MenuItem)sender!).Name.Substring(StyleCommandPrefix.Length), out var id))
-            return;
-
-        _contextController!.ApplyStyle(id);
+        parent.Submenu = sub;
+        return parent;
     }
 
     private GtkMenu BuildGtkTrayMenu(TrayCommandController trayController)
@@ -212,17 +191,17 @@ public class AppMenuFactory(StyleService styleService,
         };
     }
 
-    private SysAction? ResolveContextAction(string itemId) => itemId switch
+    private static SysAction? ResolveContextAction(string itemId, ClingyContextController controller) => itemId switch
     {
-        AppConstants.ContextMenuCommands.Sleep => _contextController!.SleepClingy,
-        AppConstants.ContextMenuCommands.Alarm => _contextController!.ShowAlarmWindow,
-        AppConstants.ContextMenuCommands.Title => _contextController!.ShowChangeTitleDialog,
-        AppConstants.ContextMenuCommands.Color => _contextController!.ShowColorWindow,
-        AppConstants.ContextMenuCommands.Lock => _contextController!.LockClingy,
-        AppConstants.ContextMenuCommands.Unlock => _contextController!.UnlockClingy,
-        AppConstants.ContextMenuCommands.RollUp => _contextController!.RollUpClingy,
-        AppConstants.ContextMenuCommands.RollDown => _contextController!.RollDownClingy,
-        AppConstants.ContextMenuCommands.Properties => _contextController!.ShowPropertiesWindow,
+        AppConstants.ContextMenuCommands.Sleep => controller.SleepClingy,
+        AppConstants.ContextMenuCommands.Alarm => controller.ShowAlarmWindow,
+        AppConstants.ContextMenuCommands.Title => controller.ShowChangeTitleDialog,
+        AppConstants.ContextMenuCommands.Color => controller.ShowColorWindow,
+        AppConstants.ContextMenuCommands.Lock => controller.LockClingy,
+        AppConstants.ContextMenuCommands.Unlock => controller.UnlockClingy,
+        AppConstants.ContextMenuCommands.RollUp => controller.RollUpClingy,
+        AppConstants.ContextMenuCommands.RollDown => controller.RollDownClingy,
+        AppConstants.ContextMenuCommands.Properties => controller.ShowPropertiesWindow,
         _ => null
     };
 

@@ -11,6 +11,7 @@ public sealed class ClingyTitleBar : Box
     private readonly EventBox _dragArea;
     private readonly Box _leftSide;
     private readonly Box _rightSide;
+    private  GtkUtilsService _utils;
 
     private Button _pinButton;
     private Button _lockButton;
@@ -20,8 +21,9 @@ public sealed class ClingyTitleBar : Box
     private bool _isLocked;
 
     // Keep ctor non-public to enforce factory usage
-    private ClingyTitleBar() : base(Orientation.Horizontal, 4)
+    private ClingyTitleBar(GtkUtilsService utils) : base(Orientation.Horizontal, 4)
     {
+        _utils = utils;
         Name = AppConstants.CssSections.ClingyTitle;
         HeightRequest = AppConstants.Dimensions.TitleHeight;
 
@@ -52,7 +54,7 @@ public sealed class ClingyTitleBar : Box
     public static ClingyTitleBar Build(ClingyModel model, Window owner,
         GtkUtilsService utils, ClingyWindowCallbacks callbacks)
     {
-        var bar = new ClingyTitleBar();
+        var bar = new ClingyTitleBar(utils);
 
         // initialize state & title
         bar._isPinned = model.IsPinned;
@@ -65,7 +67,7 @@ public sealed class ClingyTitleBar : Box
             bar._isPinned ? AppConstants.IconNames.ClingyPinned : AppConstants.IconNames.ClingyUnpinned
         );
         bar._pinButton.MarginStart = 2; bar._pinButton.MarginEnd = 4;
-        bar._pinButton.Clicked += (_, __) => bar.InternalTogglePin(callbacks, utils);
+        bar._pinButton.Clicked += (_, __) => bar.InternalTogglePin(callbacks);
         bar._leftSide.PackStart(bar._pinButton, false, false, 0);
 
         bar._lockButton = utils.MakeImgButton(
@@ -113,12 +115,12 @@ public sealed class ClingyTitleBar : Box
 
     // Internal Pin/Unpin command (by button clicking)
     // can ONLY be called by command OnClick
-    private void InternalTogglePin(ClingyWindowCallbacks callbacks, GtkUtilsService utils)
+    private void InternalTogglePin(ClingyWindowCallbacks callbacks)
     {
         if (_isLocked) return;
         _isPinned = !_isPinned;
         var assetName = _isPinned ? AppConstants.IconNames.ClingyPinned : AppConstants.IconNames.ClingyUnpinned;
-        utils.SetButtonIcon(_pinButton, assetName);
+        _utils.SetButtonIcon(_pinButton, assetName);
         // notify the window manager that pin has changed
         callbacks.PinChanged(_isPinned);
     }
@@ -130,9 +132,8 @@ public sealed class ClingyTitleBar : Box
     private void TogglePin(bool isPinned)
     {
         _isPinned = isPinned;
-        // SOLVE THIS
-        //var assetName = _isPinned ? AppConstants.IconNames.ClingyPinned : AppConstants.IconNames.ClingyUnpinned;
-        //_utils.SetButtonIcon(_pinButton, assetName);
+        var assetName = _isPinned ? AppConstants.IconNames.ClingyPinned : AppConstants.IconNames.ClingyUnpinned;
+        _utils.SetButtonIcon(_pinButton, assetName);
         _pinButton.Show();
     }
 

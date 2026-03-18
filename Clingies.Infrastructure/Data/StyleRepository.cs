@@ -5,7 +5,6 @@ using Clingies.Domain.Models;
 using Clingies.Infrastructure.Entities;
 using Clingies.Infrastructure.Mapper;
 using Clingies.Infrastructure.CustomExceptions;
-using System.Security.Principal;
 
 namespace Clingies.Infrastructure.Data;
 
@@ -36,10 +35,13 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
     {
         try
         {
-            List<StyleModel> styles = new List<StyleModel>();
-            styles = GetAll().Where(x => x.IsActive).ToList();
-
-            return styles;
+            var sql = """
+                SELECT id, style_name, body_color, body_font_name, body_font_color, 
+                    body_font_size, body_font_decorations, is_system, is_default, is_active
+                FROM styles
+                WHERE is_active = 1
+            """;
+            return Conn.Query<StyleEntity>(sql).Select(entity => entity.ToModel()).ToList();
         }
         catch (Exception ex)
         {
@@ -52,8 +54,12 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
     {
         try
         {
-            List<StyleModel> styles = new List<StyleModel>();
-            return GetAll().Where(x => x.IsActive).ToList().Count;
+            const string sql = """
+                SELECT COUNT(*)
+                FROM styles
+                WHERE is_active = 1
+            """;
+            return Conn.ExecuteScalar<int>(sql);
         }
         catch (Exception ex)
         {
@@ -118,12 +124,13 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
     {
         try
         {
+            var current = Get(style.Id) ?? throw new KeyNotFoundException($"Style {style.Id} not found.");
+
             if (style.IsSystem)
                 throw new CannotUpdateSystemStyleException("The system style cannot be modified.");
             if (style.StyleName == AppConstants.SystemStyle.Name)
                 throw new ReservedStyleNameException("You cannot use the 'System' name for a style. Please choose another.");
-            if (CountAllActive() >= 10 && style.IsActive)
-                throw new TooManyActiveStylesException("Cannot make Active this style, there are already 10 Active styles");
+            ValidateActiveTransition(current, style.IsActive);
 
             var sql = """
                 UPDATE styles SET 
@@ -141,6 +148,7 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
             Conn.Execute(sql, style.ToEntity());
 
             if (style.IsDefault) MarkDefault(style.Id, true);
+            else if (current.IsDefault) CheckOneAndOnlyOneDefault();
         }
         catch (Exception ex)
         {
@@ -212,12 +220,8 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
     {
         try
         {
-            int currentActives = CountAllActive();
-            int futureActives = isActive ? currentActives + 1 : currentActives - 1;
-            if (isActive && futureActives > 10)
-                throw new TooManyActiveStylesException("You cannot have more than 10 active styles at a time");
-            if (!isActive && futureActives < 1)
-                throw new AtLeastOneActiveStyleException("You must have at least one active style");
+            var current = Get(id) ?? throw new KeyNotFoundException($"Style {id} not found.");
+            ValidateActiveTransition(current, isActive);
 
             var parms = new Dictionary<string, object> { { "@Id", id }, { "@IsActive", isActive } };
             var sql = """
@@ -255,7 +259,7 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
             {
                 sql = """
                     UPDATE styles SET 
-                        is_default = @IsDefault;
+                        is_default = @IsDefault
                     WHERE id = @Id;
                 """;
             }
@@ -323,6 +327,18 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
         {
             MarkDefault(GetSystemStyleId(), true);
         }
+    }
+
+    private void ValidateActiveTransition(StyleModel currentStyle, bool targetIsActive)
+    {
+        if (currentStyle.IsActive == targetIsActive)
+            return;
+
+        int currentActives = CountAllActive();
+        if (targetIsActive && currentActives >= 10)
+            throw new TooManyActiveStylesException("You cannot have more than 10 active styles at a time");
+        if (!targetIsActive && currentActives <= 1)
+            throw new AtLeastOneActiveStyleException("You must have at least one active style");
     }
 
     private bool CheckStyleIsInUse(int styleId)
