@@ -26,27 +26,19 @@ Table clingy_content {
 }
 
 Table clingy_types {
-  id integer [pk, identity]
+  id integer [pk]
   name varchar [not null, unique]
 }
 
-Table app_icon_paths {
-  id integer [pk, identity]                    // or make this a key/value table
-  light_path varchar
-  dark_path varchar
-}
-
-Table system_menu {
+Table styles {
   id integer [pk, identity]
-  menu_type varchar [not null]                 // consider lookup or CHECK
-  parent_id integer [ref: > system_menu.id]    // self-FK, cascade delete in FM
-  label varchar [not null]
-  tooltip varchar
-  enabled boolean [not null, default: 1]
-  separator boolean [not null, default: 0]
-  sort_order integer [not null]
-  indexes {
-    (parent_id, sort_order) [unique]
-  }
+  style_name varchar [not null]
+  body_color varchar [not null]
+  body_font_name varchar [not null]
+  body_font_color varchar [not null]
+  body_font_size integer [not null]
+  body_font_decorations integer [not null, default: 0]
+  is_system boolean [not null, default: 0]
+  is_default boolean [not null, default: 0]
+  is_active boolean [not null, default: 1]
 }
-

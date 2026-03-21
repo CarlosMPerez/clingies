@@ -6,7 +6,7 @@ language = "csharp"
 framework = ".NET 9"
 platform = "linux"
 ui = "gtk3"
-description = "Linux sticky-notes desktop app. Executable host in Clingies/, GTK UI in Clingies.GtkFront/."
+description = "Linux sticky-notes desktop app. GTK UI and bootstrap live in Clingies/."
 
 [structure]
 solution = "Clingies.sln"
@@ -20,16 +20,13 @@ host = "Clingies"
 application = "Clingies.Application"
 domain = "Clingies.Domain"
 infrastructure = "Clingies.Infrastructure"
-frontend = "Clingies.GtkFront"
-utils = "Clingies.Utils"
+frontend = "Clingies"
 
 [dependencies]
-Clingies = ["Clingies.Application", "Clingies.GtkFront", "Clingies.Infrastructure", "Clingies.Utils"]
-Clingies.Application = ["Clingies.Domain", "Clingies.Utils"]
-Clingies.Domain = ["Clingies.Utils"]
-Clingies.Infrastructure = ["Clingies.Application", "Clingies.Domain", "Clingies.Utils"]
-Clingies.GtkFront = ["Clingies.Application", "Clingies.Domain", "Clingies.Utils"]
-Clingies.Utils = []
+Clingies = ["Clingies.Application", "Clingies.Infrastructure"]
+Clingies.Application = ["Clingies.Domain"]
+Clingies.Domain = []
+Clingies.Infrastructure = ["Clingies.Application", "Clingies.Domain"]
 
 [stack]
 database = "sqlite"
@@ -56,7 +53,7 @@ avoid_cross_layer_leaks = true
 [rules]
 notes = [
   "Keep domain models, application services, infrastructure repositories, and GTK UI concerns in their current layers.",
-  "Do not point run commands at Clingies.GtkFront; the executable host is Clingies/Clingies.csproj.",
+  "GTK UI, assets, and bootstrap live in Clingies/Clingies.csproj.",
   "When schema changes are needed, add a new FluentMigrator migration instead of editing old applied migrations.",
   "A clingy spans clingies, clingy_properties, and clingy_content tables.",
   "Clingy content is text XOR png on update.",
@@ -74,7 +71,7 @@ manual_smoke_checks = [
   "Application starts and initializes GTK/tray integration.",
   "Migrations apply on startup against an empty database.",
   "Create, edit, pin, lock, roll, and close a clingy and verify persistence after restart.",
-  "Menu assets and tray icons still resolve from Clingies.GtkFront/Assets."
+  "Menu assets and tray icons still resolve from Clingies/Assets."
 ]
 
 [environment]

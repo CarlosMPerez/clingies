@@ -16,7 +16,7 @@ Sticky‑note–style desktop app for Linux. Each note is a **Clingy**: lightwei
 - SQLite persistence via **Dapper** + **FluentMigrator**
 - DI with **Microsoft.Extensions.DependencyInjection**
 - Logging via **Serilog**
-- System tray indicator + dynamic menu (driven by DB `system_menu`)
+- System tray indicator + GTK menus defined in code, with icon paths embedded as .NET resources
 
 ## Planned / Roadmap
 
@@ -44,12 +44,10 @@ Sticky‑note–style desktop app for Linux. Each note is a **Clingy**: lightwei
 ```
 src/
     Clingies.sln
-    Clingies/                    # App composition / bootstrap (host)
+    Clingies/                    # Linux GTK app (bootstrap, widgets, windows, assets)
     Clingies.Domain/             # Business models
-    Clingies.Application/   # Interfaces, services 
+    Clingies.Application/        # Interfaces, services
     Clingies.Infrastructure/     # Repositories, mappers, entities, migrations, connection factory
-    Clingies.GtkFront/           # GTK3 front-end (widgets, windows, utils)
-    Clingies.Utils/         # (Shared) constants, attributes, small enums (UI-agnostic) [optional]
 ```
 
 ---
@@ -70,8 +68,8 @@ Package to be done.
 dotnet restore
 dotnet build -c Release
 
-# run GTK front-end
-dotnet run --project src/Clingies.GtkFront
+# run app
+dotnet run --project Clingies/Clingies.csproj
 ```
 
 ---
