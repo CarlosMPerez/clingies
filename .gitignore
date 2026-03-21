@@ -502,3 +502,6 @@ CourseAssets/
 .codex/*.local.md
 .codex/tmp/
 .codex/sessions/
+
+#others
+docs/
