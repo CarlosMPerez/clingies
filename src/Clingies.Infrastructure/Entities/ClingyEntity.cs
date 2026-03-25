@@ -10,13 +10,8 @@ public sealed class ClingyEntity
     [IgnoreComparisonField]
     public DateTime CreatedAt { get; set; }
     [IgnoreComparisonField]
-    public ClingyPropertiesEntity Properties { get; set; }
-    [IgnoreComparisonField]
-    public ClingyContentEntity Content { get; set; }
+    public ClingyPropertiesEntity Properties { get; set; } = new();
 
-    public ClingyEntity()
-    {
-        Properties = new ClingyPropertiesEntity();
-        Content = new ClingyContentEntity();    
-    }
+    [IgnoreComparisonField]
+    public ClingyContentEntity Content { get; set; } = new();
 }

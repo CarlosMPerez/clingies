@@ -1,8 +1,6 @@
 using System.Data;
-using Clingies.Domain.Common;
 using Clingies.Domain.Models;
 using Clingies.Infrastructure.Data;
-using Clingies.Infrastructure.Migrations;
 using Dapper;
 
 namespace Clingies.Infrastructure.Tests;
@@ -14,7 +12,7 @@ internal sealed class TestDatabase : IDisposable
 
     public TestDatabase()
     {
-        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+        DefaultTypeMap.MatchNamesWithUnderscores = true;
 
         _tempDirectory = Path.Combine(Path.GetTempPath(), "clingies-tests", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_tempDirectory);

@@ -5,7 +5,7 @@ namespace Clingies.Infrastructure.Migrations
 {
     public class MigrationRunnerService(string dbPath)
     {
-        private readonly string connectionString = $"Data Source={dbPath}";
+        private readonly string _connectionString = $"Data Source={dbPath}";
         public void MigrateUp()
         {
             var serviceProvider = CreateServices();
@@ -20,7 +20,7 @@ namespace Clingies.Infrastructure.Migrations
                 .AddFluentMigratorCore()
                 .ConfigureRunner(rb => rb
                     .AddSQLite()
-                    .WithGlobalConnectionString(connectionString)
+                    .WithGlobalConnectionString(_connectionString)
                     .ScanIn(typeof(MigrationRunnerService).Assembly).For.Migrations())
                 .AddLogging(lb => lb.AddFluentMigratorConsole())
                 .BuildServiceProvider(false);

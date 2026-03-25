@@ -2,18 +2,18 @@ namespace Clingies.Domain.Models;
 
 public class ClingyModel
 {
-    public int Id { get; set; }
+    public int Id { get; set; } = 0;
     public Enums.ClingyType Type { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public DateTime CreatedAt { get; set; }
+    public string Title { get; set; } = "";
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public bool IsDeleted { get; set; }
 
     // properties
     public double PositionX { get; set; }
     public double PositionY { get; set; }
 
-    public double Width { get; set; }
-    public double Height { get; set; }
+    public double Width { get; set; } = AppConstants.Dimensions.DefaultClingyWidth;
+    public double Height { get; set; } = AppConstants.Dimensions.DefaultClingyHeight;
     public bool IsPinned { get; set; }
     public bool IsRolled { get; set; }
     public bool IsLocked { get; set; }
@@ -24,16 +24,5 @@ public class ClingyModel
     public string? Text { get; set; }
     public byte[]? PngBytes { get; set; }
 
-    public StyleModel Style { get; set; }
-
-    public ClingyModel()
-    {
-        // default values
-        Id = 0;
-        Title = "";
-        Height = AppConstants.Dimensions.DefaultClingyHeight;
-        Width = AppConstants.Dimensions.DefaultClingyWidth;
-        CreatedAt = DateTime.UtcNow;
-        Style = new StyleModel();
-    }
+    public StyleModel Style { get; set; } = new();
 }

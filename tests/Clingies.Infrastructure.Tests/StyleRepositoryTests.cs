@@ -18,8 +18,8 @@ public class StyleRepositoryTests
 
         Assert.NotNull(created);
         Assert.NotNull(defaultStyle);
-        Assert.True(created!.IsDefault);
-        Assert.Equal(styleId, defaultStyle!.Id);
+        Assert.True(created.IsDefault);
+        Assert.Equal(styleId, defaultStyle.Id);
         Assert.Single(defaults);
     }
 

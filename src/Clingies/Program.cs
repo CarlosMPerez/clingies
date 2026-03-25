@@ -12,8 +12,6 @@ namespace Clingies;
 
 internal sealed class Program
 {
-    private static FileStream? _singleInstanceLock;
-
     [STAThread]
     public static void Main(string[] args)
     {
@@ -117,7 +115,7 @@ internal sealed class Program
 
         try
         {
-            _singleInstanceLock = new FileStream(lockPath, FileMode.OpenOrCreate, 
+            var singleInstanceLock = new FileStream(lockPath, FileMode.OpenOrCreate, 
                 FileAccess.ReadWrite, FileShare.None);
             return false;
         }

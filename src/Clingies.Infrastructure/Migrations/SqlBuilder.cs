@@ -28,7 +28,7 @@ public static class SqlBuilder
 
     private static string SanitizeString(string val)
     {
-        return string.IsNullOrEmpty(val) ? "NULL" : string.Format("'{0}'", val.Replace("'", "''"));
+        return string.IsNullOrEmpty(val) ? "NULL" : $"'{val.Replace("'", "''")}'";
     }
 
     private static int ToSqlBoolean(bool value) => value ? 1 : 0;

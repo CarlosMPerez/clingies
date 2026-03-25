@@ -1,5 +1,3 @@
 namespace Clingies.Infrastructure.Annotations;
 
-public sealed class IgnoreComparisonFieldAttribute : Attribute
-{
-}
+public sealed class IgnoreComparisonFieldAttribute : Attribute;

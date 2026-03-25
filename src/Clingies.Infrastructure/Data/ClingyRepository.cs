@@ -4,7 +4,7 @@ using System.Reflection;
 using Clingies.Application.Interfaces;
 using Clingies.Domain.Models;
 using Clingies.Infrastructure.Entities;
-using Clingies.Infrastructure.Mapping;
+using Clingies.Infrastructure.Mapper;
 using static Clingies.Domain.Common.Enums;
 
 namespace Clingies.Infrastructure.Data;
@@ -16,7 +16,6 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
     {
         try
         {
-            List<ClingyModel> clingies = new List<ClingyModel>();
             var sql =
                 """
                     SELECT c.id, c.title, c.type_id AS Type, c.created_at, c.is_deleted,
@@ -44,7 +43,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     c.Content = ct;
                     return c;
                 },
-                new { TypeId = (int)Enums.ClingyType.Desktop },
+                new { TypeId = (int)ClingyType.Desktop },
                 splitOn: "PropsId, ContentId, StyleId"
             ).ToList();
 
@@ -114,7 +113,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 new
                 {
                     TypeId = entity.Type,
-                    Title = entity.Title,
+                    entity.Title,
                     CreatedAt = entity.CreatedAt == default ? DateTime.UtcNow : clingy.CreatedAt
                 },
                 tx
@@ -167,8 +166,8 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
 
             // Compute dirtiness
             var mainDirty = !IsEqual(current, incoming);
-            var propsDirty = !IsEqual(current.Properties!, incoming.Properties!);
-            var contDirty = !IsEqual(current.Content!, incoming.Content!);
+            var propsDirty = !IsEqual(current.Properties, incoming.Properties);
+            var contDirty = !IsEqual(current.Content, incoming.Content);
 
             if (mainDirty || propsDirty || contDirty)
             {
@@ -177,8 +176,8 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 NormalizeContent(current.Content);
 
                 // Enforce XOR ONLY on update
-                var hasText = incoming.Content?.Text is { Length: > 0 };
-                var hasImg = incoming.Content?.Png is { Length: > 0 };
+                var hasText = incoming.Content.Text is { Length: > 0 };
+                var hasImg = incoming.Content.Png is { Length: > 0 };
                 if (hasText && hasImg) // if both are true, error
                     throw new InvalidOperationException("On update, content must be either Text or Png (exclusively).");
 
@@ -273,13 +272,13 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     title = @Title
                 WHERE id = @Id;
             """,
-            new { Id = main.Id, TypeId = (int)main.Type, Title = main.Title }, tx);
+            new { main.Id, TypeId = (int)main.Type, main.Title }, tx);
         EnsureFound(rows, main.Id, "clingies");
     }
 
     private void UpdateProps(ClingyEntity main, IDbTransaction tx)
     {
-        var props = main.Properties!;
+        var props = main.Properties;
         var rows = Conn.Execute(
             """
                 UPDATE clingy_properties
@@ -292,7 +291,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             """,
             new
             {
-                Id = main.Id,
+                main.Id,
                 props.PositionX,
                 props.PositionY,
                 props.Width,
@@ -308,7 +307,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
 
     private void UpdateContent(ClingyEntity main, IDbTransaction tx)
     {
-        var hasText = !string.IsNullOrEmpty(main.Content!.Text);
+        var hasText = !string.IsNullOrEmpty(main.Content.Text);
         int rows;
         if (hasText)
         {
@@ -318,7 +317,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     SET text=@Text, png=NULL
                     WHERE id=@Id;
                 """,
-                new { Id = main.Id, Text = main.Content!.Text }, tx);
+                new { main.Id, main.Content.Text }, tx);
         }
         else
         {
@@ -328,7 +327,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     SET text=NULL, png=@Png
                     WHERE id=@Id;
                 """,
-                new { Id = main.Id, Png = main.Content!.Png }, tx);
+                new { main.Id, main.Content.Png }, tx);
         }
         EnsureFound(rows, main.Id, "clingy_content");
     }

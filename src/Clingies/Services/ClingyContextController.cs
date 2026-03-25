@@ -1,42 +1,28 @@
 using System;
-using Clingies.Windows;
 
 namespace Clingies.Services;
 
-public class ClingyContextController
+public class ClingyContextController(ClingyWindowManager manager,
+                                ClingyStylingService stylingService,
+                                ITitleDialogService titleDialog,
+                                int clingyId)
 {
-    private readonly ClingyWindowManager _manager;
-    private readonly ITitleDialogService _titleDialog;
-    private readonly ClingyStylingService _stylingService;
-    private readonly int _clingyId;
-
-    public ClingyContextController(ClingyWindowManager manager,
-                                    ClingyStylingService stylingService,
-                                    ITitleDialogService titleDialog,
-                                    int clingyId)
-    {
-        _manager = manager;
-        _titleDialog = titleDialog;
-        _stylingService = stylingService;
-        _clingyId = clingyId;
-    }
-
     public void ShowAlarmWindow() => Console.WriteLine("ALARM TO BE IMPLEMENTED");
 
     public void ShowChangeTitleDialog()
     {
-        var prevTitle = _manager.GetClingyModelById(_clingyId)?.Title;
-        var owner = _manager.GetClingyWindowById(_clingyId);
-        var newTitle = _titleDialog.ShowChangeTitleDialog(owner, prevTitle);
+        var prevTitle = manager.GetClingyModelById(clingyId)?.Title;
+        var owner = manager.GetClingyWindowById(clingyId);
+        var newTitle = titleDialog.ShowChangeTitleDialog(owner, prevTitle);
         if (newTitle == null) return;
-        _manager.RequestTitleChange(_clingyId, newTitle);
+        manager.RequestTitleChange(clingyId, newTitle);
     }
 
     public void ApplyStyle(int styleId)
     {
-        var owner = _manager.GetClingyWindowById(_clingyId);
-        _stylingService.ApplyTo(owner!, _clingyId, styleId);
-        _manager.RequestStyleChange(_clingyId, styleId);
+        var owner = manager.GetClingyWindowById(clingyId);
+        stylingService.ApplyTo(owner!, clingyId, styleId);
+        manager.RequestStyleChange(clingyId, styleId);
     }
 
     public void ShowColorWindow() => Console.WriteLine("COLOR TO BE IMPLEMENTED");
@@ -45,11 +31,11 @@ public class ClingyContextController
 
     public void SleepClingy() => Console.WriteLine("SLEEP TO BE IMPLEMENTED");
 
-    public void LockClingy() => _manager.RequestLock(_clingyId);
+    public void LockClingy() => manager.RequestLock(clingyId);
 
-    public void UnlockClingy() => _manager.RequestUnlock(_clingyId);
+    public void UnlockClingy() => manager.RequestUnlock(clingyId);
 
-    public void RollUpClingy() => _manager.RequestRollUp(_clingyId);
+    public void RollUpClingy() => manager.RequestRollUp(clingyId);
 
-    public void RollDownClingy() => _manager.RequestRollDown(_clingyId);
+    public void RollDownClingy() => manager.RequestRollDown(clingyId);
 }

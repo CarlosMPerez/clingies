@@ -7,27 +7,21 @@ using Gtk;
 
 namespace Clingies.Services
 {
-    public class GtkUtilsService
+    public class GtkUtilsService(IClingiesLogger logger)
     {
-        private readonly IClingiesLogger _logger;
-        public GtkUtilsService(IClingiesLogger logger)
-        {
-            _logger = logger;
-        }
-
         public string? LoadIconPath(string iconId, bool isDarkPath = false)
         {
             string? assetPath = IconPathResources.GetPath(iconId, isDarkPath);
             if (string.IsNullOrEmpty(assetPath))
             {
-                _logger.Warning($"{iconId} not found in resources");
+                logger.Warning($"{iconId} not found in resources");
                 return null;
             }
 
             var path = Path.Combine(AppContext.BaseDirectory, assetPath!);
             if (!File.Exists(path))
             {
-                _logger.Warning($"Image asset not found: {path}");
+                logger.Warning($"Image asset not found: {path}");
                 return null;
             }
 

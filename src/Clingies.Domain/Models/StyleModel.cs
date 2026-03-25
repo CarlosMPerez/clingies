@@ -1,5 +1,3 @@
-using System;
-
 namespace Clingies.Domain.Models;
 
 public class StyleModel

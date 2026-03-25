@@ -1,4 +1,3 @@
-using Clingies.Application.Interfaces;
 using Clingies.Windows;
 
 namespace Clingies.Services;

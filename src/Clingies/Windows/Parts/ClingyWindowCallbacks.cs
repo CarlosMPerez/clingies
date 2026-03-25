@@ -2,37 +2,25 @@ using System;
 
 namespace Clingies.Windows.Parts;
 
-public sealed class ClingyWindowCallbacks
+/// <summary>
+/// Class for calling WindowManager events from inside the window, or title or content
+/// </summary>
+public sealed class ClingyWindowCallbacks(int clingyId,
+                            Action closeRequested,
+                            Action<int, int> positionChanged,
+                            Action<int, int> sizeChanged,
+                            Action<string> titleChanged,
+                            Action<string> contentChanged,
+                            Action<bool> pinChanged,
+                            Action<bool> rollChanged)
 {
-    public int ClingyId { get; }
+    public int ClingyId { get; } = clingyId;
 
-    public Action CloseRequested { get; }
-    public Action<int, int> PositionChanged { get; }
-    public Action<int, int> SizeChanged { get; }
-    public Action<string> ContentChanged { get; }
-    public Action<string> TitleChanged { get; }
-    public Action<bool> PinChanged { get; }
-    public Action<bool> RollChanged { get; }
-
-    /// <summary>
-    /// Class for calling WindowManager events from inside the window, or title or content
-    /// </summary>
-    public ClingyWindowCallbacks(int clingyId,
-                                Action closeRequested,
-                                Action<int, int> positionChanged,
-                                Action<int, int> sizeChanged,
-                                Action<string> titleChanged,
-                                Action<string> contentChanged,
-                                Action<bool> pinChanged,
-                                Action<bool> rollChanged)
-    {
-        ClingyId = clingyId;
-        CloseRequested = closeRequested;
-        PositionChanged = positionChanged;
-        SizeChanged = sizeChanged;
-        TitleChanged = titleChanged;
-        ContentChanged = contentChanged;
-        PinChanged = pinChanged;
-        RollChanged = rollChanged;
-    }
+    public Action CloseRequested { get; } = closeRequested;
+    public Action<int, int> PositionChanged { get; } = positionChanged;
+    public Action<int, int> SizeChanged { get; } = sizeChanged;
+    public Action<string> ContentChanged { get; } = contentChanged;
+    public Action<string> TitleChanged { get; } = titleChanged;
+    public Action<bool> PinChanged { get; } = pinChanged;
+    public Action<bool> RollChanged { get; } = rollChanged;
 }

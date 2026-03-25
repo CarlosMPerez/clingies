@@ -15,13 +15,12 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
     {
         try
         {
-            List<StyleModel> styles = new List<StyleModel>();
             var sql = """
-                SELECT id, style_name, body_color, body_font_name, body_font_color, 
-                    body_font_size, body_font_decorations, is_system, is_default, is_active
-                FROM styles
-            """;
-            styles = Conn.Query<StyleEntity>(sql).Select(entity => entity.ToModel()).ToList();
+                          SELECT id, style_name, body_color, body_font_name, body_font_color, 
+                              body_font_size, body_font_decorations, is_system, is_default, is_active
+                          FROM styles
+                      """;
+            var styles = Conn.Query<StyleEntity>(sql).Select(entity => entity.ToModel()).ToList();
             return styles;
         }
         catch (Exception ex)

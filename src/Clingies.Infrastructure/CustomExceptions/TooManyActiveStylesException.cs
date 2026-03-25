@@ -1,7 +1,3 @@
-
 namespace Clingies.Infrastructure.CustomExceptions;
 
-public class TooManyActiveStylesException : CustomException
-{
-    public TooManyActiveStylesException(string message) : base(message) { }
-}
+public class TooManyActiveStylesException(string message) : CustomException(message);

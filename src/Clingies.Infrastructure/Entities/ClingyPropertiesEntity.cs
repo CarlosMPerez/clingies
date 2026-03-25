@@ -15,7 +15,5 @@ public sealed class ClingyPropertiesEntity
 
     public int StyleId { get; set; }
 
-    public StyleEntity Style { get; set; }
-
-    public ClingyPropertiesEntity() => Style = new StyleEntity();
+    public StyleEntity Style { get; set; } = new();
 }

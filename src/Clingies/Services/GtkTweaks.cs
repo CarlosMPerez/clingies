@@ -1,4 +1,3 @@
-using System;
 using Gtk;
 
 namespace Clingies.Services;

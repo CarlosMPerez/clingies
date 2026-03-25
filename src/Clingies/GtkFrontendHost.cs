@@ -8,28 +8,12 @@ using Clingies.Utils;
 
 namespace Clingies
 {
-    public class GtkFrontendHost
+    public class GtkFrontendHost(IClingiesLogger logger,
+                    ClingyWindowManager windowFactory,
+                    TrayCommandController trayCommandController,
+                    AppMenuFactory menuFactory,
+                    GtkUtilsService utilsService)
     {
-        private readonly IClingiesLogger _logger;
-        private readonly ClingyWindowManager _windowFactory;
-        private readonly TrayCommandController _trayCommandController;
-        private readonly AppMenuFactory _menuFactory;
-
-        private readonly GtkUtilsService _srvUtils;
-
-        public GtkFrontendHost(IClingiesLogger logger,
-                        ClingyWindowManager windowFactory,
-                        TrayCommandController trayCommandController,
-                        AppMenuFactory menuFactory,
-                        GtkUtilsService utilsService)
-        {
-            _logger = logger;
-            _windowFactory = windowFactory;
-            _trayCommandController = trayCommandController;
-            _menuFactory = menuFactory;
-            _srvUtils = utilsService;
-        }
-
         public int Run()
         {
             var baseProvider = new GlobalClingyBaseCssProvider();
@@ -37,20 +21,20 @@ namespace Clingies
 
             DrawTrayIconAndMenu();
 
-            _windowFactory.InitActiveWindows();
+            windowFactory.InitActiveWindows();
             return 0;
         }
 
         private void DrawTrayIconAndMenu()
         {
-            var iconPath = _srvUtils.LoadIconPath(AppConstants.IconNames.Application, false);
+            var iconPath = utilsService.LoadIconPath(AppConstants.IconNames.Application);
             if (string.IsNullOrEmpty(iconPath))
             {
-                _logger.Error(new Exception(), "Could not find main tray icon in resources");
+                logger.Error(new Exception(), "Could not find main tray icon in resources");
                 return;
             }
 
-            var trayMenu = _menuFactory.BuildTrayMenu(_trayCommandController);
+            var trayMenu = menuFactory.BuildTrayMenu(trayCommandController);
             trayMenu.ShowAll();
 
             try
@@ -67,7 +51,7 @@ namespace Clingies
             }
             catch (DllNotFoundException)
             {
-                _logger.Warning("libayatana-appindicator3 is missing; falling back to Gtk.StatusIcon.");
+                logger.Warning("libayatana-appindicator3 is missing; falling back to Gtk.StatusIcon.");
                 AttachOptionalStatusIconFallback(iconPath, trayMenu);
             }
         }
@@ -80,7 +64,7 @@ namespace Clingies
                 Visible = true,
                 TooltipText = "Clingies"
             };
-            si.Activate += (_, __) => _windowFactory.RenderAllWindows();
+            si.Activate += (_, __) => windowFactory.RenderAllWindows();
             si.PopupMenu += (_, __) => { trayMenu.ShowAll(); trayMenu.Popup(); };
         }
 #pragma warning restore CS0612

@@ -1,6 +1,3 @@
 namespace Clingies.Application.Common;
 
-public class CustomException : Exception
-{
-    public CustomException(string message) : base(message) { }
-}
+public class CustomException(string message) : Exception(message);

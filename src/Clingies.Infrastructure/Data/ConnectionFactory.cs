@@ -8,7 +8,7 @@ public class ConnectionFactory : IConnectionFactory, IDisposable
 {
     private readonly string _connectionString;
     private SqliteConnection? _sharedConnection;
-    private IClingiesLogger _logger;
+    private readonly IClingiesLogger _logger;
 
     public ConnectionFactory(string dbPath, IClingiesLogger logger)
     {

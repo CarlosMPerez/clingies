@@ -1,7 +1,7 @@
 using Clingies.Domain.Models;
 using Clingies.Infrastructure.Entities;
 
-namespace Clingies.Infrastructure.Mapping;
+namespace Clingies.Infrastructure.Mapper;
 
 public static class EntitiesMapper
 {
