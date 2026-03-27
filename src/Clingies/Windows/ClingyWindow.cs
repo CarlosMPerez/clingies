@@ -25,6 +25,8 @@ namespace Clingies.Windows
         private readonly ClingyContextController _contextController;
         private int _lastX = int.MinValue;
         private int _lastY = int.MinValue;
+        private int _lastWidth = int.MinValue;
+        private int _lastHeight = int.MinValue;
         private ClingyTitleBar _titleBar;
         private ClingyBody _body;
         private Box _root;
@@ -42,11 +44,16 @@ namespace Clingies.Windows
             SkipTaskbarHint = true;
             SkipPagerHint = true;
 
-            DefaultWidth = Math.Max(AppConstants.Dimensions.DefaultClingyWidth, (int)model.Width);
-            DefaultHeight = Math.Max(AppConstants.Dimensions.DefaultClingyHeight, (int)model.Height);
+            var initialWidth = model.Width > 0 ? (int)model.Width : AppConstants.Dimensions.DefaultClingyWidth;
+            var initialHeight = model.Height > 0 ? (int)model.Height : AppConstants.Dimensions.DefaultClingyHeight;
+
+            DefaultWidth = Math.Max(AppConstants.Dimensions.MinimumClingyWidth, initialWidth);
+            DefaultHeight = Math.Max(AppConstants.Dimensions.TitleHeight, initialHeight);
             Move((int)model.PositionX, (int)model.PositionY);
             _lastX = (int)model.PositionX;
             _lastY = (int)model.PositionY;
+            _lastWidth = DefaultWidth;
+            _lastHeight = DefaultHeight;
 
             // Build callbacks that *raise the same events* the Manager already listens to
             var cb = new ClingyWindowCallbacks(
@@ -88,10 +95,13 @@ namespace Clingies.Windows
 
             clickCatcher.ShowAll();
 
-            // Persist *size* continuously in a WM-agnostic way
-            this.SizeAllocated += (_, a) =>
+            DeleteEvent += (_, __) =>
             {
-                UpdateWindowSizeRequested?.Invoke(model.Id, a.Allocation.Width, a.Allocation.Height);
+                GetPosition(out var x, out var y);
+                GetSize(out var w, out var h);
+
+                PositionChangeRequested?.Invoke(model.Id, x, y);
+                UpdateWindowSizeRequested?.Invoke(model.Id, w, h);
             };
 
             // Add on focus title bar color change
@@ -107,9 +117,10 @@ namespace Clingies.Windows
         [GLib.ConnectBefore]
         private void OnConfigureEvent(object? sender, ConfigureEventArgs e)
         {
-            // Ask after the event has been applied
-            int x, y;
-            GetPosition(out x, out y);
+            var x = e.Event.X;
+            var y = e.Event.Y;
+            var width = e.Event.Width;
+            var height = e.Event.Height;
 
             if (x != _lastX || y != _lastY)
             {
@@ -120,6 +131,13 @@ namespace Clingies.Windows
                     PositionChangeRequested?.Invoke(model.Id, x, y);
                 else
                     PositionChangeRequested?.Invoke(model.Id, x, y);
+            }
+
+            if (width != _lastWidth || height != _lastHeight)
+            {
+                _lastWidth = width;
+                _lastHeight = height;
+                UpdateWindowSizeRequested?.Invoke(model.Id, width, height);
             }
 
             // Don't swallow the event

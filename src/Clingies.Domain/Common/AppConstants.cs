@@ -76,6 +76,7 @@ public record AppConstants
     {
         public const int DefaultClingyWidth = 380;
         public const int DefaultClingyHeight = 80;
+        public const int MinimumClingyWidth = 100;
 
         public const int DefaultDialogWidth = 380;
         public const int DefaultDialogHeight = 60;

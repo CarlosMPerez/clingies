@@ -7,11 +7,18 @@ namespace Clingies.Windows.Parts;
 public sealed class ClingyBody : Overlay
 {
     private TextView _content;
+    private ScrolledWindow _scroller;
     private EventBox _leftGrip;
     private EventBox _rightGrip;
     private bool _isLocked;
 
     private bool _autoSizeEnabled = true;
+    private uint _autosizeId;
+    private int _lastAutoHeight = -1;
+    private bool _scrollNormalizationPending;
+    private uint _scrollNormalizationId;
+    private bool _contentFitsWithoutScrolling = true;
+    private bool _pasteScrollRecoveryPending;
 
     private ClingyBody() : base()
     {
@@ -26,6 +33,7 @@ public sealed class ClingyBody : Overlay
             RightMargin = 6
         };
 
+        _scroller = new ScrolledWindow();
         _leftGrip = new EventBox();
         _rightGrip = new EventBox();
     }
@@ -35,7 +43,7 @@ public sealed class ClingyBody : Overlay
                                     ClingyWindowCallbacks cb)
     {
         var overlay = new ClingyBody();
-        var scroller = new ScrolledWindow
+        overlay._scroller = new ScrolledWindow
         {
             Name = AppConstants.CssSections.ClingyContent,
             ShadowType = ShadowType.None,
@@ -67,32 +75,24 @@ public sealed class ClingyBody : Overlay
         overlay._content.Buffer.Changed += (_, e) =>
         {
             cb.ContentChanged(overlay._content.Buffer.Text);
+            overlay.DebounceAutosize(owner);
         };
+        overlay._content.PasteClipboard += (_, __) => overlay.HandlePaste(owner);
 
-        // optional: auto-height (same logic, local to body)
-        uint autosizeId = 0;
-        overlay._content.SizeAllocated += (_, __) => DebounceAutosize();
-        overlay._content.Buffer.Changed += (_, __) => DebounceAutosize();
-
-        void DebounceAutosize()
+        overlay._content.SizeAllocated += (_, __) =>
         {
-            if (!overlay._autoSizeEnabled) return;
+            overlay.DebounceAutosize(owner);
+            overlay.FlushPendingScrollNormalization();
+        };
+        overlay._scroller.SizeAllocated += (_, __) => overlay.FlushPendingScrollNormalization();
+        overlay.MapEvent += (_, __) => overlay.DebounceAutosize(owner);
 
-            if (autosizeId != 0) GLib.Source.Remove(autosizeId);
-            autosizeId = GLib.Timeout.Add(16, () =>
-            {
-                autosizeId = 0;
-                AutoHeightToContent(owner, overlay._content);
-                return false;
-            });
-        }
-
-        scroller.Add(overlay._content);
-        overlay.Add(scroller);
+        overlay._scroller.Add(overlay._content);
+        overlay.Add(overlay._scroller);
 
         // grips: 2 thin overlays that start resize drags, and on release report size+pos
-        overlay._leftGrip = MakeGrip(owner, cb, true, () => overlay._isLocked);
-        overlay._rightGrip = MakeGrip(owner, cb, false, () => overlay._isLocked);
+        overlay._leftGrip = MakeGrip(owner, cb, true, () => overlay._isLocked, () => overlay.DebounceAutosize(owner));
+        overlay._rightGrip = MakeGrip(owner, cb, false, () => overlay._isLocked, () => overlay.DebounceAutosize(owner));
         overlay.AddOverlay(overlay._leftGrip);
         overlay.AddOverlay(overlay._rightGrip);
 
@@ -155,15 +155,26 @@ public sealed class ClingyBody : Overlay
             SetAutoSizeEnabled(true);
             parent.SetChildPacking(this, expand: true, fill: true, padding: 0, PackType.Start);
             ShowAll();
-            UnclampHeight(owner, width);
+            UnclampHeight(owner);
+            DebounceAutosize(owner);
         }
 
         parent.QueueResize();
     }
 
-    public void SetAutoSizeEnabled(bool enabled) => _autoSizeEnabled = enabled;
+    public void SetAutoSizeEnabled(bool enabled)
+    {
+        _autoSizeEnabled = enabled;
 
-    private static EventBox MakeGrip(Gtk.Window owner, ClingyWindowCallbacks cb, bool isLeft, Func<bool> isLocked)
+        if (!enabled && _autosizeId != 0)
+        {
+            GLib.Source.Remove(_autosizeId);
+            _autosizeId = 0;
+        }
+    }
+
+    private static EventBox MakeGrip(Window owner, ClingyWindowCallbacks cb, bool isLeft, Func<bool> isLocked,
+        System.Action autosizeAfterResize)
     {
         var grip = new EventBox
         {
@@ -191,6 +202,7 @@ public sealed class ClingyBody : Overlay
             cb.SizeChanged(owner.Allocation.Width, owner.Allocation.Height);
             owner.GetPosition(out var x, out var y);
             cb.PositionChanged(x, y);
+            autosizeAfterResize();
         };
         grip.EnterNotifyEvent += (_, e) =>
         {
@@ -210,21 +222,117 @@ public sealed class ClingyBody : Overlay
         return grip;
     }
 
-    private static void AutoHeightToContent(Gtk.Window owner, TextView tv)
+    private void DebounceAutosize(Gtk.Window owner)
     {
-        int w = tv.Allocation.Width;
-        if (w <= 0) return;
+        if (!_autoSizeEnabled) return;
 
-        using var layout = tv.CreatePangoLayout(tv.Buffer.Text);
+        if (_autosizeId != 0) GLib.Source.Remove(_autosizeId);
+        _autosizeId = GLib.Timeout.Add(16, () =>
+        {
+            _autosizeId = 0;
+            AutoHeightToContent(owner);
+            return false;
+        });
+    }
+
+    private void AutoHeightToContent(Gtk.Window owner)
+    {
+        int availableTextWidth = _content.Allocation.Width - _content.LeftMargin - _content.RightMargin;
+        if (availableTextWidth <= 0) return;
+
+        var text = string.IsNullOrEmpty(_content.Buffer.Text) ? " " : _content.Buffer.Text;
+        using var layout = _content.CreatePangoLayout(text);
         layout.Wrap = Pango.WrapMode.WordChar;
-        layout.Width = (int)(w * Pango.Scale.PangoScale);
+        layout.Width = (int)(availableTextWidth * Pango.Scale.PangoScale);
         layout.GetPixelSize(out _, out int textH);
 
-        const int MinH = AppConstants.Dimensions.DefaultClingyHeight, MaxH = 1500, Pad = 16;
-        int targetH = Math.Max(MinH, Math.Min(MaxH, textH + Pad));
+        const int MinWindowHeight = AppConstants.Dimensions.DefaultClingyHeight;
+        const int MaxWindowHeight = 1500;
+        const int TextVerticalPad = 16;
+
+        int chromeHeight = owner.Allocation.Height > 0 && _content.Allocation.Height > 0
+            ? Math.Max(AppConstants.Dimensions.TitleHeight, owner.Allocation.Height - _content.Allocation.Height)
+            : AppConstants.Dimensions.TitleHeight;
+
+        int desiredWindowHeight = chromeHeight + textH + TextVerticalPad;
+        _contentFitsWithoutScrolling = desiredWindowHeight <= MaxWindowHeight;
+        int targetH = Math.Max(MinWindowHeight, Math.Min(MaxWindowHeight, desiredWindowHeight));
         int currentW = owner.Allocation.Width > 0 ? owner.Allocation.Width : AppConstants.Dimensions.DefaultClingyWidth;
-        //Console.WriteLine($"W:{currentW} - H:{targetH}");
+
+        if (_lastAutoHeight == targetH && owner.Allocation.Height == targetH)
+        {
+            QueueScrollNormalization();
+            return;
+        }
+
+        if (Math.Abs(owner.Allocation.Height - targetH) <= 1)
+        {
+            _lastAutoHeight = targetH;
+            QueueScrollNormalization();
+            return;
+        }
+
+        _lastAutoHeight = targetH;
+        _scrollNormalizationPending = true;
         owner.Resize(currentW, targetH);
+    }
+
+    private void QueueScrollNormalization()
+    {
+        if (_scrollNormalizationId != 0)
+            GLib.Source.Remove(_scrollNormalizationId);
+
+        GLib.Idle.Add(() =>
+        {
+            NormalizeScrollPosition();
+            return false;
+        });
+
+        // Gtk may update adjustment/page size one or two frames after the resize.
+        // Retry shortly after the idle pass so a first Ctrl+V lands in the final settled state.
+        _scrollNormalizationId = GLib.Timeout.Add(48, () =>
+        {
+            NormalizeScrollPosition();
+            _scrollNormalizationId = GLib.Timeout.Add(120, () =>
+            {
+                _scrollNormalizationId = 0;
+                NormalizeScrollPosition();
+                _pasteScrollRecoveryPending = false;
+                return false;
+            });
+            return false;
+        });
+    }
+
+    private void NormalizeScrollPosition()
+    {
+        var vadj = _scroller.Vadjustment;
+        if (vadj == null) return;
+
+        if (_pasteScrollRecoveryPending || _contentFitsWithoutScrolling)
+        {
+            if (Math.Abs(vadj.Value - vadj.Lower) > 1)
+                vadj.Value = vadj.Lower;
+            return;
+        }
+
+        var insertMark = _content.Buffer.InsertMark;
+        _content.ScrollMarkOnscreen(insertMark);
+    }
+
+    private void FlushPendingScrollNormalization()
+    {
+        if (!_scrollNormalizationPending) return;
+
+        _scrollNormalizationPending = false;
+        QueueScrollNormalization();
+    }
+
+    private void HandlePaste(Gtk.Window owner)
+    {
+        _pasteScrollRecoveryPending = true;
+        DebounceAutosize(owner);
+        QueueScrollNormalization();
     }
 
     private void ClampToTitleBarHeight(Gtk.Window owner, int width)
@@ -239,13 +347,13 @@ public sealed class ClingyBody : Overlay
         owner.SetGeometryHints(this, geom, Gdk.WindowHints.MinSize | Gdk.WindowHints.MaxSize);
     }
 
-    private void UnclampHeight(Gtk.Window owner, int width)
+    private void UnclampHeight(Gtk.Window owner)
     {
         var geom = new Gdk.Geometry
         {
             MinHeight = AppConstants.Dimensions.TitleHeight,
             MaxHeight = int.MaxValue,
-            MinWidth = width,
+            MinWidth = AppConstants.Dimensions.MinimumClingyWidth,
             MaxWidth = int.MaxValue
         };
 

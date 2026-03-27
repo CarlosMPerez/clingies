@@ -90,6 +90,28 @@ public class ClingyRepositoryTests
     }
 
     [Fact]
+    public void Update_PersistsPositionAndSizeProperties()
+    {
+        using var db = new TestDatabase();
+
+        var clingyId = db.CreateClingy();
+        var clingy = db.Clingies.Get(clingyId)!;
+        clingy.PositionX = 321;
+        clingy.PositionY = 654;
+        clingy.Width = 222;
+        clingy.Height = 111;
+
+        db.Clingies.Update(clingy);
+
+        var updated = db.Clingies.Get(clingyId)!;
+
+        Assert.Equal(321, updated.PositionX);
+        Assert.Equal(654, updated.PositionY);
+        Assert.Equal(222, updated.Width);
+        Assert.Equal(111, updated.Height);
+    }
+
+    [Fact]
     public void Update_NormalizesWhitespaceTextAndEmptyPngToNull()
     {
         using var db = new TestDatabase();
