@@ -274,7 +274,7 @@ public sealed class ClingyBody : Overlay
 
         _lastAutoHeight = targetH;
         _scrollNormalizationPending = true;
-        owner.Resize(currentW, targetH);
+        ResizeKeepingPosition(owner, currentW, targetH);
     }
 
     private void QueueScrollNormalization()
@@ -333,6 +333,24 @@ public sealed class ClingyBody : Overlay
         _pasteScrollRecoveryPending = true;
         DebounceAutosize(owner);
         QueueScrollNormalization();
+    }
+
+    private static void ResizeKeepingPosition(Gtk.Window owner, int width, int height)
+    {
+        owner.GetPosition(out var x, out var y);
+        owner.Resize(width, height);
+
+        GLib.Idle.Add(() =>
+        {
+            owner.Move(x, y);
+            return false;
+        });
+
+        GLib.Timeout.Add(48, () =>
+        {
+            owner.Move(x, y);
+            return false;
+        });
     }
 
     private void ClampToTitleBarHeight(Gtk.Window owner, int width)
