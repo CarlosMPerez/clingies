@@ -505,7 +505,3 @@ CourseAssets/
 
 # misc
 docs/
-.codex/
-Directory.Packages.props
-clingies.editorconfig
-codex.toml

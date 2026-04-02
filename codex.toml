@@ -1,0 +1,80 @@
+version = "1"
+
+[project]
+name = "Clingies"
+language = "csharp"
+framework = ".NET 9"
+platform = "linux"
+ui = "gtk3"
+description = "Linux sticky-notes desktop app. GTK UI and bootstrap live in Clingies/."
+
+[structure]
+solution = "Clingies.sln"
+entry_project = "Clingies/Clingies.csproj"
+entry_file = "Clingies/Program.cs"
+readme = "README.md"
+docs = "docs"
+
+[projects]
+host = "Clingies"
+application = "Clingies.Application"
+domain = "Clingies.Domain"
+infrastructure = "Clingies.Infrastructure"
+frontend = "Clingies"
+
+[dependencies]
+Clingies = ["Clingies.Application", "Clingies.Infrastructure"]
+Clingies.Application = ["Clingies.Domain"]
+Clingies.Domain = []
+Clingies.Infrastructure = ["Clingies.Application", "Clingies.Domain"]
+
+[stack]
+database = "sqlite"
+orm = "dapper"
+migrations = "fluentmigrator"
+dependency_injection = "microsoft.extensions.dependencyinjection"
+logging = "serilog"
+
+[runtime]
+db_location = "Environment.SpecialFolder.ApplicationData/Clingies/clingies.db"
+lock_file = "Environment.SpecialFolder.ApplicationData/Clingies/clingies.lock"
+logs = "AppContext.BaseDirectory/logs/clingies.log"
+auto_run_migrations_on_startup = true
+single_instance_lock = true
+
+[coding]
+models_are_mutable = true
+repositories_are_sync = true
+services_are_sync = true
+nullable_enabled = true
+central_package_management = true
+avoid_cross_layer_leaks = true
+
+[rules]
+notes = [
+  "Keep domain models, application services, infrastructure repositories, and GTK UI concerns in their current layers.",
+  "GTK UI, assets, and bootstrap live in Clingies/Clingies.csproj.",
+  "When schema changes are needed, add a new FluentMigrator migration instead of editing old applied migrations.",
+  "A clingy spans clingies, clingy_properties, and clingy_content tables.",
+  "Clingy content is text XOR png on update.",
+  "Preserve Linux and GTK3 assumptions unless the user asks for cross-platform changes."
+]
+
+[verification]
+restore = "dotnet restore Clingies.sln"
+build = "dotnet build Clingies.sln"
+run = "dotnet run --project Clingies/Clingies.csproj"
+
+[testing]
+automated_test_projects = false
+manual_smoke_checks = [
+  "Application starts and initializes GTK/tray integration.",
+  "Migrations apply on startup against an empty database.",
+  "Create, edit, pin, lock, roll, and close a clingy and verify persistence after restart.",
+  "Menu assets and tray icons still resolve from Clingies/Assets."
+]
+
+[environment]
+sdk_pin = "global.json -> 9.0.115"
+gtk_runtime_required = true
+gtk_packages_hint = "libgtk-3-0 libgtk-3-dev"
