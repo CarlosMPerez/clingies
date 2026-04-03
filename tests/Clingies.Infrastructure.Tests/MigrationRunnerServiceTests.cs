@@ -59,6 +59,8 @@ public class MigrationRunnerServiceTests
         Assert.Contains("trg_styles_prevent_change_system", triggerNames);
         Assert.Contains("trg_styles_prevent_more_than_one_system", triggerNames);
         Assert.Contains("trg_styles_prevent_id_change_system", triggerNames);
+        Assert.Contains("trg_clingy_content_xor_insert", triggerNames);
+        Assert.Contains("trg_clingy_content_xor_update", triggerNames);
     }
 
     [Fact]
@@ -73,6 +75,51 @@ public class MigrationRunnerServiceTests
         var updateEx = Assert.ThrowsAny<Exception>(() =>
             db.Connection.Execute("UPDATE styles SET style_name = 'Changed' WHERE is_system = 1"));
         Assert.Contains("read-only columns", updateEx.Message);
+    }
+
+    [Fact]
+    public void ContentXorTriggers_BlockInsertWhenTextAndPngAreBothPresent()
+    {
+        using var db = new TestDatabase();
+
+        var ex = Assert.ThrowsAny<Exception>(() =>
+            db.Connection.Execute(
+                """
+                INSERT INTO clingy_content (id, text, png)
+                VALUES (@Id, @Text, @Png)
+                """,
+                new
+                {
+                    Id = 999_001,
+                    Text = "hello",
+                    Png = new byte[] { 1, 2, 3 }
+                }));
+
+        Assert.Contains("mutually exclusive", ex.Message);
+    }
+
+    [Fact]
+    public void ContentXorTriggers_BlockUpdateWhenTextAndPngAreBothPresent()
+    {
+        using var db = new TestDatabase();
+        var clingyId = db.CreateClingy();
+
+        var ex = Assert.ThrowsAny<Exception>(() =>
+            db.Connection.Execute(
+                """
+                UPDATE clingy_content
+                SET text = @Text,
+                    png = @Png
+                WHERE id = @Id
+                """,
+                new
+                {
+                    Id = clingyId,
+                    Text = "hello",
+                    Png = new byte[] { 4, 5, 6 }
+                }));
+
+        Assert.Contains("mutually exclusive", ex.Message);
     }
 
     private sealed class SystemStyleRow

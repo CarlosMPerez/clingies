@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Clingies.Domain.Models;
 using Gtk;
 
@@ -14,9 +15,11 @@ public sealed class ClingyBody : Overlay
     private Image _image;
     private EventBox _leftGrip;
     private EventBox _rightGrip;
+    private ClingyWindowCallbacks? _callbacks;
     private bool _isLocked;
     private bool _hasImageContent;
     private bool _imagePastePending;
+    private byte[]? _imageBytes;
     private int _imageWidth;
     private int _imageWindowHeight;
 
@@ -66,6 +69,7 @@ public sealed class ClingyBody : Overlay
                                     ClingyWindowCallbacks cb)
     {
         var overlay = new ClingyBody();
+        overlay._callbacks = cb;
         overlay._scroller = new ScrolledWindow
         {
             Name = AppConstants.CssSections.ClingyContent,
@@ -77,7 +81,13 @@ public sealed class ClingyBody : Overlay
 
         // init + caret behavior
         overlay._content.Buffer.Text = model.Text ?? string.Empty;
-        overlay._content.MapEvent += (_, __) => GLib.Idle.Add(() => { overlay._content.GrabFocus(); return false; });
+        overlay.InitializeContentFromModel(model);
+        overlay._content.MapEvent += (_, __) => GLib.Idle.Add(() =>
+        {
+            if (overlay._hasImageContent) overlay._imageHost.GrabFocus();
+            else overlay._content.GrabFocus();
+            return false;
+        });
         overlay._content.EnterNotifyEvent += (_, e) =>
         {
             try
@@ -163,25 +173,39 @@ public sealed class ClingyBody : Overlay
         if (isRolled)
         {
             SetAutoSizeEnabled(false);
+            if (_hasImageContent)
+                UnloadImageView();
+            HeightRequest = 0;
             Hide();
             parent.SetChildPacking(this, expand: false, fill: false, padding: 0, PackType.Start);
-            ClampToTitleBarHeight(owner, width);
+            var targetWidth = owner.Allocation.Width > 0 ? owner.Allocation.Width : width;
+            parent.SetSizeRequest(-1, AppConstants.Dimensions.TitleHeight);
+            owner.SetSizeRequest(targetWidth, AppConstants.Dimensions.TitleHeight);
+            parent.QueueResize();
+            QueueRolledResize(owner, targetWidth);
         }
         else
         {
             SetAutoSizeEnabled(!_hasImageContent);
+            HeightRequest = -1;
+            parent.SetSizeRequest(-1, -1);
+            owner.SetSizeRequest(-1, -1);
             parent.SetChildPacking(this, expand: true, fill: true, padding: 0, PackType.Start);
+            if (_hasImageContent)
+                EnsureImageViewLoaded();
             ShowAll();
             UpdateVisibleContent();
             if (_hasImageContent)
             {
+                ApplyInteractivity(owner);
                 ClampToFixedSize(owner, _imageWidth, _imageWindowHeight);
-                ResizeKeepingPosition(owner, _imageWidth, _imageWindowHeight);
+                ResizeKeepingPosition(owner, _imageWidth, _imageWindowHeight, forceResizable: true);
             }
             else
             {
                 UnclampHeight(owner);
                 DebounceAutosize(owner);
+                ApplyInteractivity(owner);
             }
         }
 
@@ -388,6 +412,8 @@ public sealed class ClingyBody : Overlay
 
     private void ShowImage(Gtk.Window owner, Gdk.Pixbuf pixbuf)
     {
+        var blob = SerializePixbuf(pixbuf);
+        _imageBytes = blob;
         _hasImageContent = true;
         _imageWidth = pixbuf.Width + (ImagePadding * 2);
         _image.Pixbuf = pixbuf;
@@ -399,13 +425,15 @@ public sealed class ClingyBody : Overlay
 
         ApplyInteractivity(owner);
         ClampToFixedSize(owner, _imageWidth, _imageWindowHeight);
-        ResizeKeepingPosition(owner, _imageWidth, _imageWindowHeight);
+        ResizeKeepingPosition(owner, _imageWidth, _imageWindowHeight, forceResizable: true);
 
         GLib.Idle.Add(() =>
         {
             _imageHost.GrabFocus();
             return false;
         });
+
+        _callbacks?.ImageChanged(blob);
     }
 
     private void ApplyInteractivity(Gtk.Window owner)
@@ -436,6 +464,88 @@ public sealed class ClingyBody : Overlay
         }
     }
 
+    private void InitializeContentFromModel(ClingyModel model)
+    {
+        if (model.PngBytes is not { Length: > 0 })
+            return;
+
+        _imageBytes = model.PngBytes;
+        var pixbuf = DeserializePixbuf(model.PngBytes);
+        if (pixbuf is null)
+            return;
+
+        _hasImageContent = true;
+        _image.Pixbuf = pixbuf;
+        _imageWidth = model.Width > 0 ? (int)model.Width : pixbuf.Width + (ImagePadding * 2);
+        _imageWindowHeight = model.Height > 0
+            ? (int)model.Height
+            : AppConstants.Dimensions.TitleHeight + pixbuf.Height + (ImagePadding * 2);
+        SetAutoSizeEnabled(false);
+    }
+
+    private void UnloadImageView()
+    {
+        if (!_hasImageContent)
+            return;
+
+        _image.Pixbuf = null;
+        _image.SetSizeRequest(1, 1);
+        _imageHost.SetSizeRequest(1, 1);
+        _image.Hide();
+        _imageHost.Hide();
+    }
+
+    private void EnsureImageViewLoaded()
+    {
+        if (!_hasImageContent)
+            return;
+
+        _image.SetSizeRequest(-1, -1);
+        _imageHost.SetSizeRequest(-1, -1);
+
+        if (_image.Pixbuf is not null)
+            return;
+
+        if (_imageBytes is not { Length: > 0 })
+            return;
+
+        var pixbuf = DeserializePixbuf(_imageBytes);
+        if (pixbuf is null)
+            return;
+
+        _image.Pixbuf = pixbuf;
+    }
+
+    private static byte[] SerializePixbuf(Gdk.Pixbuf pixbuf)
+    {
+        var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"{Guid.NewGuid():N}.png");
+        try
+        {
+            pixbuf.Save(tempPath, "png");
+            return System.IO.File.ReadAllBytes(tempPath);
+        }
+        finally
+        {
+            if (System.IO.File.Exists(tempPath))
+                System.IO.File.Delete(tempPath);
+        }
+    }
+
+    private static Gdk.Pixbuf? DeserializePixbuf(byte[] bytes)
+    {
+        var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"{Guid.NewGuid():N}.png");
+        try
+        {
+            System.IO.File.WriteAllBytes(tempPath, bytes);
+            return new Gdk.Pixbuf(tempPath);
+        }
+        finally
+        {
+            if (System.IO.File.Exists(tempPath))
+                System.IO.File.Delete(tempPath);
+        }
+    }
+
     private bool HasAnyContent() =>
         _hasImageContent || _content.Buffer.CharCount > 0;
 
@@ -454,20 +564,45 @@ public sealed class ClingyBody : Overlay
             ? Math.Max(AppConstants.Dimensions.TitleHeight, owner.Allocation.Height - _scroller.Allocation.Height)
             : AppConstants.Dimensions.TitleHeight;
 
-    private static void ResizeKeepingPosition(Gtk.Window owner, int width, int height)
+    private static void ResizeKeepingPosition(Gtk.Window owner, int width, int height, bool forceResizable = false)
     {
+        var previousResizable = owner.Resizable;
+        if (forceResizable)
+            owner.Resizable = true;
+
         owner.GetPosition(out var x, out var y);
         owner.Resize(width, height);
 
         GLib.Idle.Add(() =>
         {
             owner.Move(x, y);
+            if (forceResizable)
+                owner.Resizable = previousResizable;
             return false;
         });
 
         GLib.Timeout.Add(48, () =>
         {
             owner.Move(x, y);
+            if (forceResizable)
+                owner.Resizable = previousResizable;
+            return false;
+        });
+    }
+
+    private void QueueRolledResize(Gtk.Window owner, int width)
+    {
+        GLib.Idle.Add(() =>
+        {
+            ClampToTitleBarHeight(owner, width);
+            ResizeKeepingPosition(owner, width, AppConstants.Dimensions.TitleHeight, forceResizable: true);
+            return false;
+        });
+
+        GLib.Timeout.Add(48, () =>
+        {
+            ClampToTitleBarHeight(owner, width);
+            ResizeKeepingPosition(owner, width, AppConstants.Dimensions.TitleHeight, forceResizable: true);
             return false;
         });
     }
