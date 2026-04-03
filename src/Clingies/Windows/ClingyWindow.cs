@@ -27,6 +27,7 @@ namespace Clingies.Windows
         private int _lastY = int.MinValue;
         private int _lastWidth = int.MinValue;
         private int _lastHeight = int.MinValue;
+        private bool _isClosing;
         private ClingyTitleBar _titleBar;
         private ClingyBody _body;
         private Box _root;
@@ -91,12 +92,18 @@ namespace Clingies.Windows
             clickCatcher.AddEvents((int)Gdk.EventMask.KeyPressMask);
             clickCatcher.KeyPressEvent += OnKeyPressForContextMenu;
 
+            AddEvents((int)(Gdk.EventMask.KeyPressMask | Gdk.EventMask.StructureMask));
+            KeyPressEvent += OnWindowKeyPress;
+
             Add(clickCatcher);
 
             clickCatcher.ShowAll();
 
             DeleteEvent += (_, __) =>
             {
+                if (_isClosing)
+                    return;
+
                 GetPosition(out var x, out var y);
                 GetSize(out var w, out var h);
 
@@ -108,7 +115,6 @@ namespace Clingies.Windows
             FocusInEvent += (_, __) => _titleBar.StyleContext.AddClass(AppConstants.CssSections.Focused);
             FocusOutEvent += (_, __) => _titleBar.StyleContext.RemoveClass(AppConstants.CssSections.Focused);
 
-            AddEvents((int)Gdk.EventMask.StructureMask);
             ConfigureEvent += OnConfigureEvent;
             ApplyLockState(model.IsLocked);
             ApplyRollState(model.IsRolled);
@@ -117,6 +123,12 @@ namespace Clingies.Windows
         [GLib.ConnectBefore]
         private void OnConfigureEvent(object? sender, ConfigureEventArgs e)
         {
+            if (_isClosing)
+            {
+                e.RetVal = false;
+                return;
+            }
+
             var x = e.Event.X;
             var y = e.Event.Y;
             var width = e.Event.Width;
@@ -142,6 +154,25 @@ namespace Clingies.Windows
 
             // Don't swallow the event
             e.RetVal = false;
+        }
+
+        [GLib.ConnectBefore]
+        private void OnWindowKeyPress(object? sender, KeyPressEventArgs e)
+        {
+            var isCtrlV = (e.Event.State & Gdk.ModifierType.ControlMask) != 0 &&
+                          (e.Event.Key == Gdk.Key.v || e.Event.Key == Gdk.Key.V);
+
+            if (!isCtrlV)
+                return;
+
+            if (model.IsLocked)
+            {
+                e.RetVal = true;
+                return;
+            }
+
+            if (_body.TryPasteImageFromClipboard(this))
+                e.RetVal = true;
         }
 
         private void OnRightClick(object? sender, ButtonPressEventArgs e)
@@ -188,6 +219,8 @@ namespace Clingies.Windows
             _titleBar.SetLockIcon(isLocked);
             _body.ApplyLock(isLocked, this);
         }
+
+        public void BeginClose() => _isClosing = true;
 
         // public accessor for window manager (only knows isRolled)
         public void ApplyRollState(bool isRolled) =>

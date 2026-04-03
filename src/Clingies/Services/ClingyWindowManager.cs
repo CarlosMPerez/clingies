@@ -141,9 +141,11 @@ public class ClingyWindowManager(ClingyService clingyService,
     {
         try
         {
-            var window = _activeWindows.Single(x => x.ClingyId == id);
-            var clingy = _activeClingies.Single(x => x.Id == id);
+            var window = _activeWindows.FirstOrDefault(x => x.ClingyId == id);
+            var clingy = _activeClingies.FirstOrDefault(x => x.Id == id);
+            if (window is null || clingy is null) return;
             if (clingy.IsLocked) return;
+            window.BeginClose();
             _activeWindows.Remove(window);
             _activeClingies.Remove(clingy);
             window.Close();
@@ -196,7 +198,8 @@ public class ClingyWindowManager(ClingyService clingyService,
     {
         try
         {
-            var clingy = _activeClingies.Single(x => x.Id == clingyId);
+            var clingy = _activeClingies.FirstOrDefault(x => x.Id == clingyId);
+            if (clingy is null) return;
             if (clingy.IsLocked) return;
             clingy.PositionX = positionX;
             clingy.PositionY = positionY;
@@ -248,7 +251,8 @@ public class ClingyWindowManager(ClingyService clingyService,
     {
         try
         {
-            var clingy = _activeClingies.Single(x => x.Id == clingyId);
+            var clingy = _activeClingies.FirstOrDefault(x => x.Id == clingyId);
+            if (clingy is null) return;
             if (clingy.IsLocked) return;
             clingy.Width = width;
             clingy.Height = height;
