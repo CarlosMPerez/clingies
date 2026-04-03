@@ -11,6 +11,7 @@ public sealed class ClingyWindowCallbacks(int clingyId,
                             Action<int, int> sizeChanged,
                             Action<string> titleChanged,
                             Action<string> contentChanged,
+                            Action<byte[]> imageChanged,
                             Action<bool> pinChanged,
                             Action<bool> rollChanged)
 {
@@ -20,6 +21,7 @@ public sealed class ClingyWindowCallbacks(int clingyId,
     public Action<int, int> PositionChanged { get; } = positionChanged;
     public Action<int, int> SizeChanged { get; } = sizeChanged;
     public Action<string> ContentChanged { get; } = contentChanged;
+    public Action<byte[]> ImageChanged { get; } = imageChanged;
     public Action<string> TitleChanged { get; } = titleChanged;
     public Action<bool> PinChanged { get; } = pinChanged;
     public Action<bool> RollChanged { get; } = rollChanged;

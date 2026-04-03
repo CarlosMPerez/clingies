@@ -132,6 +132,7 @@ public class ClingyWindowManager(ClingyService clingyService,
         window.PinRequested += HandlePinRequested;
         window.PositionChangeRequested += HandlePositionChangeRequested;
         window.ContentChangeRequested += HandleContentChangeRequested;
+        window.ImageContentChangeRequested += HandleImageContentChangeRequested;
         window.TitleChangeRequested += HandleTitleChangeRequested;
         window.UpdateWindowSizeRequested += HandleUpdateWindowSizeRequested;
         window.RollRequested += HandleRollRequested;
@@ -141,9 +142,11 @@ public class ClingyWindowManager(ClingyService clingyService,
     {
         try
         {
-            var window = _activeWindows.Single(x => x.ClingyId == id);
-            var clingy = _activeClingies.Single(x => x.Id == id);
+            var window = _activeWindows.FirstOrDefault(x => x.ClingyId == id);
+            var clingy = _activeClingies.FirstOrDefault(x => x.Id == id);
+            if (window is null || clingy is null) return;
             if (clingy.IsLocked) return;
+            window.BeginClose();
             _activeWindows.Remove(window);
             _activeClingies.Remove(clingy);
             window.Close();
@@ -196,7 +199,8 @@ public class ClingyWindowManager(ClingyService clingyService,
     {
         try
         {
-            var clingy = _activeClingies.Single(x => x.Id == clingyId);
+            var clingy = _activeClingies.FirstOrDefault(x => x.Id == clingyId);
+            if (clingy is null) return;
             if (clingy.IsLocked) return;
             clingy.PositionX = positionX;
             clingy.PositionY = positionY;
@@ -213,15 +217,32 @@ public class ClingyWindowManager(ClingyService clingyService,
     {
         try
         {
-            // TODO - HANDLE IMGS
             var clingy = _activeClingies.Single(x => x.Id == clingyId);
             if (clingy.IsLocked) return;
             clingy.Text = string.IsNullOrEmpty(content) ? "" : content;
+            clingy.PngBytes = null;
             clingyService.Update(clingy);
         }
         catch (Exception ex)
         {
             loggerService.Error(ex, "Error at HandleContentChangeRequested");
+            throw;
+        }
+    }
+
+    private void HandleImageContentChangeRequested(int clingyId, byte[] pngBytes)
+    {
+        try
+        {
+            var clingy = _activeClingies.Single(x => x.Id == clingyId);
+            if (clingy.IsLocked) return;
+            clingy.Text = null;
+            clingy.PngBytes = pngBytes;
+            clingyService.Update(clingy);
+        }
+        catch (Exception ex)
+        {
+            loggerService.Error(ex, "Error at HandleImageContentChangeRequested");
             throw;
         }
     }
@@ -248,7 +269,8 @@ public class ClingyWindowManager(ClingyService clingyService,
     {
         try
         {
-            var clingy = _activeClingies.Single(x => x.Id == clingyId);
+            var clingy = _activeClingies.FirstOrDefault(x => x.Id == clingyId);
+            if (clingy is null) return;
             if (clingy.IsLocked) return;
             clingy.Width = width;
             clingy.Height = height;
