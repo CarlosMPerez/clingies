@@ -3,6 +3,7 @@ namespace Clingies.Infrastructure.Entities;
 
 public sealed class ClingyPropertiesEntity
 {
+    [IgnoreComparisonField]
     public int Id { get; set; }
     public double PositionX { get; set; }
     public double PositionY { get; set; }
@@ -15,5 +16,6 @@ public sealed class ClingyPropertiesEntity
 
     public int StyleId { get; set; }
 
+    [IgnoreComparisonField]
     public StyleEntity Style { get; set; } = new();
 }

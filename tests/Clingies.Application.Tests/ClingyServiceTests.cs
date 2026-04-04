@@ -66,45 +66,16 @@ public class ClingyServiceTests
     }
 
     [Fact]
-    public void SoftDelete_DelegatesToRepository()
+    public void Close_DelegatesToRepository()
     {
         var repo = new FakeClingyRepository();
         var logger = new TestLogger();
         var service = new ClingyService(repo, logger);
 
-        service.SoftDelete(3);
+        service.Close(3);
 
         Assert.Equal(3, repo.LastId);
         Assert.Empty(logger.ErrorEntries);
-    }
-
-    [Fact]
-    public void UnDelete_DelegatesToRepository_WhenNoException()
-    {
-        var repo = new FakeClingyRepository();
-        var logger = new TestLogger();
-        var service = new ClingyService(repo, logger);
-
-        service.UnDelete(9);
-
-        Assert.Equal(9, repo.LastId);
-        Assert.Empty(logger.ErrorEntries);
-    }
-
-    [Fact]
-    public void UnDelete_SwallowsExceptionAndLogsError()
-    {
-        var expected = new InvalidOperationException("boom");
-        var repo = new FakeClingyRepository { OnUnDelete = _ => throw expected };
-        var logger = new TestLogger();
-        var service = new ClingyService(repo, logger);
-
-        var exception = Record.Exception(() => service.UnDelete(9));
-
-        Assert.Null(exception);
-        var entry = Assert.Single(logger.ErrorEntries);
-        Assert.Same(expected, entry.Exception);
-        Assert.Contains("recover a deleted Clingy", entry.Message);
     }
 
     [Fact]
@@ -125,7 +96,7 @@ public class ClingyServiceTests
     [InlineData("Get")]
     [InlineData("Create")]
     [InlineData("Update")]
-    [InlineData("SoftDelete")]
+    [InlineData("Close")]
     [InlineData("HardDelete")]
     public void Methods_LogAndRethrow_OnRepositoryFailure(string methodName)
     {
@@ -136,7 +107,7 @@ public class ClingyServiceTests
             OnGet = _ => throw expected,
             OnCreate = _ => throw expected,
             OnUpdate = _ => throw expected,
-            OnSoftDelete = _ => throw expected,
+            OnClose = _ => throw expected,
             OnHardDelete = _ => throw expected
         };
         var logger = new TestLogger();
@@ -148,7 +119,7 @@ public class ClingyServiceTests
             "Get" => Assert.Throws<InvalidOperationException>(() => service.Get(1)),
             "Create" => Assert.Throws<InvalidOperationException>(() => service.Create(new ClingyModel())),
             "Update" => Assert.Throws<InvalidOperationException>(() => service.Update(new ClingyModel())),
-            "SoftDelete" => Assert.Throws<InvalidOperationException>(() => service.SoftDelete(1)),
+            "Close" => Assert.Throws<InvalidOperationException>(() => service.Close(1)),
             "HardDelete" => Assert.Throws<InvalidOperationException>(() => service.HardDelete(1)),
             _ => throw new NotSupportedException(methodName)
         };

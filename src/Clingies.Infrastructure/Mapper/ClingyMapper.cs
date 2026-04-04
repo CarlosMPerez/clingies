@@ -11,7 +11,7 @@ public static class EntitiesMapper
         Type = model.Type,
         Title = model.Title,
         CreatedAt = model.CreatedAt,
-        IsDeleted = model.IsDeleted,
+        ChangedAt = model.ChangedAt,
         Content = new ClingyContentEntity
         {
             Id = model.Id,
@@ -39,6 +39,7 @@ public static class EntitiesMapper
                 BodyFontColor = model.Style.BodyFontColor,
                 BodyFontSize = model.Style.BodyFontSize,
                 BodyFontDecorations = model.Style.BodyFontDecorations,
+                IsSystem = model.Style.IsSystem,
                 IsDefault = model.Style.IsDefault,
                 IsActive = model.Style.IsActive
             }
@@ -50,8 +51,8 @@ public static class EntitiesMapper
         Id = entity.Id,
         Type = entity.Type,
         Title = entity.Title ?? string.Empty,
-        IsDeleted = entity.IsDeleted,
         CreatedAt = entity.CreatedAt,
+        ChangedAt = entity.ChangedAt,
         Text = entity.Content.Text,
         PngBytes = entity.Content.Png,
         PositionX = entity.Properties.PositionX,
@@ -72,6 +73,7 @@ public static class EntitiesMapper
             BodyFontColor = entity.Properties.Style.BodyFontColor,
             BodyFontSize = entity.Properties.Style.BodyFontSize,
             BodyFontDecorations = entity.Properties.Style.BodyFontDecorations,
+            IsSystem = entity.Properties.Style.IsSystem,
             IsDefault = entity.Properties.Style.IsDefault,
             IsActive = entity.Properties.Style.IsActive
         }

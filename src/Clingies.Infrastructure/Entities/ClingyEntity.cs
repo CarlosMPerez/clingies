@@ -5,10 +5,11 @@ public sealed class ClingyEntity
     public int Id { get; set; }
     public Enums.ClingyType Type { get; set; }
     public string? Title { get; set; }
-    public bool IsDeleted { get; set; }
 
     [IgnoreComparisonField]
     public DateTime CreatedAt { get; set; }
+    [IgnoreComparisonField]
+    public DateTime? ChangedAt { get; set; }
     [IgnoreComparisonField]
     public ClingyPropertiesEntity Properties { get; set; } = new();
 

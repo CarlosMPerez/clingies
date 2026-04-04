@@ -6,7 +6,7 @@ public class ClingyModel
     public Enums.ClingyType Type { get; set; }
     public string Title { get; set; } = "";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public bool IsDeleted { get; set; }
+    public DateTime? ChangedAt { get; set; }
 
     // properties
     public double PositionX { get; set; }

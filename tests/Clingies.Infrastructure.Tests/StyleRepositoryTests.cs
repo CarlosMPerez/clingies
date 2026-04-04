@@ -86,6 +86,20 @@ public class StyleRepositoryTests
     }
 
     [Fact]
+    public void Delete_AllowsStyleUsedOnlyByClosedClingy()
+    {
+        using var db = new TestDatabase();
+
+        var styleId = db.CreateStyle(name: "Closed-only-style");
+        var clingyId = db.CreateClingy(styleId, "Closed clingy");
+        db.Clingies.Close(clingyId);
+
+        db.Styles.Delete(styleId);
+
+        Assert.Null(db.Styles.Get(styleId));
+    }
+
+    [Fact]
     public void Delete_RemovesUnusedDefaultStyleAndFallsBackToSystemDefault()
     {
         using var db = new TestDatabase();

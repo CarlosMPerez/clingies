@@ -186,9 +186,8 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
     }
 
     /// <summary>
-    /// Cambiamos el estilo por defecto de las notas que usen el estilo que vamos a borrar
-    /// aunque la misma nota esté soft-deleted para evitar errores de FK (o que se restaure la nota con un 
-    /// estilo que ya no existe). Cambiamos por estilo System. 
+    /// Cambiamos el estilo por System para cualquier clingy que aún use el estilo que vamos a borrar,
+    /// aunque no esté activo en escritorio, para evitar errores de FK.
     /// </summary>
     /// <param name="styleId"></param>
     /// <returns>True si con éxito</returns>
@@ -342,13 +341,17 @@ public class StyleRepository(IConnectionFactory connectionFactory, IClingiesLogg
 
     private bool CheckStyleIsInUse(int styleId)
     {
-        var parms = new Dictionary<string, object> { { "@StyleId", styleId } };
+        var parms = new Dictionary<string, object>
+        {
+            { "@StyleId", styleId },
+            { "@TypeId", (int)Clingies.Domain.Common.Enums.ClingyType.Desktop }
+        };
         var notesUsingStyles = Conn.ExecuteScalar<int>(
             """
                 SELECT COUNT(*)
                 FROM clingies AS c 
                 INNER JOIN clingy_properties AS p ON p.id = c.id
-                WHERE p.style_id = @StyleId AND c.is_deleted = 0
+                WHERE p.style_id = @StyleId AND c.type_id = @TypeId
             """, parms);
 
         return notesUsingStyles > 0;

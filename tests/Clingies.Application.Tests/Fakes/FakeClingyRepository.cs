@@ -6,8 +6,7 @@ internal sealed class FakeClingyRepository : IClingyRepository
     public Func<int, ClingyModel?>? OnGet { get; set; }
     public Func<ClingyModel, int>? OnCreate { get; set; }
     public Action<ClingyModel>? OnUpdate { get; set; }
-    public Action<int>? OnSoftDelete { get; set; }
-    public Action<int>? OnUnDelete { get; set; }
+    public Action<int>? OnClose { get; set; }
     public Action<int>? OnHardDelete { get; set; }
 
     public int? LastId { get; private set; }
@@ -34,16 +33,10 @@ internal sealed class FakeClingyRepository : IClingyRepository
         OnUpdate?.Invoke(clingy);
     }
 
-    public void SoftDelete(int id)
+    public void Close(int id)
     {
         LastId = id;
-        OnSoftDelete?.Invoke(id);
-    }
-
-    public void UnDelete(int id)
-    {
-        LastId = id;
-        OnUnDelete?.Invoke(id);
+        OnClose?.Invoke(id);
     }
 
     public void HardDelete(int id)

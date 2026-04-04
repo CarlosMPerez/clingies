@@ -147,7 +147,7 @@ public class ClingyWindowManager(ClingyService clingyService,
             _activeWindows.Remove(window);
             _activeClingies.Remove(clingy);
             window.Close();
-            clingyService.SoftDelete(id);
+            clingyService.Close(id);
         }
         catch (Exception ex)
         {

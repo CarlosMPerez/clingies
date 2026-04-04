@@ -26,25 +26,26 @@ public class ClingyRepositoryTests
         Assert.Equal(id, created!.Id);
         Assert.Null(created.Text);
         Assert.Null(created.PngBytes);
+        Assert.Null(created.ChangedAt);
         Assert.Equal(1, db.Scalar<int>("SELECT COUNT(*) FROM clingies WHERE id = @Id", new { Id = id }));
         Assert.Equal(1, db.Scalar<int>("SELECT COUNT(*) FROM clingy_properties WHERE id = @Id", new { Id = id }));
         Assert.Equal(1, db.Scalar<int>("SELECT COUNT(*) FROM clingy_content WHERE id = @Id", new { Id = id }));
     }
 
     [Fact]
-    public void GetAllActive_ExcludesSoftDeletedClingies()
+    public void GetAllActive_ExcludesClosedClingies()
     {
         using var db = new TestDatabase();
 
         var activeId = db.CreateClingy(title: "Active");
-        var deletedId = db.CreateClingy(title: "Deleted");
+        var closedId = db.CreateClingy(title: "Closed");
 
-        db.Clingies.SoftDelete(deletedId);
+        db.Clingies.Close(closedId);
 
         var active = db.Clingies.GetAllActive();
 
         Assert.Contains(active, x => x.Id == activeId);
-        Assert.DoesNotContain(active, x => x.Id == deletedId);
+        Assert.DoesNotContain(active, x => x.Id == closedId);
     }
 
     [Fact]
@@ -109,6 +110,7 @@ public class ClingyRepositoryTests
         Assert.Equal(654, updated.PositionY);
         Assert.Equal(222, updated.Width);
         Assert.Equal(111, updated.Height);
+        Assert.NotNull(updated.ChangedAt);
     }
 
     [Fact]
@@ -144,31 +146,43 @@ public class ClingyRepositoryTests
     }
 
     [Fact]
-    public void SoftDeleteAndUnDelete_ToggleFlagsAndTypes()
+    public void Close_ChangesTypeToClosed()
     {
         using var db = new TestDatabase();
 
         var clingyId = db.CreateClingy();
 
-        db.Clingies.SoftDelete(clingyId);
+        db.Clingies.Close(clingyId);
 
-        var deletedState = db.QuerySingle<ClingyState>(
-            "SELECT is_deleted AS IsDeleted, type_id AS TypeId FROM clingies WHERE id = @Id",
+        var closedState = db.QuerySingle<ClingyState>(
+            "SELECT type_id AS TypeId, changed_at AS ChangedAt FROM clingies WHERE id = @Id",
             new { Id = clingyId });
 
-        Assert.True(deletedState.IsDeleted);
-        Assert.Equal((int)Enums.ClingyType.Closed, deletedState.TypeId);
+        Assert.Equal((int)Enums.ClingyType.Closed, closedState.TypeId);
+        Assert.NotNull(closedState.ChangedAt);
         Assert.DoesNotContain(db.Clingies.GetAllActive(), x => x.Id == clingyId);
+    }
 
-        db.Clingies.UnDelete(clingyId);
+    [Fact]
+    public void Update_SetsChangedAtOnlyWhenPersistenceChanges()
+    {
+        using var db = new TestDatabase();
 
-        var restoredState = db.QuerySingle<ClingyState>(
-            "SELECT is_deleted AS IsDeleted, type_id AS TypeId FROM clingies WHERE id = @Id",
-            new { Id = clingyId });
+        var clingyId = db.CreateClingy();
+        var original = db.Clingies.Get(clingyId)!;
+        Assert.Null(original.ChangedAt);
 
-        Assert.False(restoredState.IsDeleted);
-        Assert.Equal((int)Enums.ClingyType.Desktop, restoredState.TypeId);
-        Assert.Contains(db.Clingies.GetAllActive(), x => x.Id == clingyId);
+        db.Clingies.Update(original);
+
+        var stillUnchanged = db.Clingies.Get(clingyId)!;
+        Assert.Null(stillUnchanged.ChangedAt);
+
+        stillUnchanged.Title = "Updated title";
+        db.Clingies.Update(stillUnchanged);
+
+        var updated = db.Clingies.Get(clingyId)!;
+        Assert.NotNull(updated.ChangedAt);
+        Assert.True(updated.ChangedAt >= updated.CreatedAt);
     }
 
     [Fact]
@@ -203,7 +217,7 @@ public class ClingyRepositoryTests
 
     private sealed class ClingyState
     {
-        public bool IsDeleted { get; init; }
         public int TypeId { get; init; }
+        public DateTime? ChangedAt { get; init; }
     }
 }

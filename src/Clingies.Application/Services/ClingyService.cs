@@ -59,28 +59,16 @@ public class ClingyService(IClingyRepository repo, IClingiesLogger logger)
         }
     }
 
-    public void SoftDelete(int id)
+    public void Close(int id)
     {
         try
         {
-            repo.SoftDelete(id);
+            repo.Close(id);
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "Error soft deleting a Clingy");
+            logger.Error(ex, "Error closing a Clingy");
             throw;
-        }
-    }
-
-    public void UnDelete(int id)
-    {
-        try
-        {
-            repo.UnDelete(id);
-        }
-        catch (Exception ex)
-        {
-            logger.Error(ex, "Error trying to recover a deleted Clingy");
         }
     }
 

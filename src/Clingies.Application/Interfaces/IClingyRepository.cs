@@ -8,8 +8,7 @@ public interface IClingyRepository
     ClingyModel? Get(int id);
     int Create(ClingyModel clingy);
     void Update(ClingyModel clingy);
-    void SoftDelete(int id);
-    void UnDelete(int id);
+    void Close(int id);
     void HardDelete(int id);
 
 }

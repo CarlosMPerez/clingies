@@ -10,7 +10,7 @@ Sticky‑note–style desktop app for Linux. Each note is a **Clingy**: lightwei
 
 - Create, view, and edit “clingy” notes
 - Custom title bar with pin/lock/roll controls
-- Soft delete (`is_deleted`) and hard delete (cascades to children)
+- Close clingies by changing their lifecycle type, plus hard delete (cascades to children)
 - Per‑note properties (position, size, pin/lock/roll/standing)
 - Per‑note content: **either** text **or** PNG image (XOR enforced on update)
 - SQLite persistence via **Dapper** + **FluentMigrator**

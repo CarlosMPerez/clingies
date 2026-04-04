@@ -13,7 +13,6 @@ public class ClingyModelTests
         Assert.Equal(string.Empty, model.Title);
         Assert.Equal(AppConstants.Dimensions.DefaultClingyWidth, model.Width);
         Assert.Equal(AppConstants.Dimensions.DefaultClingyHeight, model.Height);
-        Assert.False(model.IsDeleted);
         Assert.False(model.IsPinned);
         Assert.False(model.IsRolled);
         Assert.False(model.IsLocked);
@@ -23,6 +22,7 @@ public class ClingyModelTests
         Assert.Equal(0, model.StyleId);
         Assert.Null(model.Text);
         Assert.Null(model.PngBytes);
+        Assert.Null(model.ChangedAt);
         Assert.NotNull(model.Style);
         Assert.InRange(model.CreatedAt, before, after);
     }
@@ -56,6 +56,7 @@ public class ClingyModelTests
             IsLocked = true,
             IsStanding = true,
             StyleId = 7,
+            ChangedAt = new DateTime(2026, 4, 4, 10, 11, 12, DateTimeKind.Utc),
             Text = "Hello",
             PngBytes = [1, 2, 3]
         };
@@ -72,6 +73,7 @@ public class ClingyModelTests
         Assert.True(model.IsLocked);
         Assert.True(model.IsStanding);
         Assert.Equal(7, model.StyleId);
+        Assert.Equal(new DateTime(2026, 4, 4, 10, 11, 12, DateTimeKind.Utc), model.ChangedAt);
         Assert.Equal("Hello", model.Text);
         Assert.Equal([1, 2, 3], model.PngBytes);
     }

@@ -18,7 +18,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             var sql =
                 """
-                    SELECT c.id, c.title, c.type_id AS Type, c.created_at, c.is_deleted,
+                    SELECT c.id, c.title, c.type_id AS Type, c.created_at, c.changed_at,
                     p.Id as PropsId, p.position_x, p.position_y, 
                     p.width, p.height, p.is_pinned, p.is_rolled, 
                     p.is_locked, p.is_standing, p.style_id,
@@ -29,7 +29,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                     JOIN clingy_properties as p ON p.id = c.id
                     JOIN clingy_content as cc on cc.id = c.id
                     JOIN styles as s on s.id = p.style_id
-                    WHERE c.is_deleted = 0 AND c.type_id = @TypeId;
+                    WHERE c.type_id = @TypeId;
                 """;
             var data = Conn.Query<ClingyEntity, ClingyPropertiesEntity,
                                     ClingyContentEntity, StyleEntity, ClingyEntity>
@@ -61,7 +61,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         {
             var sql =
                 """
-                    SELECT c.id, c.type_id AS Type, c.title, c.created_at, c.is_deleted,
+                    SELECT c.id, c.type_id AS Type, c.title, c.created_at, c.changed_at,
                     p.Id as PropsId, p.position_x, p.position_y, p.width, 
                     p.height, p.is_pinned, p.is_rolled, 
                     p.is_locked, p.is_standing, p.style_id,
@@ -107,8 +107,8 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         try
         {
             var newId = Conn.ExecuteScalar<long>(
-                @"INSERT INTO clingies (type_id, title, created_at, is_deleted)
-                  VALUES (@TypeId, @Title, @CreatedAt, 0);
+                @"INSERT INTO clingies (type_id, title, created_at, changed_at)
+                  VALUES (@TypeId, @Title, @CreatedAt, NULL);
                   SELECT last_insert_rowid();",
                 new
                 {
@@ -181,9 +181,11 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
                 if (hasText && hasImg) // if both are true, error
                     throw new InvalidOperationException("On update, content must be either Text or Png (exclusively).");
 
+                var changedAt = DateTime.UtcNow;
                 if (mainDirty) UpdateMain(incoming, tx);
                 if (propsDirty) UpdateProps(incoming, tx);
                 if (contDirty) UpdateContent(incoming, tx);
+                Touch(incoming.Id, changedAt, tx);
             }
 
             tx.Commit();
@@ -215,44 +217,23 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
         }
     }
 
-    public void SoftDelete(int id)
+    public void Close(int id)
     {
         try
         {
             var rows = Conn.Execute(
                 """
                     UPDATE clingies SET 
-                    is_deleted = 1,
-                    type_id = @TypeId
+                    type_id = @TypeId,
+                    changed_at = @ChangedAt
                     WHERE id = @Id;
                 """,
-                new { Id = id, TypeId = ClingyType.Closed });
+                new { Id = id, TypeId = ClingyType.Closed, ChangedAt = DateTime.UtcNow });
             EnsureFound(rows, id, "clingies");
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "Error soft deleting clingy");
-            throw;
-        }
-    }
-
-    public void UnDelete(int id)
-    {
-        try
-        {
-            var rows = Conn.Execute(
-                """
-                    UPDATE clingies SET 
-                    is_deleted = 0,
-                    type_id = @TypeId
-                    WHERE id = @Id;
-                """,
-                new { Id = id, TypeId = ClingyType.Desktop });
-            EnsureFound(rows, id, "clingies");
-        }
-        catch (Exception ex)
-        {
-            logger.Error(ex, "Error soft deleting clingy");
+            logger.Error(ex, "Error closing clingy");
             throw;
         }
     }
@@ -274,6 +255,18 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
             """,
             new { main.Id, TypeId = (int)main.Type, main.Title }, tx);
         EnsureFound(rows, main.Id, "clingies");
+    }
+
+    private void Touch(int id, DateTime changedAt, IDbTransaction tx)
+    {
+        var rows = Conn.Execute(
+            """
+                UPDATE clingies
+                SET changed_at = @ChangedAt
+                WHERE id = @Id;
+            """,
+            new { Id = id, ChangedAt = changedAt }, tx);
+        EnsureFound(rows, id, "clingies");
     }
 
     private void UpdateProps(ClingyEntity main, IDbTransaction tx)
@@ -342,7 +335,7 @@ public class ClingyRepository(IConnectionFactory connectionFactory, IClingiesLog
     {
         const string sql =
             """
-                SELECT c.id, c.type_id AS Type, c.title, c.created_at, c.is_deleted,
+                SELECT c.id, c.type_id AS Type, c.title, c.created_at, c.changed_at,
                 p.Id as PropsId, p.position_x, p.position_y, p.width, 
                 p.height, p.is_pinned, p.is_rolled, 
                 p.is_locked, p.is_standing, p.style_id,

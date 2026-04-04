@@ -85,7 +85,7 @@ public class _20260318_01_RebuildSchema : Migration
                 .OnDelete(Rule.None).OnUpdate(Rule.None)
             .WithColumn("title").AsString().NotNullable()
             .WithColumn("created_at").AsDateTime().NotNullable()
-            .WithColumn("is_deleted").AsBoolean().NotNullable().WithDefaultValue(false);
+            .WithColumn("changed_at").AsDateTime().Nullable();
 
         Create.Index("ix_clingies_type_id")
             .OnTable("clingies")

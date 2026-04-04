@@ -3,6 +3,7 @@ namespace Clingies.Infrastructure.Entities;
 
 public sealed class ClingyContentEntity
 {
+    [IgnoreComparisonField]
     public int Id { get; set; }
     public string? Text { get; set; }
     public byte[]? Png { get; set; }
