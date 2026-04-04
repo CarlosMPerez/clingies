@@ -91,6 +91,33 @@ public class ClingyRepositoryTests
     }
 
     [Fact]
+    public void GetAllActive_ReturnsPersistedImageContentAndGeometry()
+    {
+        using var db = new TestDatabase();
+
+        var clingyId = db.CreateClingy(title: "Image clingy");
+        var clingy = db.Clingies.Get(clingyId)!;
+        clingy.PositionX = 321;
+        clingy.PositionY = 654;
+        clingy.Width = 222;
+        clingy.Height = 111;
+        clingy.Text = null;
+        clingy.PngBytes = [11, 22, 33, 44];
+
+        db.Clingies.Update(clingy);
+
+        var reloaded = Assert.Single(db.Clingies.GetAllActive(), x => x.Id == clingyId);
+
+        Assert.Equal("Image clingy", reloaded.Title);
+        Assert.Equal(321, reloaded.PositionX);
+        Assert.Equal(654, reloaded.PositionY);
+        Assert.Equal(222, reloaded.Width);
+        Assert.Equal(111, reloaded.Height);
+        Assert.Null(reloaded.Text);
+        Assert.Equal([11, 22, 33, 44], reloaded.PngBytes);
+    }
+
+    [Fact]
     public void Update_PersistsPositionAndSizeProperties()
     {
         using var db = new TestDatabase();
