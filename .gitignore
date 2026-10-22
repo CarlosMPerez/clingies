@@ -46,6 +46,7 @@ Generated\ Files/
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
+*.trx
 
 # NUnit
 *.VisualState.xml
@@ -492,10 +493,10 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
-#Current project ignores
-API/appsettings.json
-API/reactivities.db
-CourseAssets/
+# Project layout:
+# src/     - application projects (tracked)
+# tests/   - test projects (tracked; only their bin/obj output is ignored)
+# docs/    - local documentation (ignored, see below)
 
 # Codex local scratch
 .codex/local.md
