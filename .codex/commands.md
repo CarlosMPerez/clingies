@@ -7,10 +7,10 @@
 ## Restore and build
 - Restore solution: `dotnet restore Clingies.sln`
 - Build solution: `dotnet build Clingies.sln`
-- Build host only: `dotnet build Clingies/Clingies.csproj`
+- Build host only: `dotnet build src/Clingies.Host/Clingies.Host.csproj`
 
 ## Run
-- Run the executable host: `dotnet run --project Clingies/Clingies.csproj`
+- Run the executable host: `dotnet run --project src/Clingies.Host/Clingies.Host.csproj`
 
 Do not use `Clingies.GtkFront` as the run target. It is a library project, not the executable entry point.
 
@@ -20,7 +20,7 @@ Do not use `Clingies.GtkFront` as the run target. It is a library project, not t
 
 ## Useful file locations
 - Solution: `Clingies.sln`
-- Entry point: `Clingies/Program.cs`
+- Entry point: `src/Clingies.Host/Program.cs`
 - Migrations: `Clingies.Infrastructure/Migrations`
 - GTK assets: `Clingies.GtkFront/Assets`
 - Package versions: `Directory.Packages.props`

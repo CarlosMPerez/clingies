@@ -6,24 +6,24 @@ language = "csharp"
 framework = ".NET 9"
 platform = "linux"
 ui = "gtk3"
-description = "Linux sticky-notes desktop app. GTK UI and bootstrap live in Clingies/."
+description = "Linux sticky-notes desktop app. GTK UI and bootstrap live in src/Clingies.Host/."
 
 [structure]
 solution = "Clingies.sln"
-entry_project = "Clingies/Clingies.csproj"
-entry_file = "Clingies/Program.cs"
+entry_project = "src/Clingies.Host/Clingies.Host.csproj"
+entry_file = "src/Clingies.Host/Program.cs"
 readme = "README.md"
 docs = "docs"
 
 [projects]
-host = "Clingies"
+host = "Clingies.Host"
 application = "Clingies.Application"
 domain = "Clingies.Domain"
 infrastructure = "Clingies.Infrastructure"
-frontend = "Clingies"
+frontend = "Clingies.Host"
 
 [dependencies]
-Clingies = ["Clingies.Application", "Clingies.Infrastructure"]
+"Clingies.Host" = ["Clingies.Application", "Clingies.Infrastructure"]
 Clingies.Application = ["Clingies.Domain"]
 Clingies.Domain = []
 Clingies.Infrastructure = ["Clingies.Application", "Clingies.Domain"]
@@ -53,7 +53,7 @@ avoid_cross_layer_leaks = true
 [rules]
 notes = [
   "Keep domain models, application services, infrastructure repositories, and GTK UI concerns in their current layers.",
-  "GTK UI, assets, and bootstrap live in Clingies/Clingies.csproj.",
+  "GTK UI, assets, and bootstrap live in src/Clingies.Host/Clingies.Host.csproj.",
   "When schema changes are needed, add a new FluentMigrator migration instead of editing old applied migrations.",
   "A clingy spans clingies, clingy_properties, and clingy_content tables.",
   "Clingy content is text XOR png on update.",
@@ -63,7 +63,7 @@ notes = [
 [verification]
 restore = "dotnet restore Clingies.sln"
 build = "dotnet build Clingies.sln"
-run = "dotnet run --project Clingies/Clingies.csproj"
+run = "dotnet run --project src/Clingies.Host/Clingies.Host.csproj"
 
 [testing]
 automated_test_projects = false
@@ -71,7 +71,7 @@ manual_smoke_checks = [
   "Application starts and initializes GTK/tray integration.",
   "Migrations apply on startup against an empty database.",
   "Create, edit, pin, lock, roll, and close a clingy and verify persistence after restart.",
-  "Menu assets and tray icons still resolve from Clingies/Assets."
+  "Menu assets and tray icons still resolve from src/Clingies.Host/Assets."
 ]
 
 [environment]

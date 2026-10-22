@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <DirectoryPackagesPropsPath>$(MSBuildThisFileDirectory)solution-items/Directory.Packages.props</DirectoryPackagesPropsPath>
+  </PropertyGroup>
+</Project>

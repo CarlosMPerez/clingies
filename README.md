@@ -44,7 +44,7 @@ Sticky‑note–style desktop app for Linux. Each note is a **Clingy**: lightwei
 ```
 src/
     Clingies.sln
-    Clingies/                    # Linux GTK app (bootstrap, widgets, windows, assets)
+    Clingies.Host/               # Linux GTK app (bootstrap, widgets, windows, assets)
     Clingies.Domain/             # Business models
     Clingies.Application/        # Interfaces, services
     Clingies.Infrastructure/     # Repositories, mappers, entities, migrations, connection factory
@@ -69,7 +69,7 @@ dotnet restore
 dotnet build -c Release
 
 # run app
-dotnet run --project Clingies/Clingies.csproj
+dotnet run --project src/Clingies.Host/Clingies.Host.csproj
 ```
 
 ---

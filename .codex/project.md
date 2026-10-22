@@ -1,10 +1,10 @@
 # Clingies Project Notes
 
 ## Purpose
-Clingies is a Linux-only GTK3 desktop sticky-notes application built on .NET 9. The executable entry point is `Clingies/Program.cs`; the GTK UI code lives in `Clingies.GtkFront`.
+Clingies is a Linux-only GTK3 desktop sticky-notes application built on .NET 9. The executable entry point is `src/Clingies.Host/Program.cs`; the GTK UI code lives in `Clingies.GtkFront`.
 
 ## Solution layout
-- `Clingies/`: app bootstrap, DI registration, startup logging, migration run, single-instance lock.
+- `src/Clingies.Host/`: app bootstrap, DI registration, startup logging, migration run, single-instance lock.
 - `Clingies.Domain/`: domain models and shared domain concepts.
 - `Clingies.Application/`: interfaces, services, command providers, and application orchestration.
 - `Clingies.Infrastructure/`: SQLite access, Dapper repositories, entities, mappers, and FluentMigrator migrations.

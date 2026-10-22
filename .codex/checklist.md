@@ -12,7 +12,7 @@
 ## If changing infrastructure or persistence
 - Add a new migration for schema changes; do not rewrite old migrations.
 - Verify Dapper SQL aliases still match model/entity names.
-- Re-check startup migration flow from `Clingies/Program.cs`.
+- Re-check startup migration flow from `src/Clingies.Host/Program.cs`.
 
 ## If changing GTK/UI behavior
 - Smoke-test create, edit, pin, lock, roll, and close flows.
@@ -20,7 +20,7 @@
 - Confirm assets still copy to output.
 
 ## If changing startup or configuration
-- Verify the executable target remains `Clingies/Clingies.csproj`.
+- Verify the executable target remains `src/Clingies.Host/Clingies.Host.csproj`.
 - Verify database path, lock file path, and log path assumptions still hold.
 - Check single-instance behavior.
 

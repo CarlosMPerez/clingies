@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies", "src\Clingies\Clingies.csproj", "{30F14BCE-D172-4050-812D-96D0B9332A43}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Host", "src\Clingies.Host\Clingies.Host.csproj", "{30F14BCE-D172-4050-812D-96D0B9332A43}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Application", "src\Clingies.Application\Clingies.Application.csproj", "{DD251D64-0A6E-4375-A999-FC726D37E942}"
 EndProject
@@ -13,6 +13,17 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Application.Tests", "tests\Clingies.Application.Tests\Clingies.Application.Tests.csproj", "{F03CFDD6-0808-4035-A20D-E547CC213E81}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clingies.Domain.Tests", "tests\Clingies.Domain.Tests\Clingies.Domain.Tests.csproj", "{E7F6BF0C-F63C-424B-97A9-6B45C8A8B808}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CE5C0B93-B114-425B-BA7C-6CF91257C701}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3307DC04-53E8-4DBC-A6BA-3F989D2C759A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution-items", "solution-items", "{966344C0-0946-4F77-8A70-7DEB58EFB96D}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		solution-items\Directory.Packages.props = solution-items\Directory.Packages.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,5 +62,14 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{30F14BCE-D172-4050-812D-96D0B9332A43} = {CE5C0B93-B114-425B-BA7C-6CF91257C701}
+		{DD251D64-0A6E-4375-A999-FC726D37E942} = {CE5C0B93-B114-425B-BA7C-6CF91257C701}
+		{09D3BA25-B528-40DB-AFCF-9E22EBC37957} = {CE5C0B93-B114-425B-BA7C-6CF91257C701}
+		{7FEB9D94-37B4-4F2D-98CD-168683F06D67} = {CE5C0B93-B114-425B-BA7C-6CF91257C701}
+		{F03CFDD6-0808-4035-A20D-E547CC213E81} = {3307DC04-53E8-4DBC-A6BA-3F989D2C759A}
+		{E7F6BF0C-F63C-424B-97A9-6B45C8A8B808} = {3307DC04-53E8-4DBC-A6BA-3F989D2C759A}
+		{2ED35A48-683C-4F15-B57C-1AE06A2F2E8B} = {3307DC04-53E8-4DBC-A6BA-3F989D2C759A}
 	EndGlobalSection
 EndGlobal
