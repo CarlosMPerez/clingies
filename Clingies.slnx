@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="codex.toml" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.Targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="NuGet.config" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Clingies.Application/Clingies.Application.csproj" />
+    <Project Path="src/Clingies.Domain/Clingies.Domain.csproj" />
+    <Project Path="src/Clingies.Host/Clingies.Host.csproj" />
+    <Project Path="src/Clingies.Infrastructure/Clingies.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Clingies.Application.Tests/Clingies.Application.Tests.csproj" />
+    <Project Path="tests/Clingies.Domain.Tests/Clingies.Domain.Tests.csproj" />
+    <Project Path="tests/Clingies.Infrastructure.Tests/Clingies.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>

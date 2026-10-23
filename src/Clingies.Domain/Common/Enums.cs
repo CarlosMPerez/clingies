@@ -1,6 +1,6 @@
 namespace Clingies.Domain.Common;
 
-public class Enums
+public static class Enums
 {
     public enum AppIndicatorCategory
     {

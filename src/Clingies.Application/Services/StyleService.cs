@@ -50,7 +50,7 @@ public class StyleService(IStyleRepository repo, IClingiesLogger logger)
     {
         try
         {
-            return repo.GetDefault();
+            return repo.GetDefault() ?? throw new InvalidOperationException();
         }
         catch (Exception ex)
         {

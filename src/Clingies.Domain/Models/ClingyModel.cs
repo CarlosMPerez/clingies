@@ -2,7 +2,7 @@ namespace Clingies.Domain.Models;
 
 public class ClingyModel
 {
-    public int Id { get; set; } = 0;
+    public int Id { get; set; }
     public Enums.ClingyType Type { get; set; }
     public string Title { get; set; } = "";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -22,7 +22,9 @@ public class ClingyModel
 
     // content
     public string? Text { get; set; }
+#pragma warning disable CA1819
     public byte[]? PngBytes { get; set; }
+#pragma warning restore CA1819
 
     public StyleModel Style { get; set; } = new();
 }

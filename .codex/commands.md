@@ -1,24 +1,29 @@
 # Clingies Commands
 
 ## SDK
-- Preferred SDK: `.NET SDK 9.0.115` via `global.json`.
+
+- Preferred SDK: `.NET SDK 10.0.113` via `global.json`.
 - Check active SDK: `dotnet --version`
 
 ## Restore and build
+
 - Restore solution: `dotnet restore Clingies.sln`
 - Build solution: `dotnet build Clingies.sln`
 - Build host only: `dotnet build src/Clingies.Host/Clingies.Host.csproj`
 
 ## Run
+
 - Run the executable host: `dotnet run --project src/Clingies.Host/Clingies.Host.csproj`
 
 Do not use `Clingies.GtkFront` as the run target. It is a library project, not the executable entry point.
 
 ## Environment prerequisites
+
 - GTK packages on Debian/Ubuntu/Mint: `sudo apt install libgtk-3-0 libgtk-3-dev`
 - The app expects a Linux desktop session for GTK and tray behavior.
 
 ## Useful file locations
+
 - Solution: `Clingies.sln`
 - Entry point: `src/Clingies.Host/Program.cs`
 - Migrations: `Clingies.Infrastructure/Migrations`
@@ -26,6 +31,7 @@ Do not use `Clingies.GtkFront` as the run target. It is a library project, not t
 - Package versions: `Directory.Packages.props`
 
 ## Manual smoke test checklist
+
 1. Start the app and confirm it reaches GTK initialization.
 2. Create a clingy and confirm it appears on screen.
 3. Edit title/content and confirm updates persist after restart.

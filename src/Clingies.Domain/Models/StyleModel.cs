@@ -9,7 +9,7 @@ public class StyleModel
     public string BodyFontColor { get; set; } = AppConstants.SystemStyle.BodyFontColor;
     public int BodyFontSize { get; set; } = AppConstants.SystemStyle.BodyFontSize;
     public Enums.FontDecorations BodyFontDecorations { get; set; } = AppConstants.SystemStyle.BodyFontDecorations;
-    public bool IsSystem { get; set; } = false;
-    public bool IsDefault { get; set; } = false;
+    public bool IsSystem { get; set; }
+    public bool IsDefault { get; set; }
     public bool IsActive { get; set; } = true;
 }

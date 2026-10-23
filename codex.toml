@@ -3,7 +3,7 @@ version = "1"
 [project]
 name = "Clingies"
 language = "csharp"
-framework = ".NET 9"
+framework = ".NET 10"
 platform = "linux"
 ui = "gtk3"
 description = "Linux sticky-notes desktop app. GTK UI and bootstrap live in src/Clingies.Host/."
@@ -75,6 +75,6 @@ manual_smoke_checks = [
 ]
 
 [environment]
-sdk_pin = "global.json -> 9.0.115"
+sdk_pin = "global.json -> 10.0.113"
 gtk_runtime_required = true
 gtk_packages_hint = "libgtk-3-0 libgtk-3-dev"
