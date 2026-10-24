@@ -498,11 +498,14 @@ $RECYCLE.BIN/
 # tests/   - test projects (tracked; only their bin/obj output is ignored)
 # docs/    - local documentation (ignored, see below)
 
-# Codex local scratch
+# Codex
 .codex/local.md
 .codex/*.local.md
 .codex/tmp/
 .codex/sessions/
+.codex/
+codex.*
+
 
 # misc
 docs/
