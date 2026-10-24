@@ -30,12 +30,12 @@ Sticky‑note–style desktop app for Linux. Each note is a **Clingy**: lightwei
 
 ## Tech Stack
 
-- **Language:** C# (targeting .NET 9)
+- **Language:** C# (targeting .NET 10)
 - **UI:** GTK# (GTK3), Linux‑only
 - **Persistence:** SQLite, Dapper, FluentMigrator
 - **DI:** Microsoft.Extensions.DependencyInjection
 - **Logging:** Serilog
-- **Dev env:** VS Code on Linux Mint 22
+- **Dev env:** VS Code, JetBrains Rider on Linux Mint 22
 
 ---
 
@@ -44,20 +44,24 @@ Sticky‑note–style desktop app for Linux. Each note is a **Clingy**: lightwei
 ```
 src/
     Clingies.sln
-    Clingies.Host/               # Linux GTK app (bootstrap, widgets, windows, assets)
-    Clingies.Domain/             # Business models
-    Clingies.Application/        # Interfaces, services
-    Clingies.Infrastructure/     # Repositories, mappers, entities, migrations, connection factory
+    Clingies.Host/                   # Linux GTK app (bootstrap, widgets, windows, assets)
+    Clingies.Domain/                 # Business models
+    Clingies.Application/            # Interfaces, services
+    Clingies.Infrastructure/         # Repositories, mappers, entities, migrations, connection factory
+tests/
+    Clingies.Application.Tests/      # Unit tests
+    Clingies.Domain.Tests/           # Unit tests
+    Clingies.Infrastructure.Tests/   # Unit tests
 ```
 
 ---
 
 ## Getting Started
-Package to be done. 
+Package to be done.
 
 ### Prerequisites
 
-- .NET SDK 9.0
+- .NET SDK 10.0
 - GTK3 runtime (Debian/Ubuntu/Mint): `sudo apt install libgtk-3-0 libgtk-3-dev`
 - SQLite (native lib bundled with Microsoft.Data.Sqlite)
 
@@ -76,7 +80,7 @@ dotnet run --project src/Clingies.Host/Clingies.Host.csproj
 
 ## Logging
 
-- **Serilog** is used throughout. Configure sinks (console, file) via app settings or programmatic config.
+- **Serilog** is used throughout. Configure sinks (console, file) via app settings or programmatic config. TO-DO.
 
 ---
 
