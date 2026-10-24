@@ -16,7 +16,7 @@ Sticky‑note–style desktop app for Linux. Each note is a **Clingy**: lightwei
 - SQLite persistence via **Dapper** + **FluentMigrator**
 - DI with **Microsoft.Extensions.DependencyInjection**
 - Logging via **Serilog**
-- System tray indicator + GTK menus defined in code, with icon paths embedded as .NET resources
+- System tray indicator plus GTK menus defined in code, with icon paths embedded as .NET resources
 
 ## Planned / Roadmap
 
